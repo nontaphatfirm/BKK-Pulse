@@ -1,4 +1,25 @@
+# Raw & Cleaned Image Datasets (Large Binary Directories)
 Dataset/
-Dataset_Clean_V1/
+Dataset_Clean_V1/cctv_images/
+Dataset_Clean_V1/image_quality_manifest.csv
+
+# Model Checkpoints & Inference Outputs
 models/
 runs/
+*.pt
+*.onnx
+
+# Python Bytecode & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+
+# IDE & OS Metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp

@@ -6,7 +6,7 @@ Implements Stage 1 (Automated Image Quality Gate - 5 Gates) and Stage 4
 cleaned dataset, manifests, and audit report to Dataset_Clean_V1/.
 
 Usage:
-    python src/clean_dataset_v1.py
+    python 00_data_cleaning_and_qa/src/clean_dataset_v1.py
 """
 
 from __future__ import annotations

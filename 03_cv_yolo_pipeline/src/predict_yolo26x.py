@@ -9,11 +9,11 @@ Supported model presets (--model):
     - iisc-aim/UVH-26 (YOLOv11-X; or iisc-aim/UVH-26-s for lightweight YOLOv11-S)
 
 Usage:
-    python src/predict_yolo26x.py
-    python src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26
-    python src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --sahi
-    python src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --imgsz 1280
-    python src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --agnostic-nms
+    python 03_cv_yolo_pipeline/src/predict_yolo26x.py
+    python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26
+    python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --sahi
+    python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --imgsz 1280
+    python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --agnostic-nms
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ import torch
 import torchvision
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_IMAGE_DIR = PROJECT_ROOT / "Dataset_Clean_V1" / "cctv_images"
 MODELS_CACHE_DIR = PROJECT_ROOT / "models"
 

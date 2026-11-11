@@ -1,0 +1,234 @@
+{
+  "generated_at": "2026-11-11T10:42:13",
+  "elapsed_seconds": 129.42,
+  "total_cameras": 100,
+  "total_raw_images": 61319,
+  "total_valid_images": 60210,
+  "total_filtered_images": 1109,
+  "valid_rate_pct": 98.1914,
+  "status_counts": {
+    "valid": 60210,
+    "frozen": 553,
+    "white_error": 504,
+    "no_signal_error": 33,
+    "corrupt_color": 19
+  },
+  "error_subtype_counts": {
+    "none": 60210,
+    "frozen": 553,
+    "white_error": 504,
+    "no_signal_rainbow": 33,
+    "gray_pframe": 11,
+    "green_screen": 8
+  },
+  "quality_warning_counts_among_valid": {
+    "none": 60178,
+    "partial_gray_pframe": 24,
+    "partial_green_screen": 8
+  },
+  "daily_breakdown": [
+    {
+      "date": "2026-08-25",
+      "total": 8937,
+      "valid": 8827,
+      "white_error": 15,
+      "no_signal_error": 0,
+      "corrupt_color": 1,
+      "frozen": 94
+    },
+    {
+      "date": "2026-08-26",
+      "total": 8953,
+      "valid": 8720,
+      "white_error": 111,
+      "no_signal_error": 0,
+      "corrupt_color": 2,
+      "frozen": 120
+    },
+    {
+      "date": "2026-08-27",
+      "total": 7438,
+      "valid": 7229,
+      "white_error": 71,
+      "no_signal_error": 33,
+      "corrupt_color": 6,
+      "frozen": 99
+    },
+    {
+      "date": "2026-08-28",
+      "total": 9015,
+      "valid": 8806,
+      "white_error": 108,
+      "no_signal_error": 0,
+      "corrupt_color": 2,
+      "frozen": 99
+    },
+    {
+      "date": "2026-08-29",
+      "total": 8964,
+      "valid": 8831,
+      "white_error": 64,
+      "no_signal_error": 0,
+      "corrupt_color": 2,
+      "frozen": 67
+    },
+    {
+      "date": "2026-08-30",
+      "total": 9002,
+      "valid": 8884,
+      "white_error": 73,
+      "no_signal_error": 0,
+      "corrupt_color": 1,
+      "frozen": 44
+    },
+    {
+      "date": "2026-08-31",
+      "total": 9010,
+      "valid": 8913,
+      "white_error": 62,
+      "no_signal_error": 0,
+      "corrupt_color": 5,
+      "frozen": 30
+    }
+  ],
+  "top_10_faulty_cameras": [
+    {
+      "cam_id": 150,
+      "location_th": "สะพานลอยใกล้โรงเรียนสามเสนวิทยาลัย ถนนพระรามที่ 6",
+      "ip_subnet": "10.102.x.x",
+      "actual_raw_image_count": 631,
+      "valid_image_count": 503,
+      "error_image_count": 128,
+      "white_error_count": 4,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 124,
+      "valid_rate_pct": 79.71
+    },
+    {
+      "cam_id": 938,
+      "location_th": "แยกรามคำแหง-พระราม 9",
+      "ip_subnet": "10.156.x.x",
+      "actual_raw_image_count": 612,
+      "valid_image_count": 507,
+      "error_image_count": 105,
+      "white_error_count": 7,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 98,
+      "valid_rate_pct": 82.84
+    },
+    {
+      "cam_id": 939,
+      "location_th": "แยกมหาดไทย",
+      "ip_subnet": "10.156.x.x",
+      "actual_raw_image_count": 613,
+      "valid_image_count": 508,
+      "error_image_count": 105,
+      "white_error_count": 10,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 95,
+      "valid_rate_pct": 82.87
+    },
+    {
+      "cam_id": 206,
+      "location_th": "สะพานลอยใกล้ซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์",
+      "ip_subnet": "10.128.x.x",
+      "actual_raw_image_count": 610,
+      "valid_image_count": 507,
+      "error_image_count": 103,
+      "white_error_count": 4,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 4,
+      "frozen_image_count": 95,
+      "valid_rate_pct": 83.11
+    },
+    {
+      "cam_id": 395,
+      "location_th": "แยกเสาชิงช้า",
+      "ip_subnet": "10.101.x.x",
+      "actual_raw_image_count": 614,
+      "valid_image_count": 536,
+      "error_image_count": 78,
+      "white_error_count": 6,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 72,
+      "valid_rate_pct": 87.3
+    },
+    {
+      "cam_id": 1804,
+      "location_th": "ปากซอยอ่อนนุช 33 ถนนอ่อนนุช",
+      "ip_subnet": "10.134.x.x",
+      "actual_raw_image_count": 629,
+      "valid_image_count": 604,
+      "error_image_count": 25,
+      "white_error_count": 5,
+      "no_signal_error_count": 16,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 4,
+      "valid_rate_pct": 96.03
+    },
+    {
+      "cam_id": 432,
+      "location_th": "ทางแยกสามย่าน",
+      "ip_subnet": "10.107.x.x",
+      "actual_raw_image_count": 627,
+      "valid_image_count": 604,
+      "error_image_count": 23,
+      "white_error_count": 6,
+      "no_signal_error_count": 17,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 0,
+      "valid_rate_pct": 96.33
+    },
+    {
+      "cam_id": 500,
+      "location_th": "ทางแยกมิตรสัมพันธ์",
+      "ip_subnet": "10.137.x.x",
+      "actual_raw_image_count": 613,
+      "valid_image_count": 600,
+      "error_image_count": 13,
+      "white_error_count": 7,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 6,
+      "frozen_image_count": 0,
+      "valid_rate_pct": 97.88
+    },
+    {
+      "cam_id": 169,
+      "location_th": "สะพานลอยหน้าวัดเสาหิน ใกล้ซอยวงศ์สว่าง 3 ถนนวงศ์สว่าง",
+      "ip_subnet": "10.125.x.x",
+      "actual_raw_image_count": 609,
+      "valid_image_count": 598,
+      "error_image_count": 11,
+      "white_error_count": 4,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 7,
+      "frozen_image_count": 0,
+      "valid_rate_pct": 98.19
+    },
+    {
+      "cam_id": 595,
+      "location_th": "แยกบ้านแขก",
+      "ip_subnet": "10.118.x.x",
+      "actual_raw_image_count": 611,
+      "valid_image_count": 600,
+      "error_image_count": 11,
+      "white_error_count": 6,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 0,
+      "frozen_image_count": 5,
+      "valid_rate_pct": 98.2
+    }
+  ],
+  "rules_applied": {
+    "gate_1_white_error": "file_size < 2000 or brightness_mean == 255.0",
+    "gate_2_no_signal_error": "file_size == 8782 or (8700 <= file_size <= 8900 and 127.5 <= brightness_mean <= 128.5 and contrast_std >= 111.0)",
+    "gate_3_gray_pframe": "127.0 <= brightness_mean <= 132.0 and contrast_std < 16.0",
+    "gate_3_green_screen": "(g_mean - r_mean > 40.0) and (g_mean - b_mean > 40.0)",
+    "gate_4_frozen": "MAD == 0.0 compared against previous non-error frame of same cam_id",
+    "gate_5_timestamp": "Parsed strictly from filename _YYYYMMDD_HHMMSS.jpg (never OSD)"
+  }
+}

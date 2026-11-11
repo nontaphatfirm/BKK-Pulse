@@ -26,16 +26,7 @@ Full raw Bangkok CCTV images collected from 100 CCTV camera locations.
 - CCTV images are captured under diverse and uncontrolled conditions, including different camera angles, road layouts, traffic densities, and backgrounds.
 - Image quality also varies with time of day and lighting conditions, such as low light, glare, shadows, and reflections from wet roads.
 - **Dataset link:** <https://drive.google.com/drive/folders/1k2-KxXe4wbDmFGcGXI-pK7TdSXjBHTni?usp=sharing>
-
-![Locations of the 100 selected CCTV cameras in Bangkok](assets/page3-camera-map.jpg)
-
-CCTV images are captured under diverse and uncontrolled conditions, including different camera angles, road layouts, traffic densities, and backgrounds.
-
-![Diverse camera angles, road layouts, traffic densities, and backgrounds](assets/page4-diverse-conditions.jpg)
-
-Image quality also varies with time of day and lighting conditions, such as low light, glare, shadows, and reflections from wet roads.
-
-![Varied lighting: low light, glare, shadows, and wet-road reflections](assets/page5-lighting-conditions.jpg)
+- *(Visual examples of camera locations, diverse angles, and varied lighting conditions can be viewed on Slides 3–5 of [`2110403_2026s1_Project_CEDT.pdf`](2110403_2026s1_Project_CEDT.pdf).)*
 
 ## Project Criteria
 
@@ -105,4 +96,4 @@ The scoring criteria will be based on:
 
 ## FAQ
 
-_(No FAQ content in the source docuent.)_
+_(No FAQ content in the source document.)_
