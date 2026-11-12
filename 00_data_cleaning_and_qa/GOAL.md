@@ -59,11 +59,13 @@ To ensure 100% metadata accuracy before locking the final tables:
    - Verify `location_en` and `location_th` match the physical road/intersection.
    - Verify `district` and `corridor` assignments are geographically sound.
    - Verify `direction` (`Inbound` vs. `Outbound`) and `pair_id` groupings match the actual traffic flow direction.
-3. If any correction is needed, update `CAMERA_CURATION` in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py) and re-run:
+3. If any correction is needed, update `CAMERA_CURATION` in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py), log the change with exact Before -> After impact in [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md), and re-run:
 
    ```bash
    python 00_data_cleaning_and_qa/src/clean_dataset_v1.py --skip-copy
    ```
+
+   *(Re-running `--skip-copy` preserves [`../Dataset_Clean_V1/README.md`](../Dataset_Clean_V1/README.md) and [`CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md) unless `--overwrite-readme` is explicitly passed.)*
 
 ---
 
@@ -71,4 +73,5 @@ To ensure 100% metadata accuracy before locking the final tables:
 
 - [x] Execute 5-stage Automated Image Quality Gate across all 61,319 images (`Dataset_Clean_V1/`).
 - [x] Generate `cctv_info_cleaned.parquet` and `image_quality_manifest.parquet`.
-- [ ] All 6 team members complete their assigned 16-17 camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md).
+- [x] Document `V1.0` cleaning rules, team audit guide, and version changelog in [`Dataset_Clean_V1/README.md`](../Dataset_Clean_V1/README.md) and [`Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).
+- [ ] All 6 team members complete their assigned 16-17 camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md) and log any data fixes in [`CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).

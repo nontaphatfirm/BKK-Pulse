@@ -12,6 +12,8 @@ See full technical specification in [`../GOAL.md`](../GOAL.md).
 # Full run (image quality gate + ASCII copy + metadata cleansing)
 python 00_data_cleaning_and_qa/src/clean_dataset_v1.py
 
-# Fast metadata-only update (after editing CAMERA_CURATION during peer QA)
+# Fast metadata-only update (after editing CAMERA_CURATION during peer QA; preserves custom README.md & CLEANING_CHANGELOG.md)
 python 00_data_cleaning_and_qa/src/clean_dataset_v1.py --skip-copy
 ```
+
+> **Note:** After any update, always record what changed (and Before -> After impact) in [`../../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../../Dataset_Clean_V1/CLEANING_CHANGELOG.md) for the final report, then verify [`../../DATA_CONTRACT.md`](../../DATA_CONTRACT.md) with `python run_pipeline.py --check-contract`.
