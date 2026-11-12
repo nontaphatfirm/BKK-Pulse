@@ -1,6 +1,7 @@
 # Task 02: Interactive Web Scraping of BMA Traffy Fondue (`GOAL.md`)
 
-> **Assigned Role:** Member 2 — Interactive Web Scraping & Spatial Incident Matching  
+> **Assigned Owners:** ปลื้ม ([@siravidthongsook](https://github.com/siravidthongsook)) & กร ([@kkooAAA](https://github.com/kkooAAA)) *(Optional Flex Support: นิว [@Pranithi-New](https://github.com/Pranithi-New))*  
+> **Role:** Interactive Web Scraping & Spatial Incident Matching  
 > **Source Directory:** [`src/`](src/README.md)  
 > **Input Tables:** [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet) and `data/weather_air_poi.parquet` (from Task 01)  
 > **Primary Output Artifacts:**  
@@ -11,7 +12,7 @@
 
 ## 1. Objective & Course Rubric Alignment
 
-This module satisfies the **Interactive Web Scraping Requirement (≥ 1 Interactive Website using Playwright/Selenium)** for **2110403 DSDE** by scraping citizen-reported urban infrastructure complaints from **BMA Traffy Fondue** (specifically **flooding/drainage failures**, **traffic signal malfunctions**, and **road obstructions/accidents**) and spatially linking them to our 100 CCTV cameras.
+This module satisfies the **Interactive Web Scraping Requirement (>= 1 Interactive Website using Playwright/Selenium)** for **2110403 DSDE** by scraping citizen-reported urban infrastructure complaints from **BMA Traffy Fondue** (specifically **flooding/drainage failures**, **traffic signal malfunctions**, and **road obstructions/accidents**) and spatially linking them to our 100 CCTV cameras.
 
 ---
 
@@ -38,10 +39,10 @@ To guarantee both **full credit on the Playwright interactive scraping rubric** 
 ### 2.2 Spatial-Temporal Matching & Monsoon Hotspot Density Strategy
 1. **Haversine Spatial Matching:**
    - Compute the Haversine distance between every scraped complaint coordinate `(lat, lon)` and the 100 camera coordinates in [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet).
-   - Retain complaints falling within **≤ 500 m** (or **≤ 1,000 m** for corridor-level flooding) of each camera.
+   - Retain complaints falling within **`<= 500 m`** (or **`<= 1,000 m`** for corridor-level flooding) of each camera.
 2. **Dual Temporal Strategy (Solving 7-Day Sparsity):**
    - *Verified Sparsity Finding:* Across all of Bangkok, a single 7-day window (`2026-08-25` to `2026-08-31`) contains only ~50 flood reports city-wide, meaning naive 7-day filtering within 500m of our 100 cameras would leave >90% of cameras with `0` complaints.
-   - **Required Implementation:** Scrape a **multi-month monsoon baseline (e.g., May–October 2026 / 6-month window)** within 500m–1,000m of each camera so every camera receives a meaningful **structural vulnerability hotspot count** (`traffy_complaint_count`, `traffy_flood_count`, `traffy_traffic_count`), modulated by hourly/daily profile during `2026-08-25` – `2026-08-31` when active reports exist. This makes cross-referencing against Task 04's **Top 10 Rain-Vulnerable Intersections** statistically informative and practically useful for BMA planners.
+   - **Required Implementation:** Scrape a **multi-month monsoon baseline (e.g., May-October 2026 / 6-month window)** within 500m-1,000m of each camera so every camera receives a meaningful **structural vulnerability hotspot count** (`traffy_complaint_count`, `traffy_flood_count`, `traffy_traffic_count`), modulated by hourly/daily profile during `2026-08-25` to `2026-08-31` when active reports exist. This makes cross-referencing against Task 04's **Top 10 Rain-Vulnerable Intersections** statistically informative and practically useful for BMA planners.
 
 ---
 
@@ -62,7 +63,7 @@ To guarantee both **full credit on the Playwright interactive scraping rubric** 
 | `lon` | `float64` | Incident longitude (WGS84) |
 
 ### Deliverable 2: `data/external_weather_poi.parquet` (Merged Canonical Table 4)
-Merge hourly aggregated counts (`traffy_complaint_count`, `traffy_flood_count`, `traffy_traffic_count`) into Member 1's `data/weather_air_poi.parquet` so that all 17 columns specified in [`DATA_CONTRACT.md`](../DATA_CONTRACT.md) are present and zero-filled (`0`) where no complaints occurred.
+Merge hourly aggregated counts (`traffy_complaint_count`, `traffy_flood_count`, `traffy_traffic_count`) into Task 01's `data/weather_air_poi.parquet` (**ปลื้ม** & **กร**) so that all 17 columns specified in [`DATA_CONTRACT.md`](../DATA_CONTRACT.md) are present and zero-filled (`0`) where no complaints occurred.
 
 ---
 

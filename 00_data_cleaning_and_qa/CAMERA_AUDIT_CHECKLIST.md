@@ -1,11 +1,11 @@
 # 100-Camera Metadata Peer Audit Checklist (`CAMERA_AUDIT_CHECKLIST.md`)
 
-> **Instructions:** The 100 CCTV cameras in [`Dataset_Clean_V1/cctv_info_cleaned.csv`](../Dataset_Clean_V1/cctv_info_cleaned.csv) are partitioned into **6 corridor-aligned batches (16–17 cameras per team member)**. Camera pairs sharing a `pair_id` are grouped within the same member's batch for side-by-side verification.  
+> **Instructions:** The 100 CCTV cameras in [`Dataset_Clean_V1/cctv_info_cleaned.csv`](../Dataset_Clean_V1/cctv_info_cleaned.csv) are partitioned into **6 corridor-aligned batches (16-17 cameras per team member)**. Camera pairs sharing a `pair_id` are grouped within the same member's batch for side-by-side verification.  
 > Check off `[x]` each camera after confirming its `location_en`, `location_th`, `district`, `corridor`, `pair_id`, and `direction`.
 
 ---
 
-## Batch 1 — Member 1: Ratchadaphisek Corridor (17 Cameras)
+## Batch 1 -- ปลื้ม (@siravidthongsook): Ratchadaphisek Corridor (17 Cameras)
 *Focus: Bidirectional footbridge pairs `126/127` (Soi Ratchada 30), `224/225` (Criminal Court), and Sutthisan / Lat Phrao / Thiam Ruam Mit intersections.*
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
@@ -30,7 +30,7 @@
 
 ---
 
-## Batch 2 — Member 2: Phahon Yothin - Lat Phrao & East Bangkok Corridors (16 Cameras)
+## Batch 2 -- กร (@kkooAAA): Phahon Yothin - Lat Phrao & East Bangkok Corridors (16 Cameras)
 *Focus: Bidirectional footbridge pairs `136/137` (Big C Lat Phrao), `176/177` (Chatuchak Park), `178/179` (Phyathai 2 Hospital), and Ramkhamhaeng / On Nut cameras.*
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
@@ -54,7 +54,7 @@
 
 ---
 
-## Batch 3 — Member 3: Sathon - Naradhiwas - Rama 3 & Pathum Wan Corridors (17 Cameras)
+## Batch 3 -- เฟิร์ม (@nontaphatfirm): Sathon - Naradhiwas - Rama 3 & Pathum Wan Corridors (17 Cameras)
 *Focus: Silom / Sathon / Naradhiwas CBD cameras and Sam Yan / Henri Dunant / Lang Suan intersections.*
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
@@ -79,7 +79,7 @@
 
 ---
 
-## Batch 4 — Member 4: Phetchaburi & Thon Buri - Charoen Nakhon - Borommaratchachonnani Corridors (17 Cameras)
+## Batch 4 -- สอง (@theme222): Phetchaburi & Thon Buri - Charoen Nakhon - Borommaratchachonnani Corridors (17 Cameras)
 *Focus: Bidirectional footbridge pair `1078/1132` (Wat Suwan on Charoen Nakhon), Bukkhalo pair `26/1195`, and Phutthamonthon Sai 2 `529`.*
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
@@ -104,7 +104,7 @@
 
 ---
 
-## Batch 5 — Member 5: Dusit - Rama 5 - Samsen Corridor (17 Cameras)
+## Batch 5 -- นิว (@Pranithi-New): Dusit - Rama 5 - Samsen Corridor (17 Cameras)
 *Focus: Bank of Thailand pair `70/1361`, Chitralada Palace pair `233/1063`, Saphan Daeng `18/1028`, Thewet `370/371`, and Panichayakarn `546/1368`.*
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
@@ -129,7 +129,7 @@
 
 ---
 
-## Batch 6 — Member 6: Historic Old Town - Phra Nakhon - Pom Prap Sattru Phai Corridor (16 Cameras)
+## Batch 6 -- โม่ (@moaqilo): Historic Old Town - Phra Nakhon - Pom Prap Sattru Phai Corridor (16 Cameras)
 *Focus: Phra Athit pair `411/412`, Sao Chingcha `395` (`348x261` resolution), Bang Lamphu, Worachak, and Klang Hospital.*
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |

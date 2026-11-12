@@ -1,6 +1,6 @@
 # Task 00: Automated Image Quality Gate & Metadata Cleansing (`GOAL.md`)
 
-> **Module Owner:** All 6 Team Members (Initial Pipeline Executed; Distributed Peer QA in Progress)  
+> **Module Owner:** All 6 Team Members *(Initial Pipeline Executed; Distributed Peer QA in Progress)*  
 > **Implementation Script:** [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py)  
 > **Output Directory:** [`Dataset_Clean_V1/`](../Dataset_Clean_V1/README.md)  
 > **Audit Checklist:** [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md)
@@ -25,7 +25,7 @@ Executed via [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py) and logged in 
 | :---: | :--- | :--- | :---: |
 | **Gate 1** | `white_error` | `file_size < 2,000 bytes` OR `brightness_mean >= 254.5` (blank white HTTP placeholder images during stream timeouts) | **504** |
 | **Gate 2** | `no_signal_error` | `file_size == 8,782 bytes` OR (`8,700 <= file_size <= 8,900` with `127.5 <= brightness_mean <= 128.5` and `contrast_std >= 111.0`), capturing `gst-launch-0.10` rainbow test bars on Cameras `432` (17 frames) and `1804` (16 frames) | **33** |
-| **Gate 3** | `corrupt_color` | **Gray P-Frame:** `127.0 <= brightness_mean <= 132.0` and `contrast_std < 16.0` (11 frames)<br>**Green Screen (YUV Drop):** `g_mean - r_mean > 40.0` and `g_mean - b_mean > 40.0` (8 frames)<br>*(Note: 32 valid frames with mild bottom-strip artifacts are retained and flagged in `quality_warning`)* | **19** |
+| **Gate 3** | `corrupt_color` | **Gray P-Frame:** `127.0 <= brightness_mean <= 132.0` and `contrast_std < 16.0` (11 frames); **Green Screen (YUV Drop):** `g_mean - r_mean > 40.0` and `g_mean - b_mean > 40.0` (8 frames). *(32 valid frames with mild bottom-strip artifacts are retained and tagged in `quality_warning`)* | **19** |
 | **Gate 4** | `frozen` | Pixel-wise Mean Absolute Difference `mad_from_prev == 0.0` against the preceding valid frame of the same camera (e.g., Cam `150`: 124 frozen frames; Cam `938`: 98; Cam `939`: 95; Cam `206`: 95; Cam `395`: 72) | **553** |
 | **Gate 5** | `valid` | Strict timestamp extraction from filename (`_YYYYMMDD_HHMMSS.jpg`), bypassing on-screen display (OSD) text due to `1970-01-01` CMOS battery resets | **60,210** *(Valid)* |
 
@@ -54,12 +54,13 @@ The raw `Dataset/cctv_info.csv` contained severe row-shift errors and truncated 
 
 To ensure 100% metadata accuracy before locking the final tables:
 
-1. Open [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), where the 100 cameras are divided into **6 batches (16–17 cameras per member)**.
+1. Open [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), where the 100 cameras are divided into **6 batches (16-17 cameras per member)**: Batch 1 (**ปลื้ม**), Batch 2 (**กร**), Batch 3 (**เฟิร์ม**), Batch 4 (**สอง**), Batch 5 (**นิว**), Batch 6 (**โม่**).
 2. Cross-check your assigned cameras against sample images in `Dataset_Clean_V1/cctv_images/<cam_id>/` and Google Maps `(lat, lon)`:
    - Verify `location_en` and `location_th` match the physical road/intersection.
    - Verify `district` and `corridor` assignments are geographically sound.
    - Verify `direction` (`Inbound` vs. `Outbound`) and `pair_id` groupings match the actual traffic flow direction.
 3. If any correction is needed, update `CAMERA_CURATION` in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py) and re-run:
+
    ```bash
    python 00_data_cleaning_and_qa/src/clean_dataset_v1.py --skip-copy
    ```
@@ -70,4 +71,4 @@ To ensure 100% metadata accuracy before locking the final tables:
 
 - [x] Execute 5-stage Automated Image Quality Gate across all 61,319 images (`Dataset_Clean_V1/`).
 - [x] Generate `cctv_info_cleaned.parquet` and `image_quality_manifest.parquet`.
-- [ ] All 6 team members complete their assigned 16–17 camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md).
+- [ ] All 6 team members complete their assigned 16-17 camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md).

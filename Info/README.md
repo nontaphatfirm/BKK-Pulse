@@ -1,9 +1,9 @@
-# Data Science Project (2026/1) (15%) — Bangkok CCTV Image Analysis
+# Data Science Project (2026/1) (15%) -- Bangkok CCTV Image Analysis
 
 **Course:** 2110403 Data Science and Data Engineering (DSDE-CEDT)
 
 | Milestone | Date |
-| --- | --- |
+| :--- | :--- |
 | Release date | Tue 3 Nov 2026 |
 | Student group submission in MCV | Sun 15 Nov 2026 |
 | Package submission deadline | Sun 6 Dec 2026 |
@@ -22,11 +22,11 @@
 Full raw Bangkok CCTV images collected from 100 CCTV camera locations.
 
 - Data was collected from **100 CCTV camera locations**.
-- The number of images is highly consistent across the 100 selected cameras, with approximately **604–631 images per camera**.
+- The number of images is highly consistent across the 100 selected cameras, with approximately **604-631 images per camera**.
 - CCTV images are captured under diverse and uncontrolled conditions, including different camera angles, road layouts, traffic densities, and backgrounds.
 - Image quality also varies with time of day and lighting conditions, such as low light, glare, shadows, and reflections from wet roads.
-- **Dataset link:** <https://drive.google.com/drive/folders/1k2-KxXe4wbDmFGcGXI-pK7TdSXjBHTni?usp=sharing>
-- *(Visual examples of camera locations, diverse angles, and varied lighting conditions can be viewed on Slides 3–5 of [`2110403_2026s1_Project_CEDT.pdf`](2110403_2026s1_Project_CEDT.pdf).)*
+- **Dataset link:** [BMA CCTV Raw Dataset (Google Drive)](https://drive.google.com/drive/folders/1k2-KxXe4wbDmFGcGXI-pK7TdSXjBHTni?usp=sharing)
+- *(Visual examples of camera locations, diverse angles, and varied lighting conditions can be viewed on Slides 3-5 of [`2110403_2026s1_Project_CEDT.pdf`](2110403_2026s1_Project_CEDT.pdf).)*
 
 ## Project Criteria
 

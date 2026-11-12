@@ -6,17 +6,18 @@
 
 ## 1. Module Ownership & Workspace Isolation
 
-To prevent merge conflicts, each team member works exclusively inside their assigned module directory (`01_` through `06_`) and writes shared outputs to `data/` according to [`DATA_CONTRACT.md`](DATA_CONTRACT.md):
+To prevent merge conflicts, each team member works inside their assigned module directories (`01_` through `06_`, with **นิว (`@Pranithi-New`)** supporting across modules as needed) and writes shared outputs to `data/` according to [`DATA_CONTRACT.md`](DATA_CONTRACT.md):
 
-| Member | Module Folder | Dedicated Feature Branch | Primary Output Artifact(s) |
-| :---: | :--- | :--- | :--- |
-| **All** | `00_data_cleaning_and_qa/` | `chore/00-camera-metadata-qa` | `Dataset_Clean_V1/cctv_info_cleaned.parquet` |
-| **Member 1** | `01_scraping_apis/` | `feat/01-scraping-apis` | `data/weather_air_poi.parquet` |
-| **Member 2** | `02_scraping_traffy_playwright/` | `feat/02-scraping-playwright` | `data/external_weather_poi.parquet`, `data/traffy_complaints_near_cctv.parquet` |
-| **Member 3** | `03_cv_yolo_pipeline/` | `feat/03-cv-yolo-pipeline` | `data/vehicle_counts_sample.parquet`, `data/vehicle_counts.parquet` |
-| **Member 4** | `04_ds_traffic_analytics/` | `feat/04-ds-traffic-analytics` | `data/analytics_traffic_metrics.parquet`, `data/camera_clusters_pca.parquet` |
-| **Member 5** | `05_ds_ml_forecasting/` | `feat/05-ds-ml-forecasting` | `data/ml_forecast_predictions.parquet`, `data/ml_shap_importance.parquet`, `models/lgbm_congestion_forecaster.txt` |
-| **Member 6** | `06_bi_dashboard/` | `feat/06-bi-dashboard` | `06_bi_dashboard/src/app.py` (Streamlit 4-Tab Application) |
+| Primary Owner(s) | GitHub | Module Folder | Dedicated Feature Branch | Primary Output Artifact(s) |
+| :--- | :--- | :--- | :--- | :--- |
+| **All 6 Members** | Team-wide | `00_data_cleaning_and_qa/` | `chore/00-camera-metadata-qa` | `Dataset_Clean_V1/cctv_info_cleaned.parquet` |
+| **ปลื้ม, กร** | [@siravidthongsook](https://github.com/siravidthongsook), [@kkooAAA](https://github.com/kkooAAA) | `01_scraping_apis/` | `feat/01-scraping-apis` | `data/weather_air_poi.parquet` |
+| **ปลื้ม, กร** | [@siravidthongsook](https://github.com/siravidthongsook), [@kkooAAA](https://github.com/kkooAAA) | `02_scraping_traffy_playwright/` | `feat/02-scraping-playwright` | `data/external_weather_poi.parquet`, `data/traffy_complaints_near_cctv.parquet` |
+| **เฟิร์ม** | [@nontaphatfirm](https://github.com/nontaphatfirm) | `03_cv_yolo_pipeline/` | `feat/03-cv-yolo-pipeline` | `data/vehicle_counts_sample.parquet`, `data/vehicle_counts.parquet` |
+| **สอง** | [@theme222](https://github.com/theme222) | `04_ds_traffic_analytics/` | `feat/04-ds-traffic-analytics` | `data/analytics_traffic_metrics.parquet`, `data/camera_clusters_pca.parquet` |
+| **สอง, เฟิร์ม** | [@theme222](https://github.com/theme222), [@nontaphatfirm](https://github.com/nontaphatfirm) | `05_ds_ml_forecasting/` | `feat/05-ds-ml-forecasting` | `data/ml_forecast_predictions.parquet`, `data/ml_shap_importance.parquet`, `models/lgbm_congestion_forecaster.txt` |
+| **โม่** | [@moaqilo](https://github.com/moaqilo) | `06_bi_dashboard/` | `feat/06-bi-dashboard` | `06_bi_dashboard/src/app.py` (Streamlit 4-Tab Application) |
+| **นิว (Flex Support)** | [@Pranithi-New](https://github.com/Pranithi-New) | Any module (`01_`-`06_`) | `feat/<module>-support` | Co-develops, fills gaps, and joins priority modules |
 
 ---
 
