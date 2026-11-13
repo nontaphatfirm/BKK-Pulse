@@ -4,7 +4,7 @@
 > **Raw Coverage:** `2026-08-25 06:00:00` to `2026-08-31 21:01:19` (`100` Bangkok BMA CCTV Cameras, ~10-minute intervals)  
 > **Version History & Edit Log:** See [`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md) *(in this folder -- **every editor must log changes here for the final report**)*
 
-This folder (`Dataset_Clean_V1`) is shared via Google Drive for team-wide **Data Cleaning Peer Review & Verification**, and mirrors the canonical Phase 0 outputs tracked in GitHub (`00_data_cleaning_and_qa/`).
+This folder (`Dataset_Clean_V1`) is shared as a **READ-ONLY** mirror on Google Drive for team-wide **Data Cleaning Peer Review & Verification**. All edits and fixes must be submitted via **GitHub feature/QA branches and Pull Requests (PRs)** into `main`—never upload or overwrite files directly on Google Drive, and never push directly to `main`.
 
 ---
 
@@ -106,7 +106,7 @@ Each member verifies **16-17 cameras** inside `cctv_images/<cam_id>/` and `cctv_
 ### 2.2 Step-by-Step Verification Checklist (Per Camera)
 
 For each `cam_id` in your assigned Batch:
-1. **Open Sample Images (Day & Night):** View at least 2 daytime frames (`~10:00-15:00`) and 2 evening/night frames (`~19:00-20:30`) in `cctv_images/<cam_id>/`.
+1. **Quick Visual Sweep Across ALL Images + Day/Night Check:** Quickly scan through **all frames** inside `cctv_images/<cam_id>/` (e.g., using Google Drive thumbnail/grid view) to spot any severely broken, heavily corrupted/distorted, or unusable frames that were not filtered out automatically. Also inspect representative daytime (`~10:00-15:00`) and evening/night (`~19:00-20:30`) frames to verify location and traffic flow.
 2. **Verify Coordinate vs. Label Match:** Paste `lat, lon` from `cctv_info_cleaned.csv` into Google Maps and verify `location_th`, `location_detail_th`, `location_en`, `location_detail_en`, `district`, and `corridor`.
 3. **Verify Flow Direction & Pairs:** Watch headlight/taillight direction at night (`19:00+`) to confirm whether `direction` (`Inbound` / `Outbound` / `None`) and `pair_id` / `pair_type` reflect actual road geometry.
 4. **Inspect Missed Image Defects (Human Visual Audit):**
@@ -130,16 +130,21 @@ Every data-cleaning edit after `V1.0` **must be documented** so teammates know w
 ### 3.2 Mandatory Rules for Anyone Cleaning or Modifying Data
 
 1. **Never modify `Dataset/` raw files:** Always preserve original raw images and `Dataset/cctv_info.csv`.
-2. **Never edit `.parquet` / `.csv` files manually without updating reproducible code:**
-   - Metadata fixes go into `CAMERA_CURATION` inside [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py), then re-run:
-     ```bash
-     python 00_data_cleaning_and_qa/src/clean_dataset_v1.py --skip-copy
-     ```
-   - Image filter changes go into Gate thresholds / exclusion lists in the cleaning script (or save explicit exclusion lists) before re-generating manifests, and always validate afterward with `python run_pipeline.py --check-contract`.
-3. **Every Change Must Be Recorded in [`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md):**
-   - If you edited via Google Drive review (no Git setup yet), write your findings & requested fixes directly into [`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md) (or add rows to the Change Ledger table) with **Who, Date, Version, `cam_id` / filenames, Issue Found, Action Taken, Before -> After Count/Value**.
-   - If you run `clean_dataset_v1.py`, this `README.md` and `CLEANING_CHANGELOG.md` remain preserved unless `--overwrite-readme` is explicitly specified.
-4. **Update Verification Checkboxes in GitHub:** Once you finish checking your batch, mark `[x]` in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
+2. **Google Drive is READ-ONLY (Do NOT edit, delete, or re-upload on Drive):** Use Google Drive solely to inspect `cctv_images/<cam_id>/` and read `cctv_info_cleaned.csv`. Do not delete images or upload replacement tables to Drive individually.
+3. **GitHub Branch & Pull Request Only (Never Edit `main` Directly):**
+   - Always create your own branch from `main` (e.g., `git checkout -b chore/00-qa-<your-name>`) and open a **Pull Request (PR)** into `main` so the 6 team members do not conflict with each other.
+4. **Never edit `.parquet` / `.csv` files manually — update GitHub code & logs instead:**
+   - Metadata fixes go into `CAMERA_CURATION` inside [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py).
+   - Bad/broken image exclusions go into Gate thresholds or an explicit exclusion list inside [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py).
+5. **Every Change Must Be Recorded in [`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md):**
+   - Add a row in the Modification Ledger (and/or Detailed Version Log) with **Who, Date, Version, `cam_id` / filenames, Issue Found, Action Taken, Before -> After Count/Value**.
+6. **Update Verification Checkboxes in GitHub:** Once you finish checking all images and metadata in your batch, mark `[x]` in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md), commit to your branch, and open a PR into `main`.
+7. **Final Build & Drive Sync (Maintainer Only):** Once all 6 PRs are merged into `main`, the maintainer runs the script once, validates `DATA_CONTRACT.md`, and uploads the locked `V2.0` output to Google Drive:
+   ```bash
+   python 00_data_cleaning_and_qa/src/clean_dataset_v1.py          # full rebuild (use --skip-copy if metadata-only)
+   python run_pipeline.py --check-contract
+   ```
+   *(Running `clean_dataset_v1.py` preserves this `README.md` and `CLEANING_CHANGELOG.md` unless `--overwrite-readme` is explicitly specified.)*
 
 ### 3.3 Quick Version Summary
 
