@@ -23,3 +23,7 @@ env/
 .DS_Store
 Thumbs.db
 *.swp
+
+# Heavy regenerable raw data (archived separately)
+data/raw_traffy_cache/
+data/traffy_complaints_near_cctv.parquet

@@ -1,0 +1,24 @@
+{
+  "started_at": "2026-11-12T07:34:00.384938+00:00",
+  "target_url": "https://bangkok.traffy.in.th/",
+  "steps": [
+    {
+      "step": "goto",
+      "at": "2026-11-12T07:34:02.073686+00:00",
+      "url": "https://bangkok.traffy.in.th/"
+    },
+    {
+      "step": "networkidle",
+      "at": "2026-11-12T07:34:05.230697+00:00"
+    },
+    {
+      "step": "click สถิติ",
+      "at": "2026-11-12T07:34:13.654137+00:00"
+    }
+  ],
+  "title": "Traffy x Bangkok สถิติ",
+  "final_url": "https://bangkok.traffy.in.th/top",
+  "finished_at": "2026-11-12T07:34:19.993489+00:00",
+  "network_requests": 12,
+  "interacted": true
+}

@@ -1,0 +1,86 @@
+[
+  {
+    "url": "https://api.traffy.in.th/greeting-api/status",
+    "status": 200,
+    "content_type": "application/json",
+    "bytes": 117,
+    "json_preview": "{\"id\":1,\"type\":\"online\",\"title\":\"\",\"message\":\"\",\"normal_message\":\"\",\"highlight_message\":\"\",\"url\":\"\",\"created_at\":\"\"}\n"
+  },
+  {
+    "url": "https://api.traffy.in.th/greeting-api/status",
+    "status": 200,
+    "content_type": "application/json",
+    "bytes": 117,
+    "json_preview": "{\"id\":1,\"type\":\"online\",\"title\":\"\",\"message\":\"\",\"normal_message\":\"\",\"highlight_message\":\"\",\"url\":\"\",\"created_at\":\"\"}\n"
+  },
+  {
+    "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_comment_stats",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 1345,
+    "json_preview": "{\"count\": 1, \"source\": \"database\", \"status\": \"success\", \"message\": \"\", \"results\": [{\"data_bkk\": {\"yyyy_mm\": \"2026-11\", \"avg_star\": 4.47, \"fonduegroup_id\": 7315, \"post_count_all\": 16477, \"post_count_star\": 2140, \"fonduegroup_name\": \"กรุงเทพมหานคร\", \"post_count_finish\": 5775, \"data_stat_all_time\": [{\"avg_star\": 3.96, \"fonduegroup_id\": 7315, \"post_count_all\": 1490298, \"fonduegroup_name\": \"กรุงเทพมหานคร\", \"post_count_star_all\": 610691}], \"post_finish_percentage\": 35.05, \"data_comparison_monthly\": [{\"period\": \"current month\", \"yyyy_mm\": \"2026-11\", \"avg_star\": 4.47, \"fonduegroup_id\": 7315, \"post_count_all\": 16477, \"post_count_star\": 2140, \"star_percentage\": 85.56, \"fonduegroup_name\": \"กรุงเทพมหานคร\", \"post_count_finish\": 5775, \"post_finish_percentage\": 35.05, \"duration_minutes_finished\": 2415, \"duration_minutes_inprogress\": 629}, {\"period\": \"1 month ago\", \"yyyy_mm\": \"2026-10\", \"avg_star\": 4.33, \"fonduegroup_id\": 7315, \"post_count_all\": 50057, \"post_count_star\": 10123, \"star_percentage\": 82.25, \"fonduegroup_name\": \"กรุงเทพมหานคร\", \"post_count_finish\": 29936, \"post_finish_percentage\": 59.8, \"duration_minutes_finished\": 5908, \"duration_minutes_inprogress\": 656}]}}], \"exec_time\": \"0.001s\", \"updated_at\": \"2026-11-12T04:01:25+07:00\"}"
+  },
+  {
+    "url": "https://api.traffy.in.th/teamchadchart-stat/api/v1/reporter-comment?limit=50",
+    "status": 200,
+    "content_type": "application/json; charset=UTF-8",
+    "bytes": 137389,
+    "json_preview": "{\"status\":\"success\",\"message\":\"\",\"exec_time\":\"0s\",\"source\":\"db\",\"count\":50,\"results\":[{\"msg_id\":2325915,\"district\":\"ดุสิต\",\"star\":5,\"timestamp\":\"2026-11-12 02:00:11.799774+00\",\"comment_reporter\":\"ขอบคุณที่ปฏิบัติหน้าที่ได้อย่างดีเยี่ยม และทำงานอย่างรวดเร็วค่ะ อยากให้ลงตรวจสอบพื้นที่อย่างสม่ำเสมอและต่อเนื่อง เพื่อป้องกันเหตุดังกล่าวค่ะ ขอบคุณอีกครั้งค่ะ\",\"total_point\":0,\"like\":0,\"dislike\":0,\"gemini_comment_summary\":\"\\u0e41\\u0e1c\\u0e07\\u0e1c\\u0e31\\u0e01\\u0e01\\u0e35\\u0e14\\u0e02\\u0e27\\u0e32\\u0e07\",\"latlon\":\"13.77027,100.50417\",\"ticket_id\":\"2026-B84PAV\",\"address\":\"แขวงวชิรพยาบาล เขตดุสิต กรุงเทพมหานคร\",\"comment\":\"คนขายของวางแผงผักบนทางเท้าทั้งสองฝั่งกีดขวางทางเดิน ทำให้ทางเดินแคบ\\nซึ่งแผงดังกล่าวตั้งอยู่ใกล้กลับป้ายรถเมล์ฝั่งตรงข้ามสถาบันเทคโนโลยีราชมงคลวิทยาเขตเทเวศร์ และเป็นจุดที่คนจำนวนมากยืนรอรถรถเมล์ ซึ่งบางครั้งฝนตกทำให้บริเวณที่รอรถเมล์คับแคบ ต้องมายืนเบียดกันตรงกลาง \\nเนื่องจากทางเท้าบริเวณดังกล่าวแม่ค้าพ่อค้าตั้งแผงวางของทั้งสองข้างทาง �"
+  },
+  {
+    "url": "https://api.traffy.in.th/postgrest/rpc/get_clickable_url?p_org_id=7315",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 86,
+    "json_preview": "{\"keywords\": [\".go.th\", \".or.th\", \"traffy.in.th\", \"youtu.be\", \"youtube.com\", \"yt.be\"]}"
+  },
+  {
+    "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed?p_limit=100",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 319955,
+    "json_preview": "{\"type\": \"FeatureCollection\", \"count\": 100, \"total\": 1490584, \"source\": \"postgrest\", \"status\": \"success\", \"message\": \"\", \"features\": [{\"type\": \"Feature\", \"geometry\": {\"type\": \"Point\", \"coordinates\": [100.55523, 13.78902]}, \"properties\": {\"ai\": {\"summary\": \"ฝาท่อเสียงดัง\", \"categories\": [{\"category\": \"ท่อระบายน้ำ\", \"confidence\": 95}, {\"category\": \"ถนน\", \"confidence\": 90}, {\"category\": \"เหตุเดือดร้อนรำคาญ\", \"confidence\": 85}], \"sentimental_reason\": \"ผู้แจ้งระบุปัญหาได้ชัดเจน ให้ข้อมูลสาเหตุที่เคยแก้ไขมาแล้วอย่างละเอียด แม้จะมีความรู้สึกเดือดร้อนแต่ยังคงใช้ถ้อยคำสุภาพ ไม่มีการใช้คำหยาบคาย\", \"sentimental_percent\": 90}, \"org\": [\"ร้องทุกข์ กทม. 1555\", \"กรุงเทพมหานคร\", \"ศูนย์ควบคุมระบบป้องกันน้ำท่วม กทม.\", \"เขตพญาไท\"], \"like\": 0, \"note\": null, \"star\": null, \"type\": \"ถนน\", \"state\": \"รอรับเรื่อง\", \"address\": \"แขวงสามเสนใน เขตพญาไท กรุงเทพมหานคร\", \"dislike\": 0, \"district\": \"พญาไท\", \"province\": \"กรุงเทพมหานคร\", \"see_info\": true, \"photo_url\": \"https://storage.googleapis.com/traffy_public_bucket/attachment/2022-12/da2125e781282589d482070c3dba1726aa16a4a7.jpg\", \"ticket_id\": \"2026-KCJYRC\", \"timestamp\": \"2026-11-12 14:11:29\", \"message_id\": 2326518, \"org_action\": [\"เขตพญาไท\", \"กรุงเทพมหานคร\", \"ศูนย์ควบคุมระบบป้องกันน้ำท่วม กทม.\", \"ร้องทุกข์ กท�"
+  },
+  {
+    "url": "https://api.traffy.in.th/postgrest/district_org_bkk",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 4847,
+    "json_preview": "[{\"org_id\":\"18055\",\"name\":\"เขตคลองเตย\"}, \n {\"org_id\":\"18056\",\"name\":\"เขตคลองสาน\"}, \n {\"org_id\":\"18057\",\"name\":\"เขตคลองสามวา\"}, \n {\"org_id\":\"18058\",\"name\":\"เขตคันนายาว\"}, \n {\"org_id\":\"18059\",\"name\":\"เขตจตุจักร\"}, \n {\"org_id\":\"18013\",\"name\":\"เขตจอมทอง\"}, \n {\"org_id\":\"18014\",\"name\":\"เขตดอนเมือง\"}, \n {\"org_id\":\"18015\",\"name\":\"เขตดินแดง\"}, \n {\"org_id\":\"17370\",\"name\":\"เขตดุสิต\"}, \n {\"org_id\":\"18016\",\"name\":\"เขตตลิ่งชัน\"}, \n {\"org_id\":\"18017\",\"name\":\"เขตทวีวัฒนา\"}, \n {\"org_id\":\"18018\",\"name\":\"เขตทุ่งครุ\"}, \n {\"org_id\":\"18019\",\"name\":\"เขตธนบุรี\"}, \n {\"org_id\":\"18021\",\"name\":\"เขตบางกอกน้อย\"}, \n {\"org_id\":\"18022\",\"name\":\"เขตบางกอกใหญ่\"}, \n {\"org_id\":\"18020\",\"name\":\"เขตบางกะปิ\"}, \n {\"org_id\":\"18023\",\"name\":\"เขตบางขุนเทียน\"}, \n {\"org_id\":\"18024\",\"name\":\"เขตบางเขน\"}, \n {\"org_id\":\"18025\",\"name\":\"เขตบางคอแหลม\"}, \n {\"org_id\":\"18026\",\"name\":\"เขตบางแค\"}, \n {\"org_id\":\"8371\",\"name\":\"เขตบางซื่อ\"}, \n {\"org_id\":\"18027\",\"name\":\"เขตบางนา\"}, \n {\"org_id\":\"18028\",\"name\":\"เขตบางบอน\"}, \n {\"org_id\":\"18029\",\"name\":\"เขตบางพลัด\"}, \n {\"org_id\":\"18030\",\"name\":\"เขตบางรัก\"}, \n {\"org_id\":\"18031\",\"name\":\"เขตบึงกุ่ม\"}, \n {\"org_id\":\"18032\",\"name\":\"เขตปทุมวัน\"}, \n {\"org_id\":\"18033\",\"name\":\"เขตประเวศ\"}, \n {\"org_id\":\"18034\",\"name\":\"เขตป้อมปราบศัตรูพ่าย\"}, \n {\"org_id\":\"18035\",\"name\":\"เขตพญาไท\"}, \n {\"org_id\":\"18037\",\"name\":\"เขตพระโขนง\"}, \n {\"org_id\":\"18036\",\"name\":\"เขตพ�"
+  },
+  {
+    "url": "https://api.traffy.in.th/teamchadchart-stat/api/v1/category",
+    "status": 200,
+    "content_type": "application/json; charset=UTF-8",
+    "bytes": 8972,
+    "json_preview": "{\"status\":\"success\",\"message\":\"\",\"count\":85,\"results\":[{\"category\":\"อื่นๆ\",\"sum\":\"330156\"},{\"category\":\"ผิดกฎจราจร\",\"sum\":\"219673\"},{\"category\":\"ทางเท้า\",\"sum\":\"188273\"},{\"category\":\"ถนน\",\"sum\":\"166078\"},{\"category\":\"ไฟฟ้า\",\"sum\":\"145335\"},{\"category\":\"ความสะอาด\",\"sum\":\"122698\"},{\"category\":\"ความปลอดภัย\",\"sum\":\"86810\"},{\"category\":\"น้ำท่วม\",\"sum\":\"70580\"},{\"category\":\"ต้นไม้\",\"sum\":\"68047\"},{\"category\":\"จุดเสี่ยง\",\"sum\":\"66636\"},{\"category\":\"เสียง\",\"sum\":\"66021\"},{\"category\":\"ฝุ่นควัน&กลิ่น&PM2.5\",\"sum\":\"55524\"},{\"category\":\"อุปกรณ์ชำรุด\",\"sum\":\"51722\"},{\"category\":\"อาคารสถานที่ชำรุด\",\"sum\":\"48642\"},{\"category\":\"หาบเร่แผงลอย\",\"sum\":\"32368\"},{\"category\":\"สัตว์\",\"sum\":\"28029\"},{\"category\":\"ป้าย\",\"sum\":\"23824\"},{\"category\":\"ขยะ\",\"sum\":\"23183\"},{\"category\":\"สายสื่อสาร\",\"sum\":\"20286\"},{\"category\":\"เสนอแนะ\",\"sum\":\"18637\"},{\"category\":\"คนเร่ร่อน\",\"sum\":\"16661\"},{\"category\":\"ทุจริต\",\"sum\":\"10080\"},{\"category\":\"กรุงเทพโปร่งใส\",\"sum\":\"9921\"},{\"category\":\"ประปา\",\"sum\":\"9628\"},{\"category\":\"ขอความช่วยเหลือ\",\"sum\":\"8301\"},{\"category\":\"แท็กซี่/รถเมล์\",\"sum\":\"6664\"},{\"category\":\"เผาในที่โล่ง\",\"sum\":\"4781\"},{\"category\":\"ขอใช้บริการ\",\"sum\":\"3795\"},{\"category\":\"อุบัติเหตุ\",\"sum\":\"3131\"},{\"category\":\"ควันดำ\",\"sum\":\"3073\"},{\"category\":\"คุ้มครองผู้บริโภค\",\"sum\":\"2570\"},{\"category\":\"สถานบันเทิง\",\"sum\":\"2303\"},{\"category\":\"บริจาค/ช่วยเหลือ\",\"sum\":\"2066\"},{\"category\":\"โรงเรียน\","
+  },
+  {
+    "url": "https://api.traffy.in.th/greeting-api/status",
+    "status": 200,
+    "content_type": "application/json",
+    "bytes": 117,
+    "json_preview": "{\"id\":1,\"type\":\"online\",\"title\":\"\",\"message\":\"\",\"normal_message\":\"\",\"highlight_message\":\"\",\"url\":\"\",\"created_at\":\"\"}\n"
+  },
+  {
+    "url": "https://api.traffy.in.th/postgrest/district_org_bkk",
+    "status": 200,
+    "content_type": "application/json; charset=utf-8",
+    "bytes": 4847,
+    "json_preview": "[{\"org_id\":\"18055\",\"name\":\"เขตคลองเตย\"}, \n {\"org_id\":\"18056\",\"name\":\"เขตคลองสาน\"}, \n {\"org_id\":\"18057\",\"name\":\"เขตคลองสามวา\"}, \n {\"org_id\":\"18058\",\"name\":\"เขตคันนายาว\"}, \n {\"org_id\":\"18059\",\"name\":\"เขตจตุจักร\"}, \n {\"org_id\":\"18013\",\"name\":\"เขตจอมทอง\"}, \n {\"org_id\":\"18014\",\"name\":\"เขตดอนเมือง\"}, \n {\"org_id\":\"18015\",\"name\":\"เขตดินแดง\"}, \n {\"org_id\":\"17370\",\"name\":\"เขตดุสิต\"}, \n {\"org_id\":\"18016\",\"name\":\"เขตตลิ่งชัน\"}, \n {\"org_id\":\"18017\",\"name\":\"เขตทวีวัฒนา\"}, \n {\"org_id\":\"18018\",\"name\":\"เขตทุ่งครุ\"}, \n {\"org_id\":\"18019\",\"name\":\"เขตธนบุรี\"}, \n {\"org_id\":\"18021\",\"name\":\"เขตบางกอกน้อย\"}, \n {\"org_id\":\"18022\",\"name\":\"เขตบางกอกใหญ่\"}, \n {\"org_id\":\"18020\",\"name\":\"เขตบางกะปิ\"}, \n {\"org_id\":\"18023\",\"name\":\"เขตบางขุนเทียน\"}, \n {\"org_id\":\"18024\",\"name\":\"เขตบางเขน\"}, \n {\"org_id\":\"18025\",\"name\":\"เขตบางคอแหลม\"}, \n {\"org_id\":\"18026\",\"name\":\"เขตบางแค\"}, \n {\"org_id\":\"8371\",\"name\":\"เขตบางซื่อ\"}, \n {\"org_id\":\"18027\",\"name\":\"เขตบางนา\"}, \n {\"org_id\":\"18028\",\"name\":\"เขตบางบอน\"}, \n {\"org_id\":\"18029\",\"name\":\"เขตบางพลัด\"}, \n {\"org_id\":\"18030\",\"name\":\"เขตบางรัก\"}, \n {\"org_id\":\"18031\",\"name\":\"เขตบึงกุ่ม\"}, \n {\"org_id\":\"18032\",\"name\":\"เขตปทุมวัน\"}, \n {\"org_id\":\"18033\",\"name\":\"เขตประเวศ\"}, \n {\"org_id\":\"18034\",\"name\":\"เขตป้อมปราบศัตรูพ่าย\"}, \n {\"org_id\":\"18035\",\"name\":\"เขตพญาไท\"}, \n {\"org_id\":\"18037\",\"name\":\"เขตพระโขนง\"}, \n {\"org_id\":\"18036\",\"name\":\"เขตพ�"
+  },
+  {
+    "url": "https://api.traffy.in.th/teamchadchart-stat/api/v1/dashboard-rank?metric=avg_star&scope=district&start=2026-11-01&end=2026-11-30&limit=100&offset=0",
+    "status": 200,
+    "content_type": "application/json; charset=UTF-8",
+    "bytes": 24314,
+    "json_preview": "{\"status\":\"success\",\"message\":\"\",\"exec_time\":\"0.316s\",\"source\":\"db : 2026-11-01\",\"count\":50,\"results\":[{\"rank\":1,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18013,\"fonduegroup_name\":\"เขตจอมทอง\",\"value\":\"5.00\",\"post_count_star\":10,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":0,\"star_3\":0,\"star_4\":0,\"star_5\":10},\"avg_star\":\"5.00\",\"post_count_all\":187,\"post_count_finish\":40,\"post_finish_percentage\":\"21.39\",\"avg_duration_minutes_inprogress\":\"2812\",\"avg_duration_minutes_finished\":\"4557\",\"duration_minutes_inprogress\":1306,\"duration_minutes_finished\":3333},{\"rank\":2,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18018,\"fonduegroup_name\":\"เขตทุ่งครุ\",\"value\":\"4.96\",\"post_count_star\":23,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":0,\"star_3\":0,\"star_4\":1,\"star_5\":22},\"avg_star\":\"4.96\",\"post_count_all\":92,\"post_count_finish\":51,\"post_finish_percentage\":\"55.43\",\"avg_duration_minutes_inprogress\":\"346\",\"avg_duration_minutes_finished\":\"2305\",\"duration_minutes_inprogress\":127,\"duration_minutes_finished\":1401},{\"rank\":3,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18031,\"fonduegroup_name\":\"เขตบึงกุ่ม\",\"value\":\"4.89\",\"post_count_star\":207,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":2,\"star_3\":5,\"star_4\":7,\"star_5\":193},\"avg_star\":\"4.89\",\"post_count_all\":879,\"post_count_finish\":457,\"post_finish_percentage\":\"51.99\",\"avg_duration_minutes_inprogress\":\"213\",\"avg_duration_minutes_finished\":\"5181\",\"duration_minutes_inprogress\":45,\"duration_minutes_finished\":5360},{\"rank\":4,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18049,\"fonduegroup_name\":\"เขตสัมพันธวงศ์\",\"value\":\"4.88\",\"post_count_star\":16,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":0,\"star_3\":1,\"star_4\":0,\"star_5\":15},\"avg_star\":\"4.88\",\"post_count_all\":86,\"post_count_finish\":30,\"post_finish_percentage\":\"34.88\",\"avg_duration_minutes_inprogress\":\"904\",\"avg_duration_minutes_finished\":\"2749\",\"duration_minutes_inprogress\":"
+  },
+  {
+    "url": "https://api.traffy.in.th/teamchadchart-stat/api/v1/dashboard-rank?metric=avg_star&scope=district&start=2026-11-01&end=2026-11-30&limit=100&offset=0",
+    "status": 200,
+    "content_type": "application/json; charset=UTF-8",
+    "bytes": 24310,
+    "json_preview": "{\"status\":\"success\",\"message\":\"\",\"exec_time\":\"0s\",\"source\":\"db : 2026-11-01\",\"count\":50,\"results\":[{\"rank\":1,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18013,\"fonduegroup_name\":\"เขตจอมทอง\",\"value\":\"5.00\",\"post_count_star\":10,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":0,\"star_3\":0,\"star_4\":0,\"star_5\":10},\"avg_star\":\"5.00\",\"post_count_all\":187,\"post_count_finish\":40,\"post_finish_percentage\":\"21.39\",\"avg_duration_minutes_inprogress\":\"2812\",\"avg_duration_minutes_finished\":\"4557\",\"duration_minutes_inprogress\":1306,\"duration_minutes_finished\":3333},{\"rank\":2,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18018,\"fonduegroup_name\":\"เขตทุ่งครุ\",\"value\":\"4.96\",\"post_count_star\":23,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":0,\"star_3\":0,\"star_4\":1,\"star_5\":22},\"avg_star\":\"4.96\",\"post_count_all\":92,\"post_count_finish\":51,\"post_finish_percentage\":\"55.43\",\"avg_duration_minutes_inprogress\":\"346\",\"avg_duration_minutes_finished\":\"2305\",\"duration_minutes_inprogress\":127,\"duration_minutes_finished\":1401},{\"rank\":3,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18031,\"fonduegroup_name\":\"เขตบึงกุ่ม\",\"value\":\"4.89\",\"post_count_star\":207,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":2,\"star_3\":5,\"star_4\":7,\"star_5\":193},\"avg_star\":\"4.89\",\"post_count_all\":879,\"post_count_finish\":457,\"post_finish_percentage\":\"51.99\",\"avg_duration_minutes_inprogress\":\"213\",\"avg_duration_minutes_finished\":\"5181\",\"duration_minutes_inprogress\":45,\"duration_minutes_finished\":5360},{\"rank\":4,\"timestamp\":\"2026-11-01 00:00:00+00\",\"fonduegroup_id\":18049,\"fonduegroup_name\":\"เขตสัมพันธวงศ์\",\"value\":\"4.88\",\"post_count_star\":16,\"post_count_star_stat\":{\"star_1\":0,\"star_2\":0,\"star_3\":1,\"star_4\":0,\"star_5\":15},\"avg_star\":\"4.88\",\"post_count_all\":86,\"post_count_finish\":30,\"post_finish_percentage\":\"34.88\",\"avg_duration_minutes_inprogress\":\"904\",\"avg_duration_minutes_finished\":\"2749\",\"duration_minutes_inprogress\":658,"
+  }
+]

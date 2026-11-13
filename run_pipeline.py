@@ -205,6 +205,7 @@ PIPELINE_STAGES: tuple[PipelineStage, ...] = (
         candidate_scripts=(
             "02_scraping_traffy_playwright/src/scrape_traffy_playwright.py",
             "02_scraping_traffy_playwright/src/fetch_traffy_geojson.py",
+            "02_scraping_traffy_playwright/src/merge_external_dataset.py",
         ),
     ),
     PipelineStage(

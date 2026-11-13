@@ -1,0 +1,11 @@
+{
+  "output": "data/external_weather_poi.parquet",
+  "rows": 16800,
+  "columns": 17,
+  "cameras": 100,
+  "timestamps": 168,
+  "nulls": 0,
+  "traffy_cameras_with_reports": 100,
+  "max_complaints_per_camera": 3086,
+  "max_flood_per_camera": 401
+}

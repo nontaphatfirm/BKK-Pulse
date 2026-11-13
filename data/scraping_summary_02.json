@@ -1,0 +1,22 @@
+{
+  "window_start": "2026-05-01",
+  "window_end": "2026-10-31",
+  "actual_first_timestamp": "2026-05-01 00:00:16",
+  "actual_last_timestamp": "2026-10-31 23:56:30",
+  "complaints_fetched": 355387,
+  "complaints_within_1000m": 70881,
+  "category_counts_all": {
+    "other": 258810,
+    "traffic": 68174,
+    "flood": 28403
+  },
+  "category_counts_matched": {
+    "other": 49319,
+    "traffic": 19269,
+    "flood": 2293
+  },
+  "cameras_with_any_complaint": 100,
+  "cameras_with_flood_complaint": 94,
+  "week_complaints_within_1000m": 2528,
+  "match_radius_m": 1000.0
+}
