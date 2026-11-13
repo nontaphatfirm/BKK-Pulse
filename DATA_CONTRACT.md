@@ -81,7 +81,7 @@
 | `clean_filename` | `string` | Standardized ASCII filename (`""` if rejected) | `"150_20260826_193316.jpg"` |
 | `clean_rel_path` | `string` | Relative path inside `Dataset_Clean_V1/` (`""` if rejected) | `"cctv_images/150/150_20260826_193316.jpg"` |
 | `file_size` | `int64` | File size in bytes | `24510` |
-| `status` | `string` | Quality gate label: `"valid"`, `"white_error"`, `"no_signal_error"`, `"corrupt_color"`, `"frozen"` | `"valid"` |
+| `status` | `string` | Quality gate label: `"valid"`, `"white_error"`, `"no_signal_error"`, `"corrupt_color"`, `"frozen"`, `"manual_excluded"` | `"valid"` |
 | `is_valid` | `bool` | `True` if `status == "valid"`, else `False` | `True` |
 | `brightness_mean` | `float64` | Mean pixel intensity (`0.0-255.0`) | `118.42` |
 | `contrast_std` | `float64` | Pixel intensity standard deviation (proxy for rain/fog visibility reduction) | `54.18` |
@@ -90,7 +90,7 @@
 | `quality_warning` | `string` | Non-destructive warning for valid frames (`"none"`, `"partial_gray_pframe"`, `"partial_green_screen"`) | `"none"` |
 
 > [!NOTE]
-> `image_quality_manifest.parquet` also includes auxiliary diagnostic columns: `raw_rel_path`, `width`, `height`, `pixel_area`, `error_subtype`, `is_white_error`, `is_no_signal_error`, `is_gray_pframe`, `is_green_screen`, `is_corrupt_color`, `is_frozen`, `frozen_ref_timestamp`, `r_mean`, `g_mean`, `b_mean`, `gray128_ratio`, and `neon_green_ratio`.
+> `image_quality_manifest.parquet` also includes auxiliary diagnostic columns: `raw_rel_path`, `width`, `height`, `pixel_area`, `error_subtype`, `is_white_error`, `is_no_signal_error`, `is_gray_pframe`, `is_green_screen`, `is_corrupt_color`, `is_frozen`, `is_manual_excluded`, `frozen_ref_timestamp`, `r_mean`, `g_mean`, `b_mean`, `gray128_ratio`, and `neon_green_ratio`.
 
 ---
 

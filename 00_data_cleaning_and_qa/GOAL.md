@@ -64,7 +64,7 @@ To ensure 100% metadata and image accuracy before locking the final `V2.0` table
    - **Image-Level Visual Sweep (All Images):** Quickly scan through **all frames** in `cctv_images/<cam_id>/` (e.g., using thumbnail/grid view) to catch any severely broken, heavily distorted/corrupted, pitch-black outage, 100%-blocked, or frozen frames that were not filtered out automatically. *(Do **not** flag rainy, wet-road, or headlight-glare frames—Task `04_ds_traffic_analytics` needs them.)*
    - **Metadata & Direction Verification:** Verify `location_en`, `location_th`, `district`, `corridor`, `direction` (`Inbound` vs. `Outbound` vs. `None`), and `pair_id` using day/night frames and Google Maps `(lat, lon)`.
 4. Record fixes **only on GitHub** (do **not** manually edit `.parquet`/`.csv` files or upload anything to Drive):
-   - Update `CAMERA_CURATION` or image exclusion rules/lists in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py).
+   - Update `CAMERA_CURATION` (for metadata) or `MANUAL_EXCLUDED_IMAGES` (for broken/corrupted filenames, e.g., `"169_20260827_081012.jpg": "corrupt_artifact"`) in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py).
    - Log exact Before -> After details (including filenames of any bad frames found) in [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).
    - Check off `[x]` your verified cameras in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), then push your branch and open a **PR into `main`**.
 5. **Final Consolidation (Maintainer Only):** Once all 6 PRs are merged into `main`, the maintainer will run the final build once and sync `V2.0` to Google Drive:

@@ -135,7 +135,7 @@ Every data-cleaning edit after `V1.0` **must be documented** so teammates know w
    - Always create your own branch from `main` (e.g., `git checkout -b chore/00-qa-<your-name>`) and open a **Pull Request (PR)** into `main` so the 6 team members do not conflict with each other.
 4. **Never edit `.parquet` / `.csv` files manually — update GitHub code & logs instead:**
    - Metadata fixes go into `CAMERA_CURATION` inside [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py).
-   - Bad/broken image exclusions go into Gate thresholds or an explicit exclusion list inside [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py).
+   - Bad/broken image exclusions go into `MANUAL_EXCLUDED_IMAGES` (using `"<cam_id>_<YYYYMMDD_HHMMSS>.jpg": "<reason>"`) or Gate thresholds inside [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py).
 5. **Every Change Must Be Recorded in [`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md):**
    - Add a row in the Modification Ledger (and/or Detailed Version Log) with **Who, Date, Version, `cam_id` / filenames, Issue Found, Action Taken, Before -> After Count/Value**.
 6. **Update Verification Checkboxes in GitHub:** Once you finish checking all images and metadata in your batch, mark `[x]` in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md), commit to your branch, and open a PR into `main`.

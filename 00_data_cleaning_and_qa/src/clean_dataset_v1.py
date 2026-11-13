@@ -57,6 +57,14 @@ PARTIAL_GRAY128_WARN_RATIO = 0.45
 PARTIAL_GREEN_DIFF = 80
 PARTIAL_GREEN_WARN_RATIO = 0.08
 
+# Manual per-image exclusions added during team Peer QA (Google Drive visual sweep).
+# Key: clean ASCII filename shown in Dataset_Clean_V1/cctv_images/<cam_id>/ (e.g. "169_20260827_081012.jpg")
+#      or raw filename.
+# Value: short reason tag (e.g. "corrupt_artifact", "blocked_lens", "pitch_black", "frozen_visual").
+MANUAL_EXCLUDED_IMAGES: dict[str, str] = {
+    # "169_20260827_081012.jpg": "corrupt_artifact",
+}
+
 
 # Curated metadata repairs & spatial/directional enrichment for all 100 cameras
 # Fixes: NULL / '0' / 'connect BMAcctv' / '17/5000' / '(See Yellow)' / swapped
@@ -1317,6 +1325,13 @@ def process_camera_directory(
         out_cam_dir.mkdir(parents=True, exist_ok=True)
 
     for dt, fpath in parsed_files:
+        clean_filename = f"{cam_id}_{dt.strftime('%Y%m%d_%H%M%S')}.jpg"
+        manual_reason = (
+            MANUAL_EXCLUDED_IMAGES.get(clean_filename)
+            or MANUAL_EXCLUDED_IMAGES.get(fpath.name)
+        )
+        is_manual_excluded = manual_reason is not None
+
         metrics = evaluate_single_frame_metrics(fpath)
         img = metrics.pop("img")
 
@@ -1326,6 +1341,7 @@ def process_camera_directory(
             or metrics["is_white_error"]
             or metrics["is_no_signal_error"]
             or is_corrupt_color
+            or is_manual_excluded
         )
 
         is_frozen = False
@@ -1369,6 +1385,9 @@ def process_camera_directory(
         elif metrics["is_green_screen"]:
             status = "corrupt_color"
             error_subtype = "green_screen"
+        elif is_manual_excluded:
+            status = "manual_excluded"
+            error_subtype = str(manual_reason).strip() or "manual_excluded"
         elif is_frozen:
             status = "frozen"
             error_subtype = "frozen"
@@ -1385,13 +1404,15 @@ def process_camera_directory(
         else:
             quality_warning = "none"
 
-        clean_filename = f"{cam_id}_{dt.strftime('%Y%m%d_%H%M%S')}.jpg"
         clean_rel_path = f"cctv_images/{cam_id}/{clean_filename}" if is_valid else None
         raw_rel_path = fpath.relative_to(raw_root.parent.parent).as_posix()
 
-        if is_valid and copy_valid:
+        if copy_valid:
             dest_path = clean_images_root / str(cam_id) / clean_filename
-            shutil.copy2(fpath, dest_path)
+            if is_valid:
+                shutil.copy2(fpath, dest_path)
+            elif dest_path.exists():
+                dest_path.unlink()
 
         records.append(
             {
@@ -1419,6 +1440,7 @@ def process_camera_directory(
                 "is_green_screen": metrics["is_green_screen"],
                 "is_corrupt_color": bool(is_corrupt_color),
                 "is_frozen": is_frozen,
+                "is_manual_excluded": is_manual_excluded,
                 "mad_from_prev": mad_from_prev,
                 "frozen_ref_timestamp": frozen_ref_ts_str,
                 "brightness_mean": metrics["brightness_mean"],
@@ -1587,6 +1609,7 @@ def write_summary_and_readme(
             "gate_3_green_screen": "(g_mean - r_mean > 40.0) and (g_mean - b_mean > 40.0)",
             "gate_4_frozen": "MAD == 0.0 compared against previous non-error frame of same cam_id",
             "gate_5_timestamp": "Parsed strictly from filename _YYYYMMDD_HHMMSS.jpg (never OSD)",
+            "manual_excluded": f"{len(MANUAL_EXCLUDED_IMAGES)} filename(s) in MANUAL_EXCLUDED_IMAGES",
         },
     }
 
