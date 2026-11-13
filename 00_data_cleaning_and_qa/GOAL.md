@@ -52,20 +52,30 @@ The raw `Dataset/cctv_info.csv` contained severe row-shift errors and truncated 
 
 ## 4. Team Peer-Review Protocol (Action Required by All 6 Members)
 
-To ensure 100% metadata accuracy before locking the final tables:
+> [!IMPORTANT]
+> - **Google Drive (`Dataset_Clean_V1/`) is READ-ONLY:** Use Drive only to inspect images and reference tables. Do **not** edit, delete, or re-upload files on Google Drive.
+> - **Branch & PR Only (Never Push Directly to `main`):** Create your own branch (e.g., `chore/00-qa-<your-name>`) and open a Pull Request into `main` so teammates' edits do not conflict.
+
+To ensure 100% metadata and image accuracy before locking the final `V2.0` tables:
 
 1. Open [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), where the 100 cameras are divided into **6 batches (16-17 cameras per member)**: Batch 1 (**ปลื้ม**), Batch 2 (**กร**), Batch 3 (**เฟิร์ม**), Batch 4 (**สอง**), Batch 5 (**นิว**), Batch 6 (**โม่**).
-2. Cross-check your assigned cameras against sample images in `Dataset_Clean_V1/cctv_images/<cam_id>/` and Google Maps `(lat, lon)`:
-   - Verify `location_en` and `location_th` match the physical road/intersection.
-   - Verify `district` and `corridor` assignments are geographically sound.
-   - Verify `direction` (`Inbound` vs. `Outbound`) and `pair_id` groupings match the actual traffic flow direction.
-3. If any correction is needed, update `CAMERA_CURATION` in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py), log the change with exact Before -> After impact in [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md), and re-run:
+2. Create a personal QA branch from `main` (`git checkout -b chore/00-qa-<your-name>`).
+3. Cross-check **every camera** in your batch via Google Drive (`Dataset_Clean_V1/cctv_images/<cam_id>/`) and Google Maps `(lat, lon)`:
+   - **Image-Level Visual Sweep (All Images):** Quickly scan through **all frames** in `cctv_images/<cam_id>/` (e.g., using thumbnail/grid view) to catch any severely broken, heavily distorted/corrupted, pitch-black outage, 100%-blocked, or frozen frames that were not filtered out automatically. *(Do **not** flag rainy, wet-road, or headlight-glare frames—Task `04_ds_traffic_analytics` needs them.)*
+   - **Metadata & Direction Verification:** Verify `location_en`, `location_th`, `district`, `corridor`, `direction` (`Inbound` vs. `Outbound` vs. `None`), and `pair_id` using day/night frames and Google Maps `(lat, lon)`.
+4. Record fixes **only on GitHub** (do **not** manually edit `.parquet`/`.csv` files or upload anything to Drive):
+   - Update `CAMERA_CURATION` or image exclusion rules/lists in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py).
+   - Log exact Before -> After details (including filenames of any bad frames found) in [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).
+   - Check off `[x]` your verified cameras in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), then push your branch and open a **PR into `main`**.
+5. **Final Consolidation (Maintainer Only):** Once all 6 PRs are merged into `main`, the maintainer will run the final build once and sync `V2.0` to Google Drive:
 
    ```bash
-   python 00_data_cleaning_and_qa/src/clean_dataset_v1.py --skip-copy
+   python 00_data_cleaning_and_qa/src/clean_dataset_v1.py
+   # (or add --skip-copy if only metadata changed)
+   python run_pipeline.py --check-contract
    ```
 
-   *(Re-running `--skip-copy` preserves [`../Dataset_Clean_V1/README.md`](../Dataset_Clean_V1/README.md) and [`CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md) unless `--overwrite-readme` is explicitly passed.)*
+   *(Note: `--skip-copy` preserves [`../Dataset_Clean_V1/README.md`](../Dataset_Clean_V1/README.md) and [`CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md); default runs also preserve them unless `--overwrite-readme` is explicitly passed.)*
 
 ---
 

@@ -1,7 +1,9 @@
 # 100-Camera Metadata Peer Audit Checklist (`CAMERA_AUDIT_CHECKLIST.md`)
 
 > **Instructions:** The 100 CCTV cameras in [`Dataset_Clean_V1/cctv_info_cleaned.csv`](../Dataset_Clean_V1/cctv_info_cleaned.csv) are partitioned into **6 corridor-aligned batches (16-17 cameras per team member)**. Camera pairs sharing a `pair_id` are grouped within the same member's batch for side-by-side verification.  
-> Check off `[x]` each camera after confirming its `location_en`, `location_th`, `district`, `corridor`, `pair_id`, and `direction`.
+> **How to Audit & Submit:**
+> 1. **Google Drive (`Dataset_Clean_V1/cctv_images/<cam_id>/`) is READ-ONLY:** Quickly scan through **all images** in each assigned camera folder (e.g., thumbnail/grid view) to catch any severely broken, heavily corrupted, or unusable frames that slipped past the automated gates, and inspect day/night frames + Google Maps `(lat, lon)` to confirm `location_en`, `location_th`, `district`, `corridor`, `pair_id`, and `direction`. Do **not** edit, delete, or re-upload anything in Google Drive.
+> 2. **GitHub Branch & PR Only (Never Edit `main` Directly):** Create your own branch (e.g., `chore/00-qa-<your-name>`), update [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py) and [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md) if fixes/bad-frame exclusions are needed, check off `[x]` each verified camera below, and open a **Pull Request into `main`**. The maintainer will run the final script and sync `V2.0` to Google Drive once all 6 PRs are merged.
 
 ---
 

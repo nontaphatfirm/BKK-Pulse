@@ -6,11 +6,13 @@
 
 ## How to Log a Cleaning Change (Mandatory for Every Editor)
 
-Whenever you verify a batch, add/remove filtered frames, or edit any camera metadata field:
+> **GitHub-Only Workflow:** Google Drive (`Dataset_Clean_V1/`) is **READ-ONLY** for visual inspection. Do **not** edit/delete/re-upload files on Drive, and do **not** commit directly to `main`. Create your own branch (`chore/00-qa-<your-name>`) and open a **Pull Request (PR)** into `main`.
+
+Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit any camera metadata field:
 1. Add **one row** to the **Modification Ledger** below (so we can scan all edits at a glance).
 2. Add or append a detailed subsection under **Detailed Version Log** using the copy-paste template at the bottom of this file.
 3. Include **exact numbers / `cam_id` / filenames** (Before vs. After) and the **reason** so we can cite it directly in the Data Cleaning & Preparation section of the final report.
-4. Re-sync generated Parquet/CSV tables in the Git repo by updating `00_data_cleaning_and_qa/src/clean_dataset_v1.py`, running `python 00_data_cleaning_and_qa/src/clean_dataset_v1.py --skip-copy`, and verifying `python run_pipeline.py --check-contract`.
+4. Apply the fix in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` (`CAMERA_CURATION` or exclusion list/thresholds), mark `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`, and open a **PR into `main`**. *(Team members do not need to re-upload `Dataset_Clean_V1/` to Drive—the maintainer will run `clean_dataset_v1.py` and `python run_pipeline.py --check-contract` once after all 6 PRs are merged, then sync `V2.0` to Google Drive.)*
 
 ---
 
@@ -94,6 +96,6 @@ Whenever you verify a batch, add/remove filtered frames, or edit any camera meta
 - **Quantitative Impact (Before -> After):**
   - Metadata fields changed: <list exact fields & old -> new values>
   - Images affected: `<N>` valid images (`<before>` -> `<after>`)
-- **Verification:** Re-ran `clean_dataset_v1.py --skip-copy` + `python run_pipeline.py --check-contract` -> `[PASS / Pending]`
+- **Verification:** PR opened (`chore/00-qa-<name>` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run / PASS]`
 ```
 
