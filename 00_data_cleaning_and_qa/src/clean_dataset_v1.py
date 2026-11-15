@@ -63,6 +63,26 @@ PARTIAL_GREEN_WARN_RATIO = 0.08
 # Value: short reason tag (e.g. "corrupt_artifact", "blocked_lens", "pitch_black", "frozen_visual").
 MANUAL_EXCLUDED_IMAGES: dict[str, str] = {
     # "169_20260827_081012.jpg": "corrupt_artifact",
+    # CHG-004 (PM instruction): cam 1815 view changed (~180 deg reverse pan) from
+    # 2026-08-31 18:10:44 to end of capture; original view ends at 1815_20260831_180044.jpg
+    "1815_20260831_181044.jpg": "camera_view_changed",
+    "1815_20260831_182046.jpg": "camera_view_changed",
+    "1815_20260831_183044.jpg": "camera_view_changed",
+    "1815_20260831_184044.jpg": "camera_view_changed",
+    "1815_20260831_185044.jpg": "camera_view_changed",
+    "1815_20260831_190044.jpg": "camera_view_changed",
+    "1815_20260831_191044.jpg": "camera_view_changed",
+    "1815_20260831_192044.jpg": "camera_view_changed",
+    "1815_20260831_193044.jpg": "camera_view_changed",
+    "1815_20260831_194046.jpg": "camera_view_changed",
+    "1815_20260831_195044.jpg": "camera_view_changed",
+    "1815_20260831_200044.jpg": "camera_view_changed",
+    "1815_20260831_201046.jpg": "camera_view_changed",
+    "1815_20260831_202044.jpg": "camera_view_changed",
+    "1815_20260831_203044.jpg": "camera_view_changed",
+    "1815_20260831_204044.jpg": "camera_view_changed",
+    "1815_20260831_205044.jpg": "camera_view_changed",
+    "1815_20260831_210044.jpg": "camera_view_changed",
 }
 
 

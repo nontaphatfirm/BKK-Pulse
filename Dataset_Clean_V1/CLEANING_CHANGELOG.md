@@ -35,6 +35,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | `CHG-001` | `2026-11-11` | `V1.0` | Automated Baseline | All `100` cams / `61,319` imgs | Blank white, rainbow, gray P-frame, green screen, frozen streams, Thai Unicode paths, `1970` OSD dates, corrupted `cctv_info.csv` | Executed 5-Gate pipeline + `CAMERA_CURATION` in `clean_dataset_v1.py` | `61,319 -> 60,210` valid images (`1,109` filtered); `100/100` metadata repaired | Yes (`clean_dataset_v1.py`) |
 | `CHG-002` | *YYYY-MM-DD* | `V1.1` | *Example: ปลื้ม (@siravidthongsook)* | *e.g., `cam_id=126` or `quality_warning`* | *Describe issue observed in Drive image or CSV* | *Describe exact fix / rule / label update* | *e.g., `direction`: Inbound -> Outbound* | *No / Pending / Yes* |
 | `CHG-003` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | Batch 2 (16 cams): `1815, 136, 137, 139, 141, 170, 176, 177, 178, 179, 1070, 1071, 1112, 938, 939, 1804` | District mismatch on `938`, `1815`; no defective frames missed by automated gates | Updated `district` in `CAMERA_CURATION`; no `MANUAL_EXCLUDED_IMAGES` added; open items logged for maintainer (see V1.1 Batch 2 entry) | `938` district: Suan Luang -> Bang Kapi; `1815` district: Huai Khwang -> Din Daeng; images `9,535 -> 9,535` (0 excluded) | Yes (`clean_dataset_v1.py`) |
+| `CHG-004` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | `cam_id=1815` / `18` images | Camera view changed (~180° reverse pan) from `2026-08-31 18:10:44` to end of capture; frames no longer match `location_detail` / `direction` | **Following the PM's instruction**, added the `18` changed-view filenames to `MANUAL_EXCLUDED_IMAGES` (reason `camera_view_changed`); original-view frames kept | `1815` valid images: `611 -> 593`; Batch 2: `9,535 -> 9,517`; no other camera affected | Yes (`clean_dataset_v1.py`) |
 
 ---
 
@@ -118,9 +119,28 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
   - Metadata fields changed: `938` `district`: Suan Luang -> Bang Kapi; `1815` `district`: Huai Khwang -> Din Daeng.
   - Images affected: `0` valid images (`9,535` -> `9,535`).
 - **Open Items for Maintainer (not changed in this PR):**
-  - `cam_id=1815` **view change:** camera view changed between `1815_20260831_180044.jpg` (last original view) and `1815_20260831_181044.jpg` (first new view) -- likely a ~180° pan at the same site (same noise-barrier style on the elevated road, which flips from left to right; the same grey dome fixture moves from the left to the right frame edge; same `352x288` resolution and `:x0:44` capture cadence). `18` valid frames (`2026-08-31 18:10:44` to `21:00:44`) show the reverse view; the other `597` frames (`593` valid) show the original view. `location_detail_th/en` and `direction` do not describe these `18` frames. Not excluded -- maintainer / Task 03 owner to decide (e.g., exclude, or handle as a separate view for median background / ROI).
+  - `cam_id=1815` **view change:** camera view changed between `1815_20260831_180044.jpg` (last original view) and `1815_20260831_181044.jpg` (first new view) -- likely a ~180° pan at the same site (same noise-barrier style on the elevated road, which flips from left to right; the same grey dome fixture moves from the left to the right frame edge; same `352x288` resolution and `:x0:44` capture cadence). `18` valid frames (`2026-08-31 18:10:44` to `21:00:44`) show the reverse view; the other `597` frames (`593` valid) show the original view. `location_detail_th/en` and `direction` do not describe these `18` frames. Not excluded -- maintainer / Task 03 owner to decide (e.g., exclude, or handle as a separate view for median background / ROI). **-> Resolved by `CHG-004`** (excluded following the PM's instruction).
   - `cam_id=1112` road name: frames suggest the camera faces east along **Sutthisan Winitchai Road** (sunrise straight ahead on 28 Aug 06:45), not Vibhavadi Rangsit. Possible fix: `location_en` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`, `location_th` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`. Not applied -- needs Street View confirmation.
   - `Inbound` / `Outbound` definition is not documented in `DATA_CONTRACT.md`; existing labels imply "towards / away from central Bangkok". Suggest documenting it.
   - **Google Drive duplicates (informational only):** `28` duplicate files exist in `Dataset_Clean_V1/cctv_images/` on Drive -- `18` in `136/` (e.g., `136_20260825_111611.jpg`) and `10` in `176/` (e.g., `176_20260829_085616.jpg`); each filename appears twice with identical size, and downloaded copies are byte-for-byte identical. They do **not** affect the dataset (each image appears once in `image_quality_manifest.parquet`). They must **NOT** be added to `MANUAL_EXCLUDED_IMAGES` (that would exclude the valid original frame). Suggest removing the extra copies during the `V2.0` Drive sync.
 - **Verification:** PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
+
+#### Camera 1815 View-Change Exclusion (`CHG-004`)
+- **Date:** 2026-11-15
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** `cam_id=1815` only -- follow-up to the Batch 2 open item (`CHG-003`).
+- **Problem Found:**
+  - `cam_id=1815`: camera view changed (~180° reverse pan at the same site) between `1815_20260831_180044.jpg` (last original-view frame) and `1815_20260831_181044.jpg` (first changed-view frame). The changed view lasts until the camera's last capture, `1815_20260831_210044.jpg`. These frames do not match the camera's `location_detail_th/en` or `direction` (`Inbound`).
+- **Fix / Decision Applied:**
+  - **Following the PM's instruction**, added the `18` changed-view frames to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` with reason `camera_view_changed`:
+    - `1815_20260831_181044.jpg`, `1815_20260831_182046.jpg`, `1815_20260831_183044.jpg`, `1815_20260831_184044.jpg`, `1815_20260831_185044.jpg`, `1815_20260831_190044.jpg`,
+    - `1815_20260831_191044.jpg`, `1815_20260831_192044.jpg`, `1815_20260831_193044.jpg`, `1815_20260831_194046.jpg`, `1815_20260831_195044.jpg`, `1815_20260831_200044.jpg`,
+    - `1815_20260831_201046.jpg`, `1815_20260831_202044.jpg`, `1815_20260831_203044.jpg`, `1815_20260831_204044.jpg`, `1815_20260831_205044.jpg`, `1815_20260831_210044.jpg`.
+  - All original-view frames (up to and including `1815_20260831_180044.jpg`) are kept.
+  - Existing `CAMERA_CURATION` values (including the `CHG-003` `district` fix and the `direction` values) are unchanged.
+  - No CSV / Parquet files and no Google Drive files were modified in this PR.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: none.
+  - Images affected: `18` valid images excluded -- `cam_id=1815`: `611 -> 593` valid (`615` raw); Batch 2: `9,535 -> 9,517`. No other camera affected.
+- **Verification:** All `18` filenames exist in `image_quality_manifest.parquet` as `is_valid=True`, `cam_id=1815`, timestamps `2026-08-31 18:10:44` to `21:00:44` (the camera's last frame); boundary frames checked visually. PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
 
