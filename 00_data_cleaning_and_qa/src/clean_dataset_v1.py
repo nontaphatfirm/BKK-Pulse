@@ -421,6 +421,8 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_type": "footbridge_bidirectional",
         "direction": "Outbound",
     },
+    # CHG-005 location reference (manual check, no schema field): approx. 180 m after
+    # turning right from Phyathai 2 Hospital. Metadata values unchanged.
     178: {
         "location_th": "สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน",
         "location_detail_th": "รถมาจากแยกสะพานควาย มุ่งหน้าอนุสาวรีย์ชัยสมรภูมิ",
@@ -432,6 +434,8 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_type": "footbridge_bidirectional",
         "direction": "Inbound",
     },
+    # CHG-005 location reference (manual check, no schema field): approx. 120 m after
+    # turning right from Phyathai 2 Hospital. Metadata values unchanged.
     179: {
         "location_th": "สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน",
         "location_detail_th": "รถมาจากอนุสาวรีย์ชัยสมรภูมิ มุ่งหน้าแยกสะพานควาย",
@@ -1071,9 +1075,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "direction": "Inbound",
     },
     1112: {
-        "location_th": "แยกสุทธิสาร (ถนนวิภาวดีรังสิต)",
+        "location_th": "แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)",
         "location_detail_th": "รถมาจากแยกรัชดา-สุทธิสาร",
-        "location_en": "Sutthisan Intersection (Vibhavadi Rangsit Road)",
+        "location_en": "Sutthisan Intersection (Sutthisan Winitchai Road)",
         "location_detail_en": "From Ratchada-Sutthisan Intersection",
         "district": "Din Daeng",
         "corridor": "Phahon Yothin - Lat Phrao",

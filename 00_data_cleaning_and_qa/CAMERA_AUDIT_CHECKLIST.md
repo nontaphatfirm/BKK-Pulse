@@ -49,10 +49,20 @@
 | [x] | `179` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Victory Monument towards Saphan Khwai Intersection | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Outbound` |
 | [x] | `1070` | Footbridge near Soi Phahon Yothin 18/2 on Phahon Yothin Road | From Kamphaeng Phet Intersection towards Lat Phrao Intersection | สะพานลอยใกล้ซอยพหลโยธิน 18/2 ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
 | [x] | `1071` | Kamphaeng Phet Intersection (Phahon Yothin Road) | From Lat Phrao Intersection (near Soi Phahon Yothin 18) | แยกกำแพงเพชร (ด้านถนนพหลโยธิน) | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
-| [x] | `1112` | Sutthisan Intersection (Vibhavadi Rangsit Road) | From Ratchada-Sutthisan Intersection | แยกสุทธิสาร (ถนนวิภาวดีรังสิต) | Din Daeng | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
+| [x] | `1112` | Sutthisan Intersection (Sutthisan Winitchai Road) | From Ratchada-Sutthisan Intersection | แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย) | Din Daeng | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
 | [x] | `938` | Ramkhamhaeng - Rama 9 Intersection | Ramkhamhaeng - Rama 9 Intersection *(98 frozen frames)* | แยกรามคำแหง-พระราม 9 | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
 | [x] | `939` | Mahadthai Intersection | Mahadthai Intersection (Ramkhamhaeng Road) *(95 frozen frames)* | แยกมหาดไทย | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
 | [x] | `1804` | Entrance to Soi On Nut 33 on On Nut Road | Towards Suan Luang Intersection *(16 rainbow frames)* | ปากซอยอ่อนนุช 33 ถนนอ่อนนุช | Suan Luang | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `Outbound` |
+
+**Batch 2 location audit (`CHG-005`, 2026-11-16):** road, intersection, camera facing, and traffic direction manually re-checked (Google Maps / Street View + CCTV frames).
+- [x] `1112` -- road corrected to Sutthisan Winitchai Road (camera faces east, westbound traffic, `Inbound`); district kept `Din Daeng`.
+- [x] `939` -- name kept as `Mahadthai Intersection` to match the Dashboard (naming source of truth); no change.
+- [x] `170` -- faces south, northbound traffic, `Outbound` -- matches existing metadata.
+- [x] `1071` -- faces south, southbound traffic, `Inbound` -- matches existing metadata.
+- [x] `1804` -- faces east, eastbound traffic, `Outbound` -- matches existing metadata.
+- [x] `1815` -- Rama 9 Road (final; supersedes the Asok-Din Daeng Road note in `CHG-003`) / Rama 9 Intersection, `Din Daeng`, faces east, westbound (into the city) = `Inbound` -- matches existing metadata; `18` `camera_view_changed` exclusions kept.
+- [x] `1815` -- `location_detail` `From Phang Mueang Intersection` (`หน้ารถมาจากแยกผังเมือง`) confirmed: traffic travels from Phang Mueang Intersection toward Rama 9 Intersection; retained, no change.
+- [x] `178` / `179` -- extra location reference recorded (approx. `180 m` / `120 m` after turning right from Phyathai 2 Hospital; accepted as approximate references); no metadata field changed.
 
 ---
 
