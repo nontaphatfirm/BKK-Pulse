@@ -63,6 +63,13 @@ PARTIAL_GREEN_WARN_RATIO = 0.08
 # Value: short reason tag (e.g. "corrupt_artifact", "blocked_lens", "pitch_black", "frozen_visual").
 MANUAL_EXCLUDED_IMAGES: dict[str, str] = {
     # "169_20260827_081012.jpg": "corrupt_artifact",
+    # cam_id=206 (Batch 3 Peer QA)
+    "206_20260825_183106.jpg": "corrupt_artifact",  # severe gray P-frame corruption
+    "206_20260827_120106.jpg": "corrupt_artifact",  # severe gray P-frame corruption
+    "206_20260828_130705.jpg": "corrupt_artifact",  # severe gray P-frame corruption
+    "206_20260828_171605.jpg": "corrupt_artifact",  # severe gray P-frame corruption
+    "206_20260831_104606.jpg": "corrupt_artifact",  # severe gray P-frame corruption
+    "206_20260831_164105.jpg": "blocked_lens",      # heavy condensation/water smear occluding road center
 }
 
 
@@ -73,14 +80,14 @@ MANUAL_EXCLUDED_IMAGES: dict[str, str] = {
 CAMERA_CURATION: dict[int, dict[str, Any]] = {
     11: {
         "location_th": "ใกล้ซอยราชวิถี 6 ถนนราชวิถี",
-        "location_detail_th": "รถมาจากอนุสาวรีย์ชัยสมรภูมิ",
+        "location_detail_th": "ช่วงอนุสาวรีย์ชัยสมรภูมิ – แยกสามเหลี่ยมดินแดง (ทั้งสองทิศทาง)",
         "location_en": "Near Soi Ratchawithi 6 on Ratchawithi Road",
-        "location_detail_en": "From Victory Monument",
+        "location_detail_en": "Between Victory Monument and Din Daeng Intersection (both directions)",
         "district": "Ratchathewi",
         "corridor": "Pathum Wan - Phetchaburi - Victory Monument",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Outbound",
+        "direction": None,
     },
     18: {
         "location_th": "แยกสะพานแดง (ด้านถนนทหาร)",
@@ -150,9 +157,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     75: {
         "location_th": "แยกรัชดา-นราธิวาส (ด้านถนนนราธิวาสฯ)",
-        "location_detail_th": "รถมาจากแยกด่วนสาธุประดิษฐ์",
+        "location_detail_th": "รถมาจากแยกนราธิวาส-พระราม 3",
         "location_en": "Ratchada-Naradhiwas Intersection (Naradhiwas Road)",
-        "location_detail_en": "From Sathu Pradit Expressway Intersection",
+        "location_detail_en": "From Naradhiwas-Rama 3 Intersection",
         "district": "Yan Nawa",
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": None,
@@ -161,14 +168,14 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     82: {
         "location_th": "สะพานลอยใกล้ซอยราชปรารภ 3 ถนนราชปรารภ",
-        "location_detail_th": "รถมาจากแยกหมอเหล็ง มุ่งหน้าแยกประตูน้ำ",
+        "location_detail_th": "ช่วงแยกประตูน้ำ – แยกหมอเหล็ง (ทั้งสองทิศทาง: 4 เลนไปหมอเหล็ง / 1 เลนไปประตูน้ำ)",
         "location_en": "Footbridge near Soi Ratchaprarop 3 on Ratchaprarop Road",
-        "location_detail_en": "From Mo Leng Intersection towards Pratu Nam Intersection",
+        "location_detail_en": "Between Pratu Nam and Mo Leng Intersections (both directions: 4 northbound / 1 southbound contraflow lane)",
         "district": "Ratchathewi",
         "corridor": "Pathum Wan - Phetchaburi - Victory Monument",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": None,
     },
     88: {
         "location_th": "แยกจันทน์-สาธุประดิษฐ์",
@@ -179,7 +186,7 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": "None",
     },
     112: {
         "location_th": "แยกเทียมร่วมมิตร (ถนนเทียมร่วมมิตร)",
@@ -446,15 +453,15 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "direction": "Outbound",
     },
     194: {
-        "location_th": "สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรใต้",
-        "location_detail_th": "รถมาจากแยกสาทร-นราธิวาส มุ่งหน้าแยกวิทยุ",
-        "location_en": "Footbridge near Soi Convent on South Sathon Road",
-        "location_detail_en": "From Sathon-Naradhiwas Intersection towards Witthayu Intersection",
+        "location_th": "สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรเหนือ",
+        "location_detail_th": "รถมาจากแยกวิทยุ มุ่งหน้าแยกสาทร-นราธิวาส",
+        "location_en": "Footbridge near Soi Convent on North Sathon Road",
+        "location_detail_en": "From Witthayu Intersection towards Sathon-Naradhiwas Intersection",
         "district": "Bang Rak",
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": "Outbound",
     },
     196: {
         "location_th": "สะพานลอยหน้าแม็คโคร ถนนนราธิวาสราชนครินทร์",
@@ -468,15 +475,17 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "direction": "Outbound",
     },
     206: {
-        "location_th": "สะพานลอยใกล้ซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์",
-        "location_detail_th": "รถมาจากแยกรัชดา-นราธิวาส มุ่งหน้าแยกจันทน์-นราธิวาส",
-        "location_en": "Footbridge near Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road",
-        "location_detail_en": "From Ratchada-Naradhiwas Intersection towards Chan-Naradhiwas Intersection",
+        "location_th": "สะพานลอยตรงข้ามซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์",
+        "location_detail_th": "รถมาจากแยกจันทน์-นราธิวาส มุ่งหน้าแยกรัชดา-นราธิวาส",
+        "location_en": "Footbridge opposite Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road",
+        "location_detail_en": "From Chan-Naradhiwas Intersection towards Ratchada-Naradhiwas Intersection",
         "district": "Yan Nawa",
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": "Outbound",
+        "lat": 13.70555,
+        "lon": 100.53865,
     },
     211: {
         "location_th": "สะพานลอยใกล้ซอยรัชดาภิเษก 3 ถนนรัชดาภิเษก",
@@ -622,15 +631,15 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "direction": "Outbound",
     },
     277: {
-        "location_th": "ทางแยกอนุสาวรีย์ชัยสมรภูมิ",
-        "location_detail_th": "รถมุ่งหน้าไปแยกพญาไท (ซอยรางน้ำ)",
-        "location_en": "Footbridge near Soi Rang Nam on Phayathai Road (Victory Monument)",
-        "location_detail_en": "From Victory Monument towards Phayathai Intersection",
+        "location_th": "วงเวียนอนุสาวรีย์ชัยสมรภูมิ",
+        "location_detail_th": "บริเวณวงเวียนอนุสาวรีย์ชัยสมรภูมิ (มุมเกาะพญาไท เห็นรถวนรอบวงเวียนและแยกออกหลายทิศทาง)",
+        "location_en": "Victory Monument Roundabout",
+        "location_detail_en": "Victory Monument Roundabout (Phayathai Island side, multi-directional roundabout traffic)",
         "district": "Ratchathewi",
         "corridor": "Pathum Wan - Phetchaburi - Victory Monument",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": None,
     },
     301: {
         "location_th": "แยกอู่ทองนอก",
@@ -744,14 +753,14 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     432: {
         "location_th": "ทางแยกสามย่าน",
-        "location_detail_th": "บริเวณแยกสามย่าน (ถนนพญาไท-พระรามที่ 4)",
+        "location_detail_th": "รถมาจากสีลม มุ่งหน้าไปหัวลำโพง (บริเวณแยกสามย่าน ถนนพระรามที่ 4)",
         "location_en": "Sam Yan Intersection",
-        "location_detail_en": "Sam Yan Intersection (Phayathai-Rama 4 Road)",
+        "location_detail_en": "From Silom towards Hua Lamphong (Sam Yan Intersection, Rama 4 Road)",
         "district": "Pathum Wan",
         "corridor": "Pathum Wan - Phetchaburi - Victory Monument",
         "pair_id": None,
         "pair_type": None,
-        "direction": "None",
+        "direction": "Inbound",
     },
     500: {
         "location_th": "ทางแยกมิตรสัมพันธ์",
@@ -861,13 +870,13 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": None,
     },
     603: {
         "location_th": "แยกสีลม-นราธิวาส",
-        "location_detail_th": "รถมาจากแยกสุรศักดิ์",
+        "location_detail_th": "รถมาจากแยกสาทร-นราธิวาส",
         "location_en": "Silom-Naradhiwas Intersection",
-        "location_detail_en": "From Surasak Intersection",
+        "location_detail_en": "From Sathon-Naradhiwas Intersection",
         "district": "Bang Rak",
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": "PAIR_JX_SILOM_NARADHIWAS",
@@ -876,14 +885,14 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     604: {
         "location_th": "แยกสีลม-นราธิวาส",
-        "location_detail_th": "ท้ายรถมุ่งหน้าแยกศาลาแดง / แยกสาทร-นราธิวาส",
+        "location_detail_th": "บริเวณแยกสีลม-นราธิวาส (ด้านถนนนราธิวาสฯ มุ่งหน้าแยกสาทร-นราธิวาส)",
         "location_en": "Silom-Naradhiwas Intersection",
-        "location_detail_en": "Towards Sala Daeng / Sathon-Naradhiwas Intersection",
+        "location_detail_en": "Silom-Naradhiwas Intersection (Naradhiwas Rd towards Sathon-Naradhiwas Intersection)",
         "district": "Bang Rak",
         "corridor": "Sathon - Naradhiwas - Rama 3",
         "pair_id": "PAIR_JX_SILOM_NARADHIWAS",
         "pair_type": "perpendicular_junction",
-        "direction": "Inbound",
+        "direction": None,
     },
     619: {
         "location_th": "ทางแยกอังรีดูนังต์",
@@ -1513,8 +1522,8 @@ def build_cleaned_metadata(
                 "location_detail_th": meta["location_detail_th"],
                 "location_en": meta["location_en"],
                 "location_detail_en": meta["location_detail_en"],
-                "lat": float(row["latitude"]),
-                "lon": float(row["longitude"]),
+                "lat": float(meta.get("lat", row["latitude"])),
+                "lon": float(meta.get("lon", row["longitude"])),
                 "district": meta["district"],
                 "corridor": meta["corridor"],
                 "pair_id": meta["pair_id"] if meta["pair_id"] is not None else "None",

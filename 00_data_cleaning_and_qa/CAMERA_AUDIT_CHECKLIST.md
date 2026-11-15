@@ -23,7 +23,7 @@
 | [ ] | `126` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Inbound` |
 | [ ] | `127` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Outbound` |
 | [ ] | `135` | Footbridge in front of Toyota Sure on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยหน้าโตโยต้าชัวร์ ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `None` | `Inbound` |
-| [ ] | `211` | Footbridge near Soi Ratchadaphisek 3 on Ratchadaphisek Road | From Rama 9 Intersection towards Thiam Ruam Mit Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 3 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
+| [x] | `211` | Footbridge near Soi Ratchadaphisek 3 on Ratchadaphisek Road | From Rama 9 Intersection towards Thiam Ruam Mit Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 3 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
 | [ ] | `212` | Footbridge near Big C Ratchadaphisek on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Rama 9 Intersection | สะพานลอยใกล้บิ๊กซีรัชดา ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Inbound` |
 | [ ] | `215` | Footbridge near Soi Ratchadaphisek 7 on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 7 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
 | [ ] | `219` | Footbridge near Soi Ratchadaphisek 14 on Ratchadaphisek Road | From Ratchada-Sutthisan Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 14 ถนนรัชดาภิเษก | Huai Khwang | Ratchadaphisek | `None` | `Inbound` |
@@ -61,23 +61,23 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [ ] | `75` | Ratchada-Naradhiwas Intersection (Naradhiwas Road) | From Sathu Pradit Expressway Intersection | แยกรัชดา-นราธิวาส (ด้านถนนนราธิวาสฯ) | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
-| [ ] | `88` | Chan-Sathu Pradit Intersection | Towards Chan-Naradhiwas Intersection | แยกจันทน์-สาธุประดิษฐ์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
-| [ ] | `186` | Directional sign gantry to Rama 3 Bridge on Ratchadaphisek Road | From Ratchada-Naradhiwas Intersection towards Sathu Pradit Intersection | โครงสร้างป้ายบอกทางขึ้นสะพานพระราม 3 ถนนรัชดาภิเษก | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
-| [ ] | `188` | Footbridge near Rama 3 Soi 68 on Rama 3 Road | From Na Ranong Intersection towards Nang Linchi Intersection | สะพานลอยใกล้ซอยพระรามที่ 3 ซอย 68 ถนนพระรามที่ 3 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
-| [ ] | `194` | Footbridge near Soi Convent on South Sathon Road | From Sathon-Naradhiwas Intersection towards Witthayu Intersection | สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรใต้ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
-| [ ] | `196` | Footbridge in front of Makro on Naradhiwas Ratchanakharin Road | From Sathon-Naradhiwas Intersection towards Chan-Naradhiwas Intersection | สะพานลอยหน้าแม็คโคร ถนนนราธิวาสราชนครินทร์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
-| [ ] | `206` | Footbridge near Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road | From Ratchada-Naradhiwas Intersection towards Chan-Naradhiwas Intersection | สะพานลอยใกล้ซอยนราธิวาสราชนครินทร์ 20 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
-| [ ] | `599` | Surasak Intersection | Towards Sathon-Surasak Intersection | แยกสุรศักดิ์ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
-| [ ] | `603` | Silom-Naradhiwas Intersection | From Surasak Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `Inbound` |
-| [ ] | `604` | Silom-Naradhiwas Intersection | Towards Sala Daeng / Sathon-Naradhiwas Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `Inbound` |
-| [ ] | `11` | Near Soi Ratchawithi 6 on Ratchawithi Road | From Victory Monument | ใกล้ซอยราชวิถี 6 ถนนราชวิถี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Outbound` |
-| [ ] | `82` | Footbridge near Soi Ratchaprarop 3 on Ratchaprarop Road | From Mo Leng Intersection towards Pratu Nam Intersection | สะพานลอยใกล้ซอยราชปรารภ 3 ถนนราชปรารภ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
-| [ ] | `239` | Footbridge near Triam Udom Suksa School on Phayathai Road | From Pathum Wan Intersection towards Sam Yan Intersection | สะพานลอยใกล้โรงเรียนเตรียมอุดมศึกษา ถนนพญาไท | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
-| [ ] | `432` | Sam Yan Intersection | Sam Yan Intersection (Phayathai-Rama 4 Road) *(17 rainbow frames)* | ทางแยกสามย่าน | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
-| [ ] | `542` | Lang Suan - Sarasin Intersection | Lang Suan - Sarasin Intersection near Lumphini Park | ทางแยกหลังสวน (สารสิน-หลังสวน) | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
-| [ ] | `619` | Henri Dunant Intersection | Henri Dunant Intersection *(Repaired row-shift)* | ทางแยกอังรีดูนังต์ | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
-| [ ] | `277` | Footbridge near Soi Rang Nam on Phayathai Road (Victory Monument) | From Victory Monument towards Phayathai Intersection | ทางแยกอนุสาวรีย์ชัยสมรภูมิ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
+| [x] | `75` | Ratchada-Naradhiwas Intersection (Naradhiwas Road) | From Naradhiwas-Rama 3 Intersection | แยกรัชดา-นราธิวาส (ด้านถนนนราธิวาสฯ) | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
+| [x] | `88` | Chan-Sathu Pradit Intersection | Towards Chan-Naradhiwas Intersection | แยกจันทน์-สาธุประดิษฐ์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
+| [x] | `186` | Directional sign gantry to Rama 3 Bridge on Ratchadaphisek Road | From Ratchada-Naradhiwas Intersection towards Sathu Pradit Intersection | โครงสร้างป้ายบอกทางขึ้นสะพานพระราม 3 ถนนรัชดาภิเษก | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
+| [x] | `188` | Footbridge near Rama 3 Soi 68 on Rama 3 Road | From Na Ranong Intersection towards Nang Linchi Intersection | สะพานลอยใกล้ซอยพระรามที่ 3 ซอย 68 ถนนพระรามที่ 3 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
+| [x] | `194` | Footbridge near Soi Convent on North Sathon Road | From Witthayu Intersection towards Sathon-Naradhiwas Intersection | สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรเหนือ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
+| [x] | `196` | Footbridge in front of Makro on Naradhiwas Ratchanakharin Road | From Sathon-Naradhiwas Intersection towards Chan-Naradhiwas Intersection | สะพานลอยหน้าแม็คโคร ถนนนราธิวาสราชนครินทร์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
+| [x] | `206` | Footbridge opposite Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road | From Chan-Naradhiwas Intersection towards Ratchada-Naradhiwas Intersection | สะพานลอยตรงข้ามซอยนราธิวาสราชนครินทร์ 20 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
+| [x] | `599` | Surasak Intersection | Towards Sathon-Surasak Intersection | แยกสุรศักดิ์ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
+| [x] | `603` | Silom-Naradhiwas Intersection | From Sathon-Naradhiwas Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `Inbound` |
+| [x] | `604` | Silom-Naradhiwas Intersection | Silom-Naradhiwas Intersection (Naradhiwas Rd towards Sathon-Naradhiwas Intersection) | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `None` |
+| [x] | `11` | Near Soi Ratchawithi 6 on Ratchawithi Road | Between Victory Monument and Din Daeng Intersection (both directions) | ใกล้ซอยราชวิถี 6 ถนนราชวิถี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `82` | Footbridge near Soi Ratchaprarop 3 on Ratchaprarop Road | Between Pratu Nam and Mo Leng Intersections (both directions: 4 northbound / 1 southbound contraflow lane) | สะพานลอยใกล้ซอยราชปรารภ 3 ถนนราชปรารภ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `239` | Footbridge near Triam Udom Suksa School on Phayathai Road | From Pathum Wan Intersection towards Sam Yan Intersection | สะพานลอยใกล้โรงเรียนเตรียมอุดมศึกษา ถนนพญาไท | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
+| [x] | `432` | Sam Yan Intersection | From Silom towards Hua Lamphong (Sam Yan Intersection, Rama 4 Road) *(17 rainbow frames)* | ทางแยกสามย่าน | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
+| [x] | `542` | Lang Suan - Sarasin Intersection | Lang Suan - Sarasin Intersection near Lumphini Park | ทางแยกหลังสวน (สารสิน-หลังสวน) | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `619` | Henri Dunant Intersection | Henri Dunant Intersection *(Repaired row-shift)* | ทางแยกอังรีดูนังต์ | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `277` | Victory Monument Roundabout | Victory Monument Roundabout (Phayathai Island side, multi-directional roundabout traffic) | วงเวียนอนุสาวรีย์ชัยสมรภูมิ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
 
 ---
 
