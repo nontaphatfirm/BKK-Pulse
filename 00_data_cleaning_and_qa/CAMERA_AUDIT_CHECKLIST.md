@@ -37,22 +37,22 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [ ] | `1815` | Rama 9 Intersection | From Phang Mueang Intersection | แยกพระราม 9 | Huai Khwang | Ratchadaphisek | `None` | `Inbound` |
-| [ ] | `136` | Footbridge near Big C Extra (Soi Lat Phrao 7) on Lat Phrao Road | From Lat Phrao Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยใกล้บิ๊กซีเอ็กซ์ตร้า ลาดพร้าว | Chatuchak | Phahon Yothin - Lat Phrao | `FB_01_LatPhrao_BigC` | `Outbound` |
-| [ ] | `137` | Footbridge near Big C Extra (Soi Lat Phrao 7) on Lat Phrao Road | From Ratchada-Lat Phrao Intersection towards Lat Phrao Intersection | สะพานลอยใกล้บิ๊กซีเอ็กซ์ตร้า ลาดพร้าว | Chatuchak | Phahon Yothin - Lat Phrao | `FB_01_LatPhrao_BigC` | `Inbound` |
-| [ ] | `139` | Footbridge in front of Horwang School on Phahon Yothin Road | From Ratchayothin Intersection towards Lat Phrao Intersection | สะพานลอยหน้าโรงเรียนหอวัง ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
-| [ ] | `141` | Footbridge in front of PTT HQ near Soi Vibhavadi Rangsit 11 | From Lat Phrao Intersection towards Ratchawipha Interchange | สะพานลอยหน้าบริษัท ปตท. จำกัด (มหาชน) ถนนวิภาวดีรังสิต | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
-| [ ] | `170` | Footbridge near Nawutti Somdet Ya Hospital on Phahon Yothin Road | From Victory Monument towards Saphan Khwai Intersection | สะพานลอยใกล้โรงพยาบาลนวุติสมเด็จย่า ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
-| [ ] | `176` | Footbridge in front of Chatuchak Park on Phahon Yothin Road | From Lat Phrao Intersection towards Kamphaeng Phet Intersection | สะพานลอยหน้าสวนจตุจักร ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `FB_05_ChatuchakPark` | `Inbound` |
-| [ ] | `177` | Footbridge in front of Chatuchak Park on Phahon Yothin Road | From Kamphaeng Phet Intersection towards Lat Phrao Intersection | สะพานลอยหน้าสวนจตุจักร ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `FB_05_ChatuchakPark` | `Outbound` |
-| [ ] | `178` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Saphan Khwai Intersection towards Victory Monument | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Inbound` |
-| [ ] | `179` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Victory Monument towards Saphan Khwai Intersection | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Outbound` |
-| [ ] | `1070` | Footbridge near Soi Phahon Yothin 18/2 on Phahon Yothin Road | From Kamphaeng Phet Intersection towards Lat Phrao Intersection | สะพานลอยใกล้ซอยพหลโยธิน 18/2 ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
-| [ ] | `1071` | Kamphaeng Phet Intersection (Phahon Yothin Road) | From Lat Phrao Intersection (near Soi Phahon Yothin 18) | แยกกำแพงเพชร (ด้านถนนพหลโยธิน) | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
-| [ ] | `1112` | Sutthisan Intersection (Vibhavadi Rangsit Road) | From Ratchada-Sutthisan Intersection | แยกสุทธิสาร (ถนนวิภาวดีรังสิต) | Din Daeng | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
-| [ ] | `938` | Ramkhamhaeng - Rama 9 Intersection | Ramkhamhaeng - Rama 9 Intersection *(98 frozen frames)* | แยกรามคำแหง-พระราม 9 | Suan Luang | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
-| [ ] | `939` | Mahadthai Intersection | Mahadthai Intersection (Ramkhamhaeng Road) *(95 frozen frames)* | แยกมหาดไทย | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
-| [ ] | `1804` | Entrance to Soi On Nut 33 on On Nut Road | Towards Suan Luang Intersection *(16 rainbow frames)* | ปากซอยอ่อนนุช 33 ถนนอ่อนนุช | Suan Luang | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `Outbound` |
+| [x] | `1815` | Rama 9 Intersection | From Phang Mueang Intersection | แยกพระราม 9 | Din Daeng | Ratchadaphisek | `None` | `Inbound` |
+| [x] | `136` | Footbridge near Big C Extra (Soi Lat Phrao 7) on Lat Phrao Road | From Lat Phrao Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยใกล้บิ๊กซีเอ็กซ์ตร้า ลาดพร้าว | Chatuchak | Phahon Yothin - Lat Phrao | `FB_01_LatPhrao_BigC` | `Outbound` |
+| [x] | `137` | Footbridge near Big C Extra (Soi Lat Phrao 7) on Lat Phrao Road | From Ratchada-Lat Phrao Intersection towards Lat Phrao Intersection | สะพานลอยใกล้บิ๊กซีเอ็กซ์ตร้า ลาดพร้าว | Chatuchak | Phahon Yothin - Lat Phrao | `FB_01_LatPhrao_BigC` | `Inbound` |
+| [x] | `139` | Footbridge in front of Horwang School on Phahon Yothin Road | From Ratchayothin Intersection towards Lat Phrao Intersection | สะพานลอยหน้าโรงเรียนหอวัง ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
+| [x] | `141` | Footbridge in front of PTT HQ near Soi Vibhavadi Rangsit 11 | From Lat Phrao Intersection towards Ratchawipha Interchange | สะพานลอยหน้าบริษัท ปตท. จำกัด (มหาชน) ถนนวิภาวดีรังสิต | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
+| [x] | `170` | Footbridge near Nawutti Somdet Ya Hospital on Phahon Yothin Road | From Victory Monument towards Saphan Khwai Intersection | สะพานลอยใกล้โรงพยาบาลนวุติสมเด็จย่า ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
+| [x] | `176` | Footbridge in front of Chatuchak Park on Phahon Yothin Road | From Lat Phrao Intersection towards Kamphaeng Phet Intersection | สะพานลอยหน้าสวนจตุจักร ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `FB_05_ChatuchakPark` | `Inbound` |
+| [x] | `177` | Footbridge in front of Chatuchak Park on Phahon Yothin Road | From Kamphaeng Phet Intersection towards Lat Phrao Intersection | สะพานลอยหน้าสวนจตุจักร ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `FB_05_ChatuchakPark` | `Outbound` |
+| [x] | `178` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Saphan Khwai Intersection towards Victory Monument | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Inbound` |
+| [x] | `179` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Victory Monument towards Saphan Khwai Intersection | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Outbound` |
+| [x] | `1070` | Footbridge near Soi Phahon Yothin 18/2 on Phahon Yothin Road | From Kamphaeng Phet Intersection towards Lat Phrao Intersection | สะพานลอยใกล้ซอยพหลโยธิน 18/2 ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
+| [x] | `1071` | Kamphaeng Phet Intersection (Phahon Yothin Road) | From Lat Phrao Intersection (near Soi Phahon Yothin 18) | แยกกำแพงเพชร (ด้านถนนพหลโยธิน) | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
+| [x] | `1112` | Sutthisan Intersection (Vibhavadi Rangsit Road) | From Ratchada-Sutthisan Intersection | แยกสุทธิสาร (ถนนวิภาวดีรังสิต) | Din Daeng | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
+| [x] | `938` | Ramkhamhaeng - Rama 9 Intersection | Ramkhamhaeng - Rama 9 Intersection *(98 frozen frames)* | แยกรามคำแหง-พระราม 9 | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
+| [x] | `939` | Mahadthai Intersection | Mahadthai Intersection (Ramkhamhaeng Road) *(95 frozen frames)* | แยกมหาดไทย | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
+| [x] | `1804` | Entrance to Soi On Nut 33 on On Nut Road | Towards Suan Luang Intersection *(16 rainbow frames)* | ปากซอยอ่อนนุช 33 ถนนอ่อนนุช | Suan Luang | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `Outbound` |
 
 ---
 
