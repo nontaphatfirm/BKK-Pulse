@@ -34,6 +34,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | :--- | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :---: |
 | `CHG-001` | `2026-11-11` | `V1.0` | Automated Baseline | All `100` cams / `61,319` imgs | Blank white, rainbow, gray P-frame, green screen, frozen streams, Thai Unicode paths, `1970` OSD dates, corrupted `cctv_info.csv` | Executed 5-Gate pipeline + `CAMERA_CURATION` in `clean_dataset_v1.py` | `61,319 -> 60,210` valid images (`1,109` filtered); `100/100` metadata repaired | Yes (`clean_dataset_v1.py`) |
 | `CHG-002` | *YYYY-MM-DD* | `V1.1` | *Example: ปลื้ม (@siravidthongsook)* | *e.g., `cam_id=126` or `quality_warning`* | *Describe issue observed in Drive image or CSV* | *Describe exact fix / rule / label update* | *e.g., `direction`: Inbound -> Outbound* | *No / Pending / Yes* |
+| `CHG-003` | `2026-11-16` | `V1.1` | Chawin Sinman (@moaqilo) | Old Town batch: cams `68,228,395,411,412,413,414,556,569,576,630,913,1039,1060,1362,1589` | Wrong/missing direction & detail on `68,414,556,576,630,1039,1060`; `32` bad frames (cam `630`: 25 corrupt/stretched/blurry; cam `1039`: 5 overexposed; `68`: 1 crow; `413`: 1 pickup) | `CAMERA_CURATION`: `direction` 68 Inbound->None, 414 None->Inbound, 576 None->Inbound, 630 Outbound->Inbound, 1039 Outbound->None; `location_detail` fixed for 414,556,576,630,1060; added `32` files to `MANUAL_EXCLUDED_IMAGES`; cam `1362` location flagged (not changed) | `32` images excluded; `7` cams metadata changed; `15/16` cams ticked | Yes (`clean_dataset_v1.py`) |
 
 ---
 
