@@ -150,6 +150,6 @@
 | [x] | `913` | S.A.B. Intersection | S.A.B. Intersection (Charoen Krung - Worachak Road) | แยกเอส.เอ.บี. | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | Towards Lan Luang Intersection | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
 | [x] | `1060` | In front of Sai Panya School on Krung Kasem Road | Towards Rama 1 Road | หน้าโรงเรียนสายปัญญา ถนนกรุงเกษม | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `1362` | Samsen Intersection | Left side towards Uphai Chetsaduthit Intersection | แยกสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `1362` | Samsen Intersection | Left side towards Uphai Chetsaduthit Intersection | แยกสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `1589` | Maen Si Intersection | Maen Si Intersection | แยกแม้นศรี | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 
