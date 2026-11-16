@@ -111,23 +111,23 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [ ] | `915` | Wongwian Yai Roundabout | Wongwian Yai Roundabout | วงเวียนใหญ่ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
-| [ ] | `18` | Saphan Daeng Intersection (Thahan Road) | Towards Kiakkai Intersection | แยกสะพานแดง (ด้านถนนทหาร) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `Outbound` |
-| [ ] | `1028` | Saphan Daeng Intersection | Saphan Daeng Intersection | แยกสะพานแดง | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
-| [ ] | `70` | In front of Bank of Thailand on Sam Sen Road | From Thewet Intersection towards Bang Khun Phrom Intersection | หน้าธนาคารแห่งประเทศไทย ถนนสามเสน | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_2W_BOT_SAMSEN` | `Inbound` |
-| [ ] | `1361` | In front of Bank of Thailand on Sam Sen Road | Right side, from Bang Khun Phrom Intersection | หน้าธนาคารแห่งประเทศไทย ถนนสามเสน | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_2W_BOT_SAMSEN` | `Outbound` |
-| [ ] | `150` | Footbridge near Samsenwittayalai School on Rama 6 Road | From Ari Samphan Intersection towards Pradiphat Intersection *(124 frozen frames)* | สะพานลอยใกล้โรงเรียนสามเสนวิทยาลัย ถนนพระรามที่ 6 | Phaya Thai | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
-| [ ] | `169` | Footbridge in front of Wat Sao Hin near Soi Wong Sawang 3 on Wong Sawang Road | From Rama 7 Bridge towards Wong Sawang Intersection | สะพานลอยหน้าวัดเสาหิน ใกล้ซอยวงศ์สว่าง 3 ถนนวงศ์สว่าง | Bang Sue | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `230` | Entrance to Soi Ranong 2 on Rama 5 Road | From Saphan Daeng Intersection towards Kesakomon Intersection | ปากซอยระนอง 2 ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `233` | Opposite Chitralada Palace on Rama 5 Road | From Ratchawithi Intersection towards Wat Benchamabophit Intersection | ตรงข้ามพระตำหนักจิตรลดารโหฐาน ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `PAIR_2W_CHITRALADA` | `Inbound` |
-| [ ] | `1063` | Opposite Chitralada Palace on Rama 5 Road | From Wat Benchamabophit Intersection | ตรงข้ามพระตำหนักจิตรลดารโหฐาน ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `PAIR_2W_CHITRALADA` | `Outbound` |
-| [ ] | `301` | U Thong Nok Intersection | Towards Kan Ruean Intersection | แยกอู่ทองนอก | Dusit | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
-| [ ] | `332` | Ratchawat Intersection | Towards Phichai Intersection | แยกราชวัตร | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `363` | Khet Dusit Intersection | From Ratchawithi Intersection | แยกเขตดุสิต | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `370` | Thewet Intersection | Left side towards Pracha Kasem Intersection | แยกเทเวศร์ | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_THEWET` | `Inbound` |
-| [ ] | `371` | Thewet Intersection | Left side towards Makkhawan Rangsan Intersection | แยกเทเวศร์ | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_THEWET` | `Inbound` |
-| [ ] | `546` | Panichayakarn Intersection (Phitsanulok Road) | Phitsanulok Road side | แยกพาณิชยการ (ด้านถนนพิษณุโลก) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
-| [ ] | `1368` | Panichayakarn Intersection (Rama 5 Road) | Rama 5 Road side | แยกพาณิชยการ (ด้านถนนพระรามที่ 5) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
+| [x] | `915` | Wongwian Yai Roundabout | Wongwian Yai Roundabout (SW quadrant looking NNE towards Intharaphithak & Prajadhipok) | วงเวียนใหญ่ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
+| [x] | `18` | Saphan Daeng Intersection (Thahan Road) | Saphan Daeng Bridge towards Kiakkai Intersection (both directions visible) | แยกสะพานแดง (ด้านถนนทหาร) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
+| [x] | `1028` | Saphan Daeng Intersection | Saphan Daeng Intersection | แยกสะพานแดง | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
+| [x] | `70` | In front of Bank of Thailand on Sam Sen Road | From Thewet Intersection towards Bang Khun Phrom Intersection (with contraflow lane) | หน้าธนาคารแห่งประเทศไทย ถนนสามเสน | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_2W_BOT_SAMSEN` | `None` |
+| [x] | `1361` | In front of Bank of Thailand on Sam Sen Road | In front of Bank of Thailand (both main and contraflow lanes visible) | หน้าธนาคารแห่งประเทศไทย ถนนสามเสน | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_2W_BOT_SAMSEN` | `None` |
+| [x] | `150` | Footbridge near Samsenwittayalai School on Rama 6 Road | Between Ari Samphan and Pradiphat Intersections (both directions visible) *(124 frozen frames)* | สะพานลอยใกล้โรงเรียนสามเสนวิทยาลัย ถนนพระรามที่ 6 | Phaya Thai | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `169` | Footbridge in front of Wat Sao Hin near Soi Wong Sawang 3 on Wong Sawang Road | From Rama 7 Bridge towards Wong Sawang Intersection *(20 gray P-frame exclusions)* | สะพานลอยหน้าวัดเสาหิน ใกล้ซอยวงศ์สว่าง 3 ถนนวงศ์สว่าง | Bang Sue | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `230` | Entrance to Soi Ranong 2 on Rama 5 Road | Between Saphan Daeng and Kesakomon Intersections (both directions visible) | ปากซอยระนอง 2 ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `233` | Opposite Chitralada Palace on Rama 5 Road | Between Ratchawithi and Wat Benchamabophit Intersections (both directions visible) | ตรงข้ามพระตำหนักจิตรลดารโหฐาน ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `PAIR_2W_CHITRALADA` | `None` |
+| [x] | `1063` | Opposite Chitralada Palace on Rama 5 Road | Between Wat Benchamabophit and Ratchawithi Intersections (both directions visible) | ตรงข้ามพระตำหนักจิตรลดารโหฐาน ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `PAIR_2W_CHITRALADA` | `None` |
+| [x] | `301` | U Thong Nok Intersection | Nakhon Ratchasima Rd towards Kan Ruean Intersection (one-way + contraflow bus lane) | แยกอู่ทองนอก | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `332` | Ratchawat Intersection | Ratchawat Intersection towards Phichai Intersection (both directions and cross traffic visible) *(5 scanline smear exclusions)* | แยกราชวัตร | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `363` | Khet Dusit Intersection | Khet Dusit Intersection, Rama 5 & Sukhothai Roads (multi-directional view) | แยกเขตดุสิต | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `370` | Thewet Intersection | Krung Kasem Rd between Thewet and Pracha Kasem Intersections (both directions) *(low contrast_std verified healthy)* | แยกเทเวศร์ | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_THEWET` | `None` |
+| [x] | `371` | Thewet Intersection | Thewet Intersection crosswalks (multi-directional intersection view) *(low contrast_std verified healthy)* | แยกเทเวศร์ | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_THEWET` | `None` |
+| [x] | `546` | Panichayakarn Intersection (Phitsanulok Road) | Phitsanulok Rd side towards Chamai Maruchet Bridge / Government House *(night wet-road glare kept for Task 04)* | แยกพาณิชยการ (ด้านถนนพิษณุโลก) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
+| [x] | `1368` | Panichayakarn Intersection (Rama 5 Road) | Rama 5 Rd side past RMUTP (both directions) *(night wet-road glare kept for Task 04)* | แยกพาณิชยการ (ด้านถนนพระรามที่ 5) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
 
 ---
 
