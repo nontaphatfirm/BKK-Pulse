@@ -70,6 +70,8 @@ MANUAL_EXCLUDED_IMAGES: dict[str, str] = {
 # Fixes: NULL / '0' / 'connect BMAcctv' / '17/5000' / '(See Yellow)' / swapped
 # English names / typos / truncated ~28-char Thai strings, plus district, corridor,
 # pair_id, pair_type, and direction (Inbound / Outbound / None).
+# Optional "lat"/"lon" keys override the raw cctv_info.csv coordinates when the
+# pair cameras report their partner's position (peer-QA correction).
 CAMERA_CURATION: dict[int, dict[str, Any]] = {
     11: {
         "location_th": "ใกล้ซอยราชวิถี 6 ถนนราชวิถี",
@@ -213,6 +215,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_id": "PAIR_ARM_SUTTHISAN",
         "pair_type": "perpendicular_junction",
         "direction": "Outbound",
+        # Batch 1 QA: raw CSV carried cam 120's position (pair swap on Ratchadaphisek Rd).
+        "lat": 13.789680,
+        "lon": 100.574437,
     },
     120: {
         "location_th": "แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย)",
@@ -223,7 +228,10 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "corridor": "Ratchadaphisek",
         "pair_id": "PAIR_ARM_SUTTHISAN",
         "pair_type": "opposite_intersection_arm",
-        "direction": "Inbound",
+        # Batch 1 QA: side-view arm camera - traffic flows both ways in frame.
+        "direction": "None",
+        "lat": 13.789785,
+        "lon": 100.574031,
     },
     123: {
         "location_th": "แยกรัชดา-ลาดพร้าว (ด้านถนนรัชดาภิเษก)",
@@ -279,6 +287,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_id": "FB_03_Ratchada30",
         "pair_type": "footbridge_bidirectional",
         "direction": "Outbound",
+        # Batch 1 QA: snapped to the outbound footbridge span (raw pin sat on the median).
+        "lat": 13.810192,
+        "lon": 100.575261,
     },
     135: {
         "location_th": "สะพานลอยหน้าโตโยต้าชัวร์ ถนนรัชดาภิเษก",
@@ -532,6 +543,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_id": "FB_04_CriminalCourt",
         "pair_type": "footbridge_bidirectional",
         "direction": "Inbound",
+        # Batch 1 QA: raw CSV had the pair's outbound-side coordinates (224/225 swap).
+        "lat": 13.815228,
+        "lon": 100.575355,
     },
     225: {
         "location_th": "สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก",
@@ -543,6 +557,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_id": "FB_04_CriminalCourt",
         "pair_type": "footbridge_bidirectional",
         "direction": "Outbound",
+        # Batch 1 QA: raw CSV had the pair's inbound-side coordinates (224/225 swap).
+        "lat": 13.815248,
+        "lon": 100.575513,
     },
     228: {
         "location_th": "หน้าโรงพยาบาลกลาง ถนนหลวง",
@@ -1513,8 +1530,9 @@ def build_cleaned_metadata(
                 "location_detail_th": meta["location_detail_th"],
                 "location_en": meta["location_en"],
                 "location_detail_en": meta["location_detail_en"],
-                "lat": float(row["latitude"]),
-                "lon": float(row["longitude"]),
+                # Curation wins when peer QA corrected a swapped/misplaced pin.
+                "lat": float(meta.get("lat", row["latitude"])),
+                "lon": float(meta.get("lon", row["longitude"])),
                 "district": meta["district"],
                 "corridor": meta["corridor"],
                 "pair_id": meta["pair_id"] if meta["pair_id"] is not None else "None",

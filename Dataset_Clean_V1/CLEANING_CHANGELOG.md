@@ -21,7 +21,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | Version | Date | Status | Raw -> Valid Images | Major Milestone |
 | :--- | :---: | :---: | :---: | :--- |
 | [`V1.0`](#v10----2026-11-11-initial-automated-quality-gate--metadata-cleansing) | `2026-11-11` | **Active Baseline** | `61,319 -> 60,210` (`98.19%`) | 5-Gate Image Filter, ASCII filenames, full 100-camera `CAMERA_CURATION` repair |
-| `V1.1` *(Draft)* | *Pending* | Peer QA In Progress | *TBD* | Batch 1-6 peer audit corrections + decision on `32` `quality_warning` frames & Cam `370/371` |
+| `V1.1` *(Draft)* | `2026-11-15` | Peer QA In Progress | `61,319 -> 60,210` (unchanged) | Batch 1 (`17` cams) audited: `5` coordinate fixes, `1` direction fix, `0` bad frames; Batches 2-6 pending |
 | `V2.0` *(Planned)* | *Pending* | Planned Final Lock | *TBD* | Final locked clean dataset for production YOLO inference & final report |
 
 ---
@@ -34,6 +34,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | :--- | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :---: |
 | `CHG-001` | `2026-11-11` | `V1.0` | Automated Baseline | All `100` cams / `61,319` imgs | Blank white, rainbow, gray P-frame, green screen, frozen streams, Thai Unicode paths, `1970` OSD dates, corrupted `cctv_info.csv` | Executed 5-Gate pipeline + `CAMERA_CURATION` in `clean_dataset_v1.py` | `61,319 -> 60,210` valid images (`1,109` filtered); `100/100` metadata repaired | Yes (`clean_dataset_v1.py`) |
 | `CHG-002` | *YYYY-MM-DD* | `V1.1` | *Example: ปลื้ม (@siravidthongsook)* | *e.g., `cam_id=126` or `quality_warning`* | *Describe issue observed in Drive image or CSV* | *Describe exact fix / rule / label update* | *e.g., `direction`: Inbound -> Outbound* | *No / Pending / Yes* |
+| `CHG-003` | `2026-11-15` | `V1.1` | ปลื้ม (@siravidthongsook) | Batch 1 (`17` cameras, Ratchadaphisek) | Pair cameras `119/120` and `224/225` reported each other's `(lat, lon)`; `127` pin sat on the road median instead of the outbound footbridge span; `120` labelled `Inbound` although both directions pass the side-arm view; `0` broken frames found in the visual sweep | Added optional `lat`/`lon` override support to `CAMERA_CURATION` (`clean_dataset_v1.py`) and applied `5` camera corrections + `1` `direction` fix; no image exclusions needed | `119/120`, `224/225` swapped longitudes restored to the correct side; `127` re-pinned `~25 m` onto the outbound span; `120`: `Inbound` -> `None`; valid images unchanged at `60,210` | Yes (`clean_dataset_v1.py`) |
 
 ---
 
@@ -80,7 +81,39 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 
 ---
 
-### `V1.1` -- `TBD` *(In Progress: Peer QA & Refinement)*
+### `V1.1` -- `2026-11-15` *(In Progress: Peer QA & Refinement)*
+
+#### Batch 1 -- ปลื้ม (@siravidthongsook): Ratchadaphisek Corridor (17 cameras)
+
+- **Date:** `2026-11-15`
+- **Editor:** ปลื้ม (@siravidthongsook)
+- **Batch / Scope:** Batch 1 -- `17` cameras (`112`, `118`, `119`, `120`, `123`, `124`, `125`, `126`, `127`, `135`, `211`, `212`, `215`, `219`, `224`, `225`, `1408`)
+- **Problem Found:**
+  - `cam_id=119` / `cam_id=120` (Ratchada-Sutthisan, `PAIR_ARM_SUTTHISAN`): the two opposite arms carried each other's coordinates, so the Ratchadaphisek Road camera sat on the Sutthisan Winitchai Road arm and vice versa (≈ `30-40 m` cross-arm error).
+  - `cam_id=224` / `cam_id=225` (Criminal Court footbridge, `FB_04_CriminalCourt`): same pattern -- longitudes swapped between the inbound and outbound spans.
+  - `cam_id=127` (Soi Ratchadaphisek 30, `FB_03_Ratchada30`): the pin sat on the road median, not on the outbound footbridge span.
+  - `cam_id=120`: labelled `Inbound`, but the frame is a side-arm view carrying traffic in both directions.
+  - Image sweep: `0` unusable frames across all `17` folders (no heavily corrupted, blocked, pitch-black, or residual frozen frames) -> nothing added to `MANUAL_EXCLUDED_IMAGES`.
+  - `cam_id=225`: metadata verified, but its image folder was not visually swept in this pass (still unchecked in the audit checklist).
+- **Fix / Decision Applied:**
+  - Extended `CAMERA_CURATION` in [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py) with optional `lat` / `lon` keys that override the raw `cctv_info.csv` pin inside `build_cleaned_metadata()`:
+    ```python
+    "lat": float(meta.get("lat", row["latitude"])),
+    "lon": float(meta.get("lon", row["longitude"])),
+    ```
+  - Applied `5` coordinate corrections and `1` direction correction in the same table; no threshold or gate changes.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed (`cctv_info_cleaned` after the maintainer re-runs the script):
+    - `cam_id=119`: `lat` `13.78971 -> 13.789680`, `lon` `100.57410 -> 100.574437`
+    - `cam_id=120`: `lat` `13.78968 -> 13.789785`, `lon` `100.57441 -> 100.574031`, `direction` `Inbound -> None`
+    - `cam_id=127`: `lat` `13.81001 -> 13.810192`, `lon` `100.57511 -> 100.575261`
+    - `cam_id=224`: `lat` `13.81524 -> 13.815228`, `lon` `100.57553 -> 100.575355`
+    - `cam_id=225`: `lat` `13.81523 -> 13.815248`, `lon` `100.57533 -> 100.575513`
+  - Direction distribution now: `Inbound` `50`, `Outbound` `29`, `None` `21` (was `51 / 29 / 20`).
+  - Images affected: `0` (`60,210` valid images stay `60,210`; metadata-only change).
+- **Verification:** `CAMERA_CURATION` parsed and compared field-by-field against the Batch 1 review answers (`17/17` cameras match); `py_compile` `PASS`. PR (`chore/00-qa-siravid` -> `main`) -> final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` run `[Pending Maintainer Run]`.
+
+---
 
 > **Instructions for Contributors:** When adding `V1.1` or `V2.0` updates, copy the template below, fill in exact details, and add a summary row to the **Modification Ledger** above.
 
