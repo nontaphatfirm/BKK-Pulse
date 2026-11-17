@@ -21,8 +21,8 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | Version | Date | Status | Raw -> Valid Images | Major Milestone |
 | :--- | :---: | :---: | :---: | :--- |
 | [`V1.0`](#v10----2026-11-11-initial-automated-quality-gate--metadata-cleansing) | `2026-11-11` | Baseline | `61,319 -> 60,210` (`98.19%`) | 5-Gate Image Filter, ASCII filenames, full 100-camera `CAMERA_CURATION` repair |
-| [`V1.1`](#v11----2026-11-17-consolidated-team-peer-qa--batches-1-6) | `2026-11-17` | **Peer QA Active** | `61,319 -> 60,107` (`98.02%`) | All 6 PRs (`#2, #4, #6, #7, #8, #9`) merged & rebuilt: `56` camera metadata updates, `8` `(lat, lon)` fixes, `103` `manual_excluded` frames; `99/100` visual sweeps complete |
-| `V2.0` *(Planned)* | *Pending* | Planned Final Lock | *TBD* | Resolve `cam_id=225` sweep & `500/1188` proposal, deduplicate Drive `136/176`, lock final tables for full production YOLO inference & final report |
+| [`V1.1`](#v11----2026-11-17-consolidated-team-peer-qa--batches-1-6) | `2026-11-17` | Superseded | `61,319 -> 60,107` (`98.02%`) | All 6 PRs (`#2, #4, #6, #7, #8, #9`) merged & rebuilt: `56` camera metadata updates, `8` `(lat, lon)` fixes, `103` `manual_excluded` frames; `99/100` visual sweeps complete |
+| [`V2.0`](#v20----2026-11-17-final-data-lock--100100-peer-qa-verified--chg-b4-02-resolved) | `2026-11-17` | **Locked Final Data** | `61,319 -> 60,029` (`97.90%`) | `cam_id=225` visual sweep (`100/100` `[x]`); resolved `CHG-B4-02` (`1188` kept `607/607`; `500` `-78` severe corrupt/green frames -> `522`); `0` remaining `quality_warning`s; `DATA_CONTRACT` passed |
 
 ---
 
@@ -58,7 +58,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | `CHG-B3-17` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=619` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/619/` & metadata | Confirmed multi-directional Henri Dunant junction view (`direction="None"`); no bad frames | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
 | `CHG-B3-18` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=277` (Batch 3 — PR #2) | Mislabelled as footbridge near Soi Rang Nam (`Inbound`), whereas `(13.76429, 100.53867)` captures Victory Monument Roundabout (Phayathai Island side) | Updated `CAMERA_CURATION[277]` (`location_*`, `location_detail_*`, `direction="None"`) | `Victory Monument Roundabout`; `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
 | `CHG-B4-01` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=26`, `cam_id=1195` (Batch 4 — PR #4) | Both cameras watch Charoen Nakhon Rd from opposite sides of Bukkhalo Intersection; `1195` faces `Outbound` rather than `Inbound` | Updated `pair_id`, `pair_type`, and `1195` `location_*` / `direction` | `PAIR_JX_BUKKHALO -> PAIR_ARM_BUKKHALO`; `perpendicular_junction -> opposite_intersection_arm`; `1195`: `Inbound -> Outbound` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-02` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=500`, `cam_id=1188` (Batch 4 — PR #4) | `500` has `>10%` artifact images; `1188` wide-angle nighttime frames show tiny vehicles & heavy glare | Logged downstream exclusion proposal (kept `clean_dataset_v1.py` 100-cam contract intact pending team consensus) | Pending team decision (`100 -> 98` cameras or downstream filter) | No (Pending decision) |
+| `CHG-B4-02` | `2026-11-15` | `V1.1` -> `V2.0` | สอง (`@theme222`) | `cam_id=500`, `cam_id=1188` (Batch 4 — PR #4) | `500` has `>10%` artifact images; `1188` wide-angle nighttime frames show tiny vehicles & heavy glare | Logged downstream exclusion proposal in `V1.1`; **resolved in `CHG-V2-02`** | Superseded/Resolved by `CHG-V2-02` (`100`-cam contract preserved) | Yes (`CHG-V2-02`) |
 | `CHG-B4-03` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=32` (Batch 4 — PR #4) | View clearly captures both opposing flows along Thoet Thai Rd | Set `CAMERA_CURATION[32]["direction"]` to `"None"` | `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
 | `CHG-B4-04` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=36` (Batch 4 — PR #4) | Wide multi-directional view on Ratchadaphisek Rd side with traffic approaching from Mahai Sawan Intersection (not Ratchaphruek/Taksin) | Updated `location_*`, `location_detail_*`, `direction="None"` | `Ratchaphruek Rd -> Ratchadaphisek Rd`; `Taksin -> Mahai Sawan`; `Outbound -> None` | Yes (`clean_dataset_v1.py`) |
 | `CHG-B4-05` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=158` (Batch 4 — PR #4) | Dominant 3-lane foreground flows `Outbound` towards Bukkhalo Intersection; `location_detail_th` also said `ขาเข้า` | Updated `direction="Outbound"` and `location_detail_th` (`ขาเข้า -> ขาออก`) | `direction`: `Inbound -> Outbound`; `ขาเข้า -> ขาออก` | Yes (`clean_dataset_v1.py`) |
@@ -76,6 +76,8 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | `CHG-B5-04` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `915, 301, 370, 546, 1368` (Batch 5 — PR #9) | `915` raw pin sat ~95 m NW on Intharaphithak Rd; `301` looks along Nakhon Ratchasima Rd; `370` looks SE along Krung Kasem Rd | Added `"lat": 13.72572, "lon": 100.49268` for `915` + refined `location_detail_th/en` (`915, 301, 370, 546, 1368`) | `cam_id=915` re-pinned ~95 m SE; road details aligned to Street View & OSM | Yes (`clean_dataset_v1.py`) |
 | `CHG-B5-05` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `cam_id=332` (Batch 5 — PR #9) | Full pixel scan across `10,217` Batch 5 frames uncovered `5` severe vertical `scanline_smear` / stretched frames (>50–90% occluded) | Added all `5` filenames to `MANUAL_EXCLUDED_IMAGES` (`"scanline_smear"`) | `cam_id=332`: `611 -> 606` valid images (`-5`) | Yes (`clean_dataset_v1.py`) |
 | `CHG-B6-01` | `2026-11-16` | `V1.1` | โม่ (`@moaqilo`) | Batch 6 Old Town (`16` cams — PR #8) | Wrong/missing `direction` & `location_detail` (`68, 414, 556, 576, 630, 1039, 1060, 1362`); `1362` coords offset; `32` unusable frames (`68`: 1, `413`: 1, `630`: 25, `1039`: 5) | Updated `8` cameras in `CAMERA_CURATION` (incl. `1362` `lat=13.7746377, lon=100.5067094`) + added `32` filenames to `MANUAL_EXCLUDED_IMAGES` | `8` cams metadata updated; `-32` images queued; `16/16` ticked | Yes (`clean_dataset_v1.py`) |
+| `CHG-V2-01` | `2026-11-17` | `V2.0` | Maintainer (`Batch 1 Finalize`) | `cam_id=225` (`607` valid frames) | `cam_id=225` metadata verified in `CHG-B1-01`, visual frame sweep left unchecked (`99/100`) | Ran full pixel & visual extremity scan across all `607` valid frames (`0` corruptions; rain/mist on `29_1511`, `29_1521`, `30_1641` kept for Task 04) + ticked `[x]` | Checklist completed: `99/100 -> 100/100` (`[x]`); `0` frames dropped | Yes (`CAMERA_AUDIT_CHECKLIST.md`) |
+| `CHG-V2-02` | `2026-11-17` | `V2.0` | Maintainer (`CHG-B4-02 Resolution`) | `cam_id=500`, `cam_id=1188` | `1188` night glare (`128` night frames) vs. `500` H.264 macroblock/YUV corruptions (`>10%`, incl. remaining `7` warnings); whole-camera drops would break `100`-cam contract | Validated `RobustTrafficDetector` on `1188` (`8` cars night, `5` cars wet storm) -> kept `607/607`; audited all `600` frames of `500` & excluded `78` (`13.0%`) severe corruptions in `MANUAL_EXCLUDED_IMAGES` | `cam_id=1188`: `607` kept; `cam_id=500`: `600 -> 522` valid (`-78`); total valid `60,107 -> 60,029`; `quality_warning`: `7 -> 0` | Yes (`clean_dataset_v1.py`) |
 
 ---
 
@@ -265,11 +267,40 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 
 ---
 
-#### Remaining Open Items Before Locking `V2.0`
-1. **Batch 1 `cam_id=225` visual sweep:** Metadata (`lat/lon`, `Outbound`) verified; complete the visual frame scan (`CAMERA_AUDIT_CHECKLIST.md` line `225`).
-2. **Batch 4 `CHG-B4-02` decision (`cam_id=500` & `1188`):** Confirm whether to exclude downstream in Task 03/04 or keep in `cctv_info_cleaned` (`expected_min_rows=100`).
-3. **Google Drive `V2.0` sync:** Remove `28` redundant byte-identical duplicate copies in Drive `136/` (`18`) and `176/` (`10`), and sync regenerated `Dataset_Clean_V1/` (`60,107` images + updated `.parquet`/`.csv`) after review.
-4. **Task 03 Median Backgrounds Refresh:** Locally cached `data/median_backgrounds/` generated prior to `V1.1` should be regenerated for cameras with newly excluded frames (especially `1815`, `630`, `1039`, `169`, `158`, `529`, `206`, `332`).
+#### Remaining Open Items Before Locking `V2.0` *(Addressed in `V2.0` Below)*
+1. **Batch 1 `cam_id=225` visual sweep:** Metadata (`lat/lon`, `Outbound`) verified; complete the visual frame scan -> **Done in `CHG-V2-01`**.
+2. **Batch 4 `CHG-B4-02` decision (`cam_id=500` & `1188`):** Decide downstream handling vs. contract -> **Resolved in `CHG-V2-02`**.
+3. **Google Drive `V2.0` sync:** Local `136/` (`608` files) and `176/` (`609` files) have `0` duplicates; remember to remove the `28` extra Drive-only copies when syncing `V2.0` to Google Drive.
+4. **Task 03 Median Backgrounds Refresh:** Locally cached `data/median_backgrounds/` generated prior to `V1.1`/`V2.0` should be regenerated for cameras with newly excluded frames (`1815`, `630`, `1039`, `169`, `158`, `529`, `206`, `332`, `500`).
+
+---
+
+### `V2.0` -- `2026-11-17` *(Final Data Lock -- `100/100` Peer QA Verified & `CHG-B4-02` Resolved)*
+
+#### 1. Batch 1 Completion (`CHG-V2-01`: `cam_id=225` Visual Sweep)
+- **Quantitative & Visual Audit (`607` valid / `611` raw; `4` `white_error` already removed by Gate 1):**
+  - `warnings = none` across all `607` frames; `gray128 > 0.2 = 0`; `neon_green > 0.01 = 0`; minimum `mad_from_prev = 6.03` (zero frozen stalls); minimum `bot_std = 33.07`; `sharpness` min/p5/med = `10.74 / 24.80 / 28.17`.
+  - Visually verified the `28` lowest-sharpness / highest-glare / row-jump extreme frames (`29_1511`, `29_1521`, `30_1641`, nighttime headlights): vehicles and roadway remain fully legible; mild lens rain droplets retained per Task 04 CV weather rules.
+  - Marked `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md` (**`100 / 100` audited**).
+
+#### 2. Resolution of `CHG-B4-02` (`CHG-V2-02`: `cam_id=1188` & `cam_id=500`)
+- **Contract Decision (`100` Cameras Preserved):** Dropping whole cameras (`100 -> 98`) would break `run_pipeline.py` (`expected_min_rows=100`), invalidate `16,800` hourly rows (`100 x 168`) in `data/external_weather_poi.parquet`, and drop Bangkok's sole **Pratu Nam Intersection (`500`)** and **Kanchanaphisek / Chimphli Interchange (`1188`)** coverage. Both cameras carry `direction="None"` and do not affect directional (`32/23`) or bidirectional footbridge (`6` pairs) metrics.
+- **`cam_id=1188` (`607` valid: `479` day / `128` night; `42` frames `glare_ratio > 0.05`) -- Kept `607 / 607`:**
+  - Daytime (`79%`) frames are sharp; nighttime (`21%`) headlight glare/wet storm scenes passed `RobustTrafficDetector` validation (`25_0800`: `11` vehicles; `25_1950` night glare: `8 cars`, `18` glare FPs suppressed; `28_1845` rainy night: `5 cars`, `23` FPs suppressed). Dropping `128` night frames would erase `18:00–19:30` from `evening_rush_score`, skew K-Means clustering, and eliminate evening storm recovery (`tau_recovery_min`).
+- **`cam_id=500` (`600` valid -> `522` clean, `-78` or `13.0%` excluded; `181` total `MANUAL_EXCLUDED_IMAGES`):**
+  - Full `600`-frame visual triage confirmed `@theme222`'s `>10%` finding: `7` `partial_green_screen` frames (removing roads in the lower foreground), `1` severe bottom-half vertical `scanline_smear` (`500_20260828_190519.jpg`), and `70` heavy H.264/P-frame macroblock smears causing Task 03 hallucinated/lost detections (e.g., phantom `car 0.64` / `bus 0.40` on `500_20260827_194519.jpg`).
+  - Excluded filenames (`78`):
+    - `partial_green_screen` (`7`): `500_20260825_073524.jpg`, `500_20260825_191519.jpg`, `500_20260826_191519.jpg`, `500_20260828_111524.jpg`, `500_20260829_130521.jpg`, `500_20260831_201519.jpg`, `500_20260831_203519.jpg`.
+    - `scanline_smear` (`1`): `500_20260828_190519.jpg`.
+    - `corrupt_artifact` (`70`): `500_20260825_060027.jpg`, `065518`, `091518`, `092518`, `093518`, `094518`, `100518`, `131519`, `141523`, `162522`, `163519`, `164519`, `173520`, `183519`, `184519`, `190519`, `200519`, `201519`, `20260826_060042`, `095518`, `102519`, `104523`, `113518`, `142523`, `165519`, `193519`, `195519`, `201519`, `202519`, `205519`, `20260827_092520`, `112518`, `122520`, `162519`, `183519`, `194519`, `195521`, `203519`, `205521`, `20260828_090521`, `092520`, `163519`, `174519`, `192519`, `20260829_131518`, `140518`, `142519`, `151521`, `152518`, `180519`, `182519`, `193519`, `195521`, `200519`, `205521`, `20260830_154022`, `163022`, `165020`, `174523`, `20260831_092518`, `103518`, `112518`, `113519`, `180519`, `182519`, `190519`, `191519`, `192521`, `195521`, `200519`.
+  - **Time-Series Implementation Note (Task 05):** Scattered single-frame removals on `cam_id=500` reduce naive index-based `.shift(-3)` valid `(tgt+lag1)` rows (`528 -> 304`); Task 05 (`build_lag_dataset.py`) should use wall-clock timestamp matching (`merge_asof` on `timestamp +/- 30 min`) rather than rigid row-index shifts to avoid 3–4x gap amplification around isolated `manual_excluded` frames.
+
+#### 3. Locked `V2.0` Rebuild & Contract Validation (`clean_dataset_v1.py`, `2026-11-17`, `188.57s`)
+- **`total_raw_images`: `61,319`** -> **`total_valid_images`: `60,029` (`97.90%` / `97.8962%`)**, **`total_filtered_images`: `1,290` (`2.10%`)**
+- **`status_counts`:** `valid = 60,029`, `frozen = 553`, `white_error = 504`, `manual_excluded = 181`, `no_signal_error = 33`, `corrupt_color = 19`
+- **`quality_warning_counts_among_valid`:** `none = 60,029` (**`0` warnings remaining across all 100 cameras**)
+- **Canonical Contract Updated (`DATA_CONTRACT.md` & `run_pipeline.py`):** Table 3 `expected_min_rows` aligned to `60,029` (`python run_pipeline.py --check-contract` `[PASS]` on Tables 1, 2, 4).
+- **Drive Mirror Note:** Before/during Drive `V2.0` upload, remove the `28` Drive-only duplicates in `136/` (`18`) & `176/` (`10`) and unlink the `78` newly excluded `.jpg` files in `500/` (local disk already reflects `522` files in `500/` and `60,029` files total).
 
 ---
 

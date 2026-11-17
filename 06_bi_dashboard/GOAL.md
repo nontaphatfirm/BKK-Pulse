@@ -62,11 +62,11 @@ This module delivers the **4-Tab Streamlit Interactive BI Dashboard (`BKK-Pulse 
 ---
 
 ### Tab 4: BMA CCTV Network Health & Infrastructure Audit *(Build Immediately on Day 1!)*
-- **Network Quality Gate KPIs (`61,319` Total Inspected Frames):**
-  - Valid Operational Frames (`valid`): **`60,107` (`98.02%`)** *(plus `7` frames on `cam_id=500` tagged with non-destructive `quality_warning`)*
+- **Network Quality Gate KPIs (`61,319` Total Inspected Frames — `V2.0` Final Lock):**
+  - Valid Operational Frames (`valid`): **`60,029` (`97.90%`)** *(`0` remaining `quality_warning` frames across all 100 cameras)*
   - Frozen Stream Buffers (`frozen`): **`553` (`0.90%`)**
   - Blank White Sensor Drops (`white_error`): **`504` (`0.82%`)**
-  - Peer QA Manual Exclusions (`manual_excluded`): **`103` (`0.17%`)**
+  - Peer QA Manual Exclusions (`manual_excluded`): **`181` (`0.30%`)**
   - RTSP Pipeline Crashes (`no_signal_error` Rainbow): **`33` (`0.05%`)**
   - Codec / YUV Corruptions (`corrupt_color` -- 11 Gray P-Frame, 8 Green Screen): **`19` (`0.03%`)**
 - **System-Wide Outage Timeline:**
@@ -85,7 +85,7 @@ This module delivers the **4-Tab Streamlit Interactive BI Dashboard (`BKK-Pulse 
 
 ## 3. Definition of Done Checklist
 
-- [ ] Complete Batch 6 camera verification (16 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
+- [x] Complete Batch 6 camera verification (16 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
 - [ ] **Day 1:** Build the Streamlit multi-tab application shell, **Tab 4 (Network Health Audit)**, and the **Tab 1 Base Map** using `Dataset_Clean_V1/`.
 - [ ] Implement `data_loader.py` with DuckDB / Parquet caching (`@st.cache_data`) and automatic fallback to `vehicle_counts_sample.parquet`.
 - [ ] Integrate final Parquet artifacts and `models/lgbm_congestion_forecaster.txt` from Tasks 01-05 into Tabs 1, 2, and 3.

@@ -29,7 +29,7 @@ Observing current congestion is reactive; urban traffic management requires **pr
 > **Mandatory Engineering Safeguard for Time-Series Lags:**  
 > Because the CCTV dataset records frames at **10-minute intervals** with two major structural discontinuities, naive `.shift(k)` operations across `groupby("cam_id")` will introduce severe temporal corruption:
 > 1. **Overnight Recording Gap (`21:00-06:00` daily):** No frames exist overnight. Shifting across midnight causes the `06:00` morning frame to use the previous night's `20:50` frame as its `10-minute lag`.
-> 2. **Central Acquisition Outage (`2026-08-27 06:00-08:50`) & Filtered Error Frames:** All 100 cameras dropped offline until `08:51` on August 27, and 1,109 defective frames were removed by Task 00.
+> 2. **Central Acquisition Outage (`2026-08-27 06:00-08:50`) & Filtered Error Frames:** All 100 cameras dropped offline until `08:51` on August 27, and `1,290` defective/excluded frames (`1,109` automated + `181` `manual_excluded` in `V2.0`) were removed by Task 00.
 
 ### Required Gap-Safe Lag Construction Protocol:
 1. Sort strictly by `["cam_id", "timestamp"]` and extract `date = df["timestamp"].dt.date`.
@@ -39,6 +39,10 @@ Observing current congestion is reactive; urban traffic management requires **pr
    - **`lag_2` (`t - 20m`):** Valid only if `16.0 <= delta_min <= 25.0 min` (else `NaN`).
    - **`lag_3` (`t - 30m`):** Valid only if `25.0 <= delta_min <= 36.0 min` (else `NaN`).
    - **Target `y_target_t_plus_30m` (`t + 30m`, `shift(-3)`):** Valid only if `25.0 <= (t_plus3 - t_0) <= 36.0 min` (drop rows where target is `NaN`).
+
+> [!TIP]
+> **Preventing Gap Amplification Around Scattered Manual Exclusions (e.g., `cam_id=500`):**  
+> Removing isolated corrupted frames punches 10-minute holes that cause rigid index-based `.shift(-3)` / `.shift(k)` calls to shift past `+/- 36 min` and drop 3–4 surrounding valid timestamps (`528 -> 304` rows on `cam_id=500`). Prefer wall-clock timestamp lookups (`pd.merge_asof` at exact target offsets `timestamp + 10/20/30 min` within tolerance) or 10-minute grid re-indexing inside `(cam_id, date)` so only truly missing timestamps become `NaN`.
 
 ---
 
@@ -90,7 +94,7 @@ Never use random row shuffling (`shuffle=True`) on time-series data. Partition c
 
 ## 4. Definition of Done Checklist
 
-- [ ] Complete assigned camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md) (Batch 3: **เฟิร์ม**, Batch 4: **สอง**, Batch 5: **นิว**).
+- [x] Complete assigned camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md) (Batch 3: **เฟิร์ม**, Batch 4: **สอง**, Batch 5: **นิว**).
 - [ ] Implement gap-safe lag feature engineering and verify zero cross-day or cross-outage leakage on `data/vehicle_counts_sample.parquet`.
 - [ ] Train LightGBM Regressor on the full dataset, benchmark against Naive Persistence, and save `models/lgbm_congestion_forecaster.txt`.
 - [ ] Export `data/ml_forecast_predictions.parquet`, `data/ml_model_metrics.json`, and `data/ml_shap_importance.parquet`.

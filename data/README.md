@@ -18,7 +18,7 @@ This directory stores the intermediate and production `.parquet` and `.json` art
 | `data/traffy_complaints_near_cctv.parquet` | `02_scraping_traffy_playwright` | Incident-level BMA Traffy Fondue reports matched within 500m-1km of cameras |
 | `data/external_weather_poi.parquet` | `01` & `02` | **Canonical Table 4:** Merged hourly weather, air quality, OSM POIs, and Traffy hotspot counts |
 | `data/vehicle_counts_sample.parquet` | `03_cv_yolo_pipeline` | **Priority 1 Pilot Table:** 5-camera subset (~3,000 rows) for immediate DS/BI development |
-| `data/vehicle_counts.parquet` | `03_cv_yolo_pipeline` | **Canonical Table 3:** Full 60,107-frame vehicle counts, PCU, and road occupancy ratios |
+| `data/vehicle_counts.parquet` | `03_cv_yolo_pipeline` | **Canonical Table 3:** Full 60,029-frame vehicle counts, PCU, and road occupancy ratios (`V2.0`) |
 | `data/median_backgrounds/<cam_id>_bg.jpg` | `03_cv_yolo_pipeline` | Clean-road median background plates for all 100 cameras |
 | `data/analytics_traffic_metrics.parquet` | `04_ds_traffic_analytics` | Frame-level adaptive composite density, `low_visibility_flag`, CV weather states (`visual_rain_flag`, `wet_road_flag`, `rain_severity_score`), and per-camera `P95` `congestion_index` (`0-100`) |
 | `data/footbridge_tidal_flow.parquet` | `04_ds_traffic_analytics` | Inbound vs. Outbound profiles and 6-footbridge-pair Tidal Imbalance metrics |

@@ -5,11 +5,11 @@
 > **Source Directory:** [`src/`](src/README.md)  
 > **Existing Detection Prototype:** [`src/predict_yolo26x.py`](src/predict_yolo26x.py)  
 > **Input Data:**  
-> - Valid ASCII-renamed images in `Dataset_Clean_V1/cctv_images/` (`60,107` images across 100 cameras)  
+> - Valid ASCII-renamed images in `Dataset_Clean_V1/cctv_images/` (`60,029` images across 100 cameras, `V2.0`)  
 > - Frame manifest in [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet)  
 > **Primary Output Artifacts:**  
 > 1. **Priority 1 (Day-1 Fast Track):** `data/vehicle_counts_sample.parquet` *(5 representative cameras, ~3,000 frames, to unblock Tasks 04, 05, and 06 immediately)*  
-> 2. **Full Production Dataset:** `data/vehicle_counts.parquet` *(all `60,107` valid frames across 100 cameras per [`DATA_CONTRACT.md`](../DATA_CONTRACT.md))*  
+> 2. **Full Production Dataset:** `data/vehicle_counts.parquet` *(all `60,029` valid frames across 100 cameras per [`DATA_CONTRACT.md`](../DATA_CONTRACT.md))*  
 > 3. **Clean-Road Background Library:** `data/median_backgrounds/<cam_id>_bg.jpg` *(100 clean-road background plates for dashboard visual comparison)*
 
 ---
@@ -29,7 +29,7 @@ This module resolves all three challenges by combining **Single-Pass Batch YOLO 
 ## 2. Step-by-Step Pipeline Specification
 
 ### Step 1: Fast-Track 5-Camera Pilot Dataset (`data/vehicle_counts_sample.parquet`)
-Before running inference on all 60,107 images, execute the full pipeline on **5 representative cameras** (~3,000 images total, taking only a few minutes on GPU):
+Before running inference on all 60,029 images, execute the full pipeline on **5 representative cameras** (~3,000 images total, taking only a few minutes on GPU):
 - `136` & `137`: Bidirectional footbridge pair on Lat Phrao Road (Big C Extra).
 - `26`: Bukkhalo Intersection (Thon Buri arterial).
 - `150`: Samsenwittayalai School on Rama 6 Road (contains post-outage recovery segments).
@@ -53,7 +53,7 @@ For each of the 100 cameras (`i`):
 
 > [!TIP]
 > **Optional Cross-Module Hook with Task 04 (CV Rain & Wet-Road Features):**  
-> Because this step already reads all `60,107` valid images with OpenCV alongside each camera's clean Median Background plate and active road ROI mask, **เฟิร์ม** (`03`) and **สอง** (`04`) may optionally share OpenCV image-processing weather cues (e.g., lower-ROI wet-road reflection, sharpness, or saturation metrics) during this pass, or let Task 04 compute them independently on `Dataset_Clean_V1/cctv_images/`.
+> Because this step already reads all `60,029` valid images with OpenCV alongside each camera's clean Median Background plate and active road ROI mask, **เฟิร์ม** (`03`) and **สอง** (`04`) may optionally share OpenCV image-processing weather cues (e.g., lower-ROI wet-road reflection, sharpness, or saturation metrics) during this pass, or let Task 04 compute them independently on `Dataset_Clean_V1/cctv_images/`.
 
 ---
 
@@ -61,7 +61,7 @@ For each of the 100 cameras (`i`):
 Reuse the model resolution and `apply_nms_and_remap` logic already implemented in [`src/predict_yolo26x.py`](src/predict_yolo26x.py#L457-L505):
 
 - All 4 model checkpoints (`models/yolo26x.pt`, `models/dronefreak--visdrone-yolo11x/best.pt`, `models/dronefreak--visdrone-yolo26l/best.pt`, and `models/iisc-aim--UVH-26/UVH-26-MV-YOLOv11-X.pt`) are **already downloaded and cached locally in `models/`**.
-- **Execution Speed Rule (Single-Pass Inference Only for Batch Runs):** Do **not** enable `--sahi` sliced tiling across all 60,107 images (multi-tile SAHI increases inference time by `5x-10x` with minimal gain on `352 x 288` frames when paired with `foreground_ratio`). Benchmark single-pass models on the 5-camera pilot, pick the best single-pass checkpoint (e.g., `iisc-aim/UVH-26` or `yolo26x.pt`), and run batched GPU inference (`batch=32` or `64`). Reserve `--sahi` strictly for single-image interactive inspection in the dashboard.
+- **Execution Speed Rule (Single-Pass Inference Only for Batch Runs):** Do **not** enable `--sahi` sliced tiling across all 60,029 images (multi-tile SAHI increases inference time by `5x-10x` with minimal gain on `352 x 288` frames when paired with `foreground_ratio`). Benchmark single-pass models on the 5-camera pilot, pick the best single-pass checkpoint (e.g., `iisc-aim/UVH-26` or `yolo26x.pt`), and run batched GPU inference (`batch=32` or `64`). Reserve `--sahi` strictly for single-image interactive inspection in the dashboard.
 - Apply `CANONICAL_CLASS_MAP` in `grouped` NMS mode so fine-grained 4-wheeler subclasses (`sedan`, `hatchback`, `suv`, `muv`, `van`) merge into `car`, and 2-wheeler subclasses (`motor`, `motorbike`, `two-wheeler`) merge into `motorcycle` **before** class-aware NMS runs -- preventing intra-4-wheeler boxes from suppressing adjacent motorcycles.
 - Retain raw frame-level bounding box coordinates `[x1, y1, x2, y2]`, confidence scores, and canonical class IDs (`car`, `motorcycle`, `bus`, `truck`, `three-wheeler`) for Step 4.
 
@@ -104,7 +104,7 @@ For each camera `i` with frame dimensions `(W[i], H[i])` *(note: `352 x 288` for
 
 ## 3. Deliverable Schema (`data/vehicle_counts.parquet`)
 
-Granularity: `60,107` rows (matching all `is_valid == True` rows in `image_quality_manifest.parquet`).
+Granularity: `60,029` rows (matching all `is_valid == True` rows in `image_quality_manifest.parquet`, `V2.0`).
 
 | Column Name | Data Type | Description |
 | :--- | :--- | :--- |
@@ -129,4 +129,4 @@ Granularity: `60,107` rows (matching all `is_valid == True` rows in `image_quali
 - [x] Complete Batch 3 camera verification (17 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
 - [ ] **Priority 1:** Generate 5-camera pilot dataset `data/vehicle_counts_sample.parquet` and notify **สอง**, **โม่**, and **นิว**.
 - [ ] Generate 100 clean-road background plates in `data/median_backgrounds/<cam_id>_bg.jpg`.
-- [ ] Execute single-pass batch inference across all 60,107 valid frames with Stationary Box Filtering and Auto Road ROI masking to produce `data/vehicle_counts.parquet`.
+- [ ] Execute single-pass batch inference across all 60,029 valid frames with Stationary Box Filtering and Auto Road ROI masking to produce `data/vehicle_counts.parquet`.

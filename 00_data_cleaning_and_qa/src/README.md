@@ -4,7 +4,7 @@ See full technical specification in [`../GOAL.md`](../GOAL.md).
 
 ## Scripts
 
-- [`clean_dataset_v1.py`](clean_dataset_v1.py): Executes the 5-stage Automated Image Quality Gate across all 61,319 raw images, copies valid ASCII-renamed images (`60,210` files) into `Dataset_Clean_V1/cctv_images/`, and builds `cctv_info_cleaned.parquet` / `.csv` and `image_quality_manifest.parquet` / `.csv`.
+- [`clean_dataset_v1.py`](clean_dataset_v1.py): Executes the 5-stage Automated Image Quality Gate + Peer QA exclusions across all 61,319 raw images, copies valid ASCII-renamed images (`60,029` files in `V2.0`) into `Dataset_Clean_V1/cctv_images/`, and builds `cctv_info_cleaned.parquet` / `.csv` and `image_quality_manifest.parquet` / `.csv`.
 
 ## CLI Usage
 
