@@ -38,6 +38,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | `CHG-004` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | `cam_id=1815` / `18` images | Camera view changed (~180° reverse pan) from `2026-08-31 18:10:44` to end of capture; frames no longer match `location_detail` / `direction` | **Following the PM's instruction**, added the `18` changed-view filenames to `MANUAL_EXCLUDED_IMAGES` (reason `camera_view_changed`); original-view frames kept | `1815` valid images: `611 -> 593`; Batch 2: `9,535 -> 9,517`; no other camera affected | Yes (`clean_dataset_v1.py`) |
 | `CHG-005` | `2026-11-16` | `V1.1` | กร (@kkooAAA) | Batch 2 location audit: `1112` (changed); `939`, `170`, `1071`, `1804`, `1815`, `178`, `179` (verified) | `1112` labelled with the wrong road (Vibhavadi Rangsit) although it views Sutthisan Winitchai Road; `1815` road recorded as Asok-Din Daeng in `CHG-003` | Updated `location_en` / `location_th` (`1112`) in `CAMERA_CURATION`; `1815` road clarified as Rama 9 Road (documentation only); other cameras verified unchanged | `1112` road: Vibhavadi Rangsit -> Sutthisan Winitchai; images unchanged (`9,517`) | Yes (`clean_dataset_v1.py`) |
 | `CHG-006` | `2026-11-17` | `V1.1` | กร (@kkooAAA) | `939`, `1112`, `1804` | `939` detail named Ramkhamhaeng Road instead of Ramkhamhaeng Bridge; `1112` / `1804` detail and `direction` did not match the camera view | Updated `location_detail_th/en` (`939`, `1112`, `1804`), `location_th/en` (`1112`, back to Vibhavadi Rangsit Road, supersedes `CHG-005`) and `direction` (`1112`, `1804`) in `CAMERA_CURATION` | `1112` direction: Inbound -> None; `1804` direction: Outbound -> None; direction totals `51/29/20 -> 50/28/22` (Inbound/Outbound/None); images unchanged | Yes (`clean_dataset_v1.py`) |
+| `CHG-007` | `2026-11-17` | `V1.1` | กร (@kkooAAA) | `cam_id=1112` | Road name: camera views Sutthisan Winitchai Road, not Vibhavadi Rangsit Road | Updated `location_th/en` and `location_detail_th/en` in `CAMERA_CURATION` to Sutthisan Winitchai Road (supersedes the `CHG-006` road revert); `direction` unchanged (`None`) | `location_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`; `location_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)` (same for `location_detail_th/en`) | Yes (`clean_dataset_v1.py`) |
 
 ---
 
@@ -187,3 +188,14 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 - **Open Items for Maintainer:**
   - Direction totals `51 / 29 / 20` are still quoted in `DATA_CONTRACT.md`, `00_data_cleaning_and_qa/GOAL.md`, `04_ds_traffic_analytics/GOAL.md`, `06_bi_dashboard/GOAL.md`, `Dataset_Clean_V1/README.md`, `Info/Project Ideas.md`, and `BKK_Pulse_Team_Guide.html`.
   - `cctv_info_cleaned.csv` / `.parquet` not yet regenerated -- rerun `clean_dataset_v1.py` with the raw `Dataset/` folder.
+
+#### Batch 2 Location Road Fix (`CHG-007`)
+- **Date:** 2026-11-17
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** `1112` (metadata only).
+- **Fix / Decision Applied:**
+  - `location_th` / `location_detail_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`.
+  - `location_en` / `location_detail_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`.
+  - Supersedes the `CHG-006` road revert for `1112` (kept for history). `direction` stays `None`. No `MANUAL_EXCLUDED_IMAGES` changes; no CSV / Parquet modified.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: `4` fields, `1` camera. Images affected: `0`. Direction totals unchanged.
