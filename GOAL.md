@@ -40,9 +40,9 @@ flowchart TD
         EXT_WEB["BMA Traffy Fondue Web Platform<br/>Playwright Interactive + GeoJSON"]
     end
 
-    subgraph Task00["00_data_cleaning_and_qa (V1 Complete - Pending Peer QA)"]
+    subgraph Task00["00_data_cleaning_and_qa (V1.1 Peer QA Merged)"]
         CLEAN_SCRIPT["src/clean_dataset_v1.py<br/>5-Stage Image Quality Gate + Metadata Repair"]
-        CLEAN_IMG["Dataset_Clean_V1/cctv_images/<br/>60,210 Valid ASCII-Renamed Images"]
+        CLEAN_IMG["Dataset_Clean_V1/cctv_images/<br/>60,107 Valid ASCII-Renamed Images"]
         TBL_META["1. cctv_info_cleaned.parquet<br/>100 Cameras + Corridor + Direction"]
         TBL_MAN["2. image_quality_manifest.parquet<br/>61,319 Rows + Quality Status + Optical Stats"]
     end
@@ -54,7 +54,7 @@ flowchart TD
 
         TBL_EXT["4. data/external_weather_poi.parquet<br/>Hourly Weather, Air Quality, POIs & Traffy Hotspots"]
         TBL_SAMPLE["3a. data/vehicle_counts_sample.parquet<br/>5-Camera Pilot Dataset for Immediate DS/BI Dev"]
-        TBL_VEH["3b. data/vehicle_counts.parquet<br/>Full 60,210-Frame Vehicle Counts & Occupancy"]
+        TBL_VEH["3b. data/vehicle_counts.parquet<br/>Full 60,107-Frame Vehicle Counts & Occupancy"]
 
         T04["04_ds_traffic_analytics (สอง)<br/>PCU, Adaptive P95, Shockwave, Tidal, CV Rain & K-Means"]
         T05["05_ds_ml_forecasting (สอง, เฟิร์ม)<br/>LightGBM (t+30m) Forecaster + What-If Model + SHAP"]
@@ -101,16 +101,16 @@ flowchart TD
 
 ## 4. Phased Execution Strategy (Zero-Bottleneck Workflow)
 
-To prevent downstream Data Science (`04`, `05`) and BI Dashboard (`06`) members from waiting on full Computer Vision inference across all 60,210 images, the project executes in three structured phases:
+To prevent downstream Data Science (`04`, `05`) and BI Dashboard (`06`) members from waiting on full Computer Vision inference across all 60,107 images, the project executes in three structured phases:
 
 ### Phase 0: Baseline Cleaning Verification & 5-Camera Pilot Generation
 1. **Baseline Cleaning V1 (Completed):** [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](00_data_cleaning_and_qa/src/clean_dataset_v1.py) has already processed all 61,319 images and generated [`Dataset_Clean_V1/`](Dataset_Clean_V1/README.md).
-2. **Distributed Image & Metadata QA (All 6 Members):** Each member (**ปลื้ม**, **กร**, **เฟิร์ม**, **สอง**, **นิว**, **โม่**) quickly scans through **all images** in `Dataset_Clean_V1/cctv_images/<cam_id>/` (to catch any severely broken/corrupted frames missed by the automated gates) and verifies `location_en`, `location_th`, `district`, `corridor`, `pair_id`, and `direction` for their assigned 16-17 cameras in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md). All edits go through personal GitHub branches + PRs into `main` (Google Drive is read-only; the maintainer runs the final rebuild and Drive sync once after all PRs are merged).
+2. **Distributed Image & Metadata QA (Batches 1–6 Merged in V1.1):** All 6 members (**ปลื้ม**, **กร**, **เฟิร์ม**, **สอง**, **นิว**, **โม่**) audited their assigned batches (`100/100` metadata, `99/100` visual sweeps + `103` `manual_excluded` frames) via GitHub PRs into `main` (`60,107` valid frames retained).
 3. **5-Camera Pilot Dataset (เฟิร์ม `@nontaphatfirm` -- Priority 1):** Runs the YOLO + ROI pipeline on 5 representative cameras (`26`, `136`, `137`, `150`, `546` -- ~3,000 frames) and exports `data/vehicle_counts_sample.parquet` conforming to [`DATA_CONTRACT.md`](DATA_CONTRACT.md). This immediately unblocks **สอง**, **โม่**, and **นิว**.
 
 ### Phase 1: Parallel Track Development
 - **ปลื้ม (`@siravidthongsook`) & กร (`@kkooAAA`) (`01_scraping_apis` & `02_scraping_traffy_playwright`):** Build and merge `data/weather_air_poi.parquet`, `data/traffy_complaints_near_cctv.parquet`, and `data/external_weather_poi.parquet`.
-- **เฟิร์ม (`@nontaphatfirm`) (`03_cv_yolo_pipeline`):** Executes single-pass batch inference across all 60,210 valid images to produce `data/vehicle_counts.parquet` and `data/median_backgrounds/`.
+- **เฟิร์ม (`@nontaphatfirm`) (`03_cv_yolo_pipeline`):** Executes single-pass batch inference across all 60,107 valid images to produce `data/vehicle_counts.parquet` and `data/median_backgrounds/`.
 - **สอง (`@theme222`) & เฟิร์ม (`@nontaphatfirm`) (`04_ds_traffic_analytics` & `05_ds_ml_forecasting`):** **สอง** leads analytical, CV rain/wet-road detection, and K-Means pipelines (`04`), and co-develops the LightGBM `t + 30m` forecasting & SHAP pipeline (`05`) with **เฟิร์ม** against `vehicle_counts_sample.parquet`, then swaps in full `vehicle_counts.parquet` once complete.
 - **โม่ (`@moaqilo`) (`06_bi_dashboard`):** Immediately builds **Tab 4 (BMA CCTV Network Health Audit)** and the **Tab 1 Base Map** using [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](Dataset_Clean_V1/cctv_info_cleaned.parquet) and [`Dataset_Clean_V1/image_quality_manifest.parquet`](Dataset_Clean_V1/image_quality_manifest.parquet), then integrates analytical outputs from `01`-`05`.
 - **นิว (`@Pranithi-New`) (Cross-Module Support):** Flexibly joins any priority module (`01`-`06`) to accelerate implementation, integration, and QA.
