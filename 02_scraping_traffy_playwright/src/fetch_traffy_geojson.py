@@ -18,6 +18,7 @@ import argparse
 import gzip
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.parse
@@ -48,6 +49,16 @@ WEEK_END = "2026-08-31 23:59:59"
 
 FLOOD_KEYS = ("น้ำท่วม", "ท่อระบายน้ำ", "น้ำท่วมขัง")
 TRAFFIC_KEYS = ("จราจร", "ถนน", "กีดขวาง", "อุบัติเหตุ")
+
+PAGE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})_\d+\.json\.gz$")
+
+# Largest legitimate gap in the 2026-05..10 feed is 3.05 h (a quiet night); the
+# 2026-09-25 truncation was 13.6 h. Anything longer means a fetch stopped early.
+MAX_GAP_HOURS = 6.0
+
+
+class IncompleteWindow(RuntimeError):
+    """The crawl stopped before an empty page, so the data is a prefix of the window."""
 
 
 @dataclass(frozen=True)
@@ -91,9 +102,13 @@ def _request_page(start: str, end: str, offset: int, attempts: int = 15) -> list
                 payload = json.loads(resp.read().decode("utf-8"))
             if not isinstance(payload, dict):
                 raise RuntimeError(f"unexpected payload: {str(payload)[:200]}")
+            if "features" not in payload:
+                raise RuntimeError(
+                    f"payload without features at offset {offset}: keys={sorted(payload)[:8]}"
+                )
             # Sustained request bursts trigger 503s; pace successful pages too.
             time.sleep(10.0)
-            return payload.get("features") or []
+            return payload["features"] or []
         except urllib.error.HTTPError as exc:
             # 429/503 -> exponential backoff up to two minutes.
             wait = min(120, 5 * (2**min(attempt, 5))) + attempt
@@ -134,8 +149,10 @@ def load_page(start: str, end: str, offset: int, refresh: bool, attempts: int = 
     features = _request_page(start, end, offset, attempts=attempts)
     compact = [c for c in (_compact(f) for f in features) if c is not None]
     path.parent.mkdir(parents=True, exist_ok=True)
-    with gzip.open(path, "wt", encoding="utf-8") as handle:
+    staging = path.with_name(path.name + ".tmp")
+    with gzip.open(staging, "wt", encoding="utf-8") as handle:
         json.dump(compact, handle, ensure_ascii=False)
+    os.replace(staging, path)
     return compact
 
 
@@ -145,10 +162,12 @@ def fetch_complaints(
     refresh: bool = False,
     max_pages: int = MAX_PAGES,
     fail_on_throttle: bool = False,
-) -> pd.DataFrame:
+) -> tuple[pd.DataFrame, dict]:
     """Page through the feed until an empty page, then dedupe by ticket id."""
     records: dict[str, dict] = {}
     offset = 0
+    pages = 0
+    termination = "max_pages"
     for page in range(max_pages):
         try:
             # Once a cached prefix exists, do not stall the whole pipeline on a throttled API.
@@ -157,14 +176,17 @@ def fetch_complaints(
             if not records or fail_on_throttle:
                 raise
             print(f"[traffy] {exc}; keeping cached prefix ({len(records):,} records)")
+            termination = "error_prefix"
             break
         if not batch:
             print(f"[traffy] stopped at offset {offset} after {page} non-empty pages")
+            termination = "empty_page"
             break
         for record in batch:
             records.setdefault(record["ticket_id"], record)
         print(f"[traffy] offset {offset:>6} +{len(batch):>4} = {len(records):>6} unique")
         offset += len(batch)
+        pages += 1
         if len(batch) < PAGE_LIMIT:
             # Probe one more offset; `total` is unreliable so stop on empty only.
             continue
@@ -180,13 +202,46 @@ def fetch_complaints(
     frame = frame.dropna(subset=["timestamp", "lat", "lon"]).copy()
     frame["problem_type"] = frame["type_raw"].map(classify)
     frame["timestamp"] = frame["timestamp"].astype("datetime64[us]")
-    return frame
+    report = {
+        "termination": termination,
+        "pages": pages,
+        "terminal_offset": offset,
+    }
+    return frame, report
+
+
+def coverage_report(frame: pd.DataFrame, start: str, end: str) -> dict:
+    """Name the days and hours with no record, and the largest timestamp gap."""
+    days = pd.date_range(start, end, freq="D")
+    present = set(frame["timestamp"].dt.normalize())
+    missing = [str(day.date()) for day in days if day not in present]
+    gaps = frame["timestamp"].sort_values().diff()
+    largest = gaps.max() if len(gaps) else pd.Timedelta(0)
+    hours = pd.date_range(pd.Timestamp(start), pd.Timestamp(end) + pd.Timedelta(hours=23), freq="h")
+    covered = set(frame["timestamp"].dt.floor("h"))
+    return {
+        "days_in_window": len(days),
+        "days_with_records": len(days) - len(missing),
+        "days_missing": missing,
+        "hours_in_window": len(hours),
+        "empty_hours": sum(1 for hour in hours if hour not in covered),
+        "largest_gap_hours": round(largest.total_seconds() / 3600.0, 2),
+        "complete": not missing and largest <= pd.Timedelta(hours=MAX_GAP_HOURS),
+    }
+
+
+def _page_in_window(path: Path, start: str, end: str) -> bool:
+    match = PAGE_RE.match(path.name)
+    if not match:
+        return False
+    page_start, page_end = pd.Timestamp(match.group(1)), pd.Timestamp(match.group(2))
+    return page_start <= pd.Timestamp(end) and page_end >= pd.Timestamp(start)
 
 
 def load_cached_frame(start: str, end: str) -> pd.DataFrame:
-    """Load every cached page (all date windows), dedupe, then filter to [start, end]."""
+    """Load cached pages whose filename window intersects [start, end], then dedupe."""
     records: dict[str, dict] = {}
-    paths = sorted(CACHE_DIR.glob("*.json.gz"))
+    paths = [p for p in sorted(CACHE_DIR.glob("*.json.gz")) if _page_in_window(p, start, end)]
     for path in paths:
         with gzip.open(path, "rt", encoding="utf-8") as handle:
             for record in json.load(handle):
@@ -241,15 +296,24 @@ def build_outputs(
     max_pages: int = MAX_PAGES,
     fail_on_throttle: bool = False,
     combine_cache: bool = False,
+    allow_partial: bool = False,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     cameras = pd.read_parquet(CAMERA_PATH)[["cam_id", "lat", "lon"]]
-    raw = (
-        load_cached_frame(start, end)
-        if combine_cache
-        else fetch_complaints(
+    if combine_cache:
+        raw = load_cached_frame(start, end)
+        fetch = {"termination": "cache", "pages": 0, "terminal_offset": 0}
+    else:
+        raw, fetch = fetch_complaints(
             start, end, refresh=refresh, max_pages=max_pages, fail_on_throttle=fail_on_throttle
         )
-    )
+    coverage = coverage_report(raw, start, end)
+    complete = fetch["termination"] in {"empty_page", "cache"} and coverage["complete"]
+    if not complete and not allow_partial:
+        raise IncompleteWindow(
+            f"{start}..{end} is incomplete: termination={fetch['termination']}, "
+            f"days_missing={coverage['days_missing'][:10]}, "
+            f"largest_gap={coverage['largest_gap_hours']}h. Rerun with --allow-partial to build anyway."
+        )
     complaints = _nearest_camera(raw, cameras)
 
     matched = complaints[complaints["distance_m"] <= MATCH_RADIUS_M].copy()
@@ -333,6 +397,9 @@ def build_outputs(
         "cameras_with_flood_complaint": int((counts["traffy_flood_count"] > 0).sum()),
         "week_complaints_within_1000m": int(len(week)),
         "match_radius_m": MATCH_RADIUS_M,
+        "complete": complete,
+        "fetch": fetch,
+        "coverage": coverage,
     }
     return incidents, counts, summary
 
@@ -363,23 +430,37 @@ def main() -> None:
         action="store_true",
         help="Build outputs from every cached page, ignoring the API",
     )
+    parser.add_argument(
+        "--allow-partial",
+        action="store_true",
+        help="Build even when the window did not end on an empty page or has days with no records",
+    )
     args = parser.parse_args()
 
     if args.fetch_only:
-        frame = fetch_complaints(
+        frame, report = fetch_complaints(
             args.start,
             args.end,
             refresh=args.refresh,
             max_pages=args.max_pages,
             fail_on_throttle=args.fail_on_throttle,
         )
+        coverage = coverage_report(frame, args.start, args.end)
         progress = {
             "window_start": args.start,
             "window_end": args.end,
             "records": int(len(frame)),
             "first_timestamp": str(frame["timestamp"].min()),
             "last_timestamp": str(frame["timestamp"].max()),
+            "complete": report["termination"] == "empty_page" and coverage["complete"],
+            "fetch": report,
+            "coverage": coverage,
         }
+        if not progress["complete"] and not args.allow_partial:
+            raise IncompleteWindow(
+                f"{args.start}..{args.end} is incomplete: termination={report['termination']}, "
+                f"days_missing={coverage['days_missing'][:10]}. Rerun with --allow-partial to keep the prefix."
+            )
         (PROJECT_ROOT / "data" / "traffy_fetch_progress.json").write_text(
             json.dumps(progress, indent=2), encoding="utf-8"
         )
@@ -393,6 +474,7 @@ def main() -> None:
         max_pages=args.max_pages,
         fail_on_throttle=args.fail_on_throttle,
         combine_cache=args.combine_cache,
+        allow_partial=args.allow_partial,
     )
     incidents.to_parquet(INCIDENT_PATH, index=False)
     counts.to_parquet(COUNTS_PATH, index=False)
