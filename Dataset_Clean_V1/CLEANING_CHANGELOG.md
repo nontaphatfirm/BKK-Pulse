@@ -12,7 +12,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 1. Add **one row** to the **Modification Ledger** below (so we can scan all edits at a glance).
 2. Add or append a detailed subsection under **Detailed Version Log** using the copy-paste template at the bottom of this file.
 3. Include **exact numbers / `cam_id` / filenames** (Before vs. After) and the **reason** so we can cite it directly in the Data Cleaning & Preparation section of the final report.
-4. Apply the fix in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` (`CAMERA_CURATION` for metadata or `MANUAL_EXCLUDED_IMAGES` for broken/corrupted filenames), mark `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`, and open a **PR into `main`**. *(Team members do not need to re-upload `Dataset_Clean_V1/` to Drive—the maintainer will run `clean_dataset_v1.py` and `python run_pipeline.py --check-contract` once after all 6 PRs are merged, then sync `V2.0` to Google Drive.)*
+4. Apply the fix in [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py) (`CAMERA_CURATION` for metadata or `MANUAL_EXCLUDED_IMAGES` for broken/corrupted filenames), mark `[x]` in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md), and open a **PR into `main`**. *(Once all PRs merge, the maintainer runs `clean_dataset_v1.py` and `python run_pipeline.py --check-contract` and syncs the final output to Google Drive.)*
 
 ---
 
@@ -20,62 +20,62 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 
 | Version | Date | Status | Raw -> Valid Images | Major Milestone |
 | :--- | :---: | :---: | :---: | :--- |
-| [`V1.0`](#v10----2026-11-11-initial-automated-quality-gate--metadata-cleansing) | `2026-11-11` | **Active Baseline** | `61,319 -> 60,210` (`98.19%`) | 5-Gate Image Filter, ASCII filenames, full 100-camera `CAMERA_CURATION` repair |
-| `V1.1` *(Draft)* | `2026-11-15` | Peer QA In Progress | `61,319 -> 60,210` (unchanged) | Batch 1 (`17` cams) audited: `5` coordinate fixes, `1` direction fix, `0` bad frames; Batches 2-6 pending |
-| `V2.0` *(Planned)* | *Pending* | Planned Final Lock | *TBD* | Final locked clean dataset for production YOLO inference & final report |
+| [`V1.0`](#v10----2026-11-11-initial-automated-quality-gate--metadata-cleansing) | `2026-11-11` | Baseline | `61,319 -> 60,210` (`98.19%`) | 5-Gate Image Filter, ASCII filenames, full 100-camera `CAMERA_CURATION` repair |
+| [`V1.1`](#v11----2026-11-17-consolidated-team-peer-qa--batches-1-6) | `2026-11-17` | **Peer QA Active** | `61,319 -> 60,107` (`98.02%`) | All 6 PRs (`#2, #4, #6, #7, #8, #9`) merged & rebuilt: `56` camera metadata updates, `8` `(lat, lon)` fixes, `103` `manual_excluded` frames; `99/100` visual sweeps complete |
+| `V2.0` *(Planned)* | *Pending* | Planned Final Lock | *TBD* | Resolve `cam_id=225` sweep & `500/1188` proposal, deduplicate Drive `136/176`, lock final tables for full production YOLO inference & final report |
 
 ---
 
 ## Modification Ledger (Team Peer-Audit & Cleaning Fixes)
 
-*(Add a new row below every time anyone modifies or flags data during cleaning!)*
+*(IDs follow `CHG-B<batch>-<seq>` after baseline `CHG-001` to avoid cross-branch numbering collisions.)*
 
 | Log ID | Date (`YYYY-MM-DD`) | Target Version | Editor (Name / GitHub) | Target `cam_id` / Scope | Issue Identified | Cleaning Action Taken | Before -> After Impact | Synced in Script? |
 | :--- | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :---: |
 | `CHG-001` | `2026-11-11` | `V1.0` | Automated Baseline | All `100` cams / `61,319` imgs | Blank white, rainbow, gray P-frame, green screen, frozen streams, Thai Unicode paths, `1970` OSD dates, corrupted `cctv_info.csv` | Executed 5-Gate pipeline + `CAMERA_CURATION` in `clean_dataset_v1.py` | `61,319 -> 60,210` valid images (`1,109` filtered); `100/100` metadata repaired | Yes (`clean_dataset_v1.py`) |
-| `CHG-003` | `2026-11-15` | `V1.1` | ปลื้ม (@siravidthongsook) | Batch 1 (`17` cameras, Ratchadaphisek) | Pair cameras `119/120` and `224/225` reported each other's `(lat, lon)`; `127` pin sat on the road median instead of the outbound footbridge span; `120` labelled `Inbound` although both directions pass the side-arm view; `0` broken frames found in the visual sweep | Added optional `lat`/`lon` override support to `CAMERA_CURATION` (`clean_dataset_v1.py`) and applied `5` camera corrections + `1` `direction` fix; no image exclusions needed | `119/120`, `224/225` swapped longitudes restored to the correct side; `127` re-pinned `~25 m` onto the outbound span; `120`: `Inbound` -> `None`; valid images unchanged at `60,210` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B2-01` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | Batch 2 (16 cams): `1815, 136, 137, 139, 141, 170, 176, 177, 178, 179, 1070, 1071, 1112, 938, 939, 1804` | District mismatch on `938`, `1815`; no defective frames missed by automated gates | Updated `district` in `CAMERA_CURATION`; no `MANUAL_EXCLUDED_IMAGES` added; open items logged for maintainer (see V1.1 Batch 2 entry) | `938` district: Suan Luang -> Bang Kapi; `1815` district: Huai Khwang -> Din Daeng; images `9,535 -> 9,535` (0 excluded) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B2-02` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | `cam_id=1815` / `18` images | Camera view changed (~180° reverse pan) from `2026-08-31 18:10:44` to end of capture; frames no longer match `location_detail` / `direction` | **Following the PM's instruction**, added the `18` changed-view filenames to `MANUAL_EXCLUDED_IMAGES` (reason `camera_view_changed`); original-view frames kept | `1815` valid images: `611 -> 593`; Batch 2: `9,535 -> 9,517`; no other camera affected | Yes (`clean_dataset_v1.py`) |
-| `CHG-B2-03` | `2026-11-16` | `V1.1` | กร (@kkooAAA) | Batch 2 location audit: `1112` (changed); `939`, `170`, `1071`, `1804`, `1815`, `178`, `179` (verified) | `1112` labelled with the wrong road (Vibhavadi Rangsit) although it views Sutthisan Winitchai Road; `1815` road recorded as Asok-Din Daeng in `CHG-003` | Updated `location_en` / `location_th` (`1112`) in `CAMERA_CURATION`; `1815` road clarified as Rama 9 Road (documentation only); other cameras verified unchanged | `1112` road: Vibhavadi Rangsit -> Sutthisan Winitchai; images unchanged (`9,517`) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B2-04` | `2026-11-17` | `V1.1` | กร (@kkooAAA) | `939`, `1112`, `1804` | `939` detail named Ramkhamhaeng Road instead of Ramkhamhaeng Bridge; `1112` / `1804` detail and `direction` did not match the camera view | Updated `location_detail_th/en` (`939`, `1112`, `1804`), `location_th/en` (`1112`, back to Vibhavadi Rangsit Road, supersedes `CHG-005`) and `direction` (`1112`, `1804`) in `CAMERA_CURATION` | `1112` direction: Inbound -> None; `1804` direction: Outbound -> None; direction totals `51/29/20 -> 50/28/22` (Inbound/Outbound/None); images unchanged | Yes (`clean_dataset_v1.py`) |
-| `CHG-B2-05` | `2026-11-17` | `V1.1` | กร (@kkooAAA) | `cam_id=1112` | Road name: camera views Sutthisan Winitchai Road, not Vibhavadi Rangsit Road | Updated `location_th/en` and `location_detail_th/en` in `CAMERA_CURATION` to Sutthisan Winitchai Road (supersedes the `CHG-006` road revert); `direction` unchanged (`None`) | `location_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`; `location_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)` (same for `location_detail_th/en`) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-01` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=75` (Batch 3) | `location_detail_th`/`en` in raw metadata misstated incoming approach as Sathu Pradit Expressway (Ratchadaphisek Rd), whereas daylight/night images show BRT median lane on Naradhiwas Rd inbound from Naradhiwas–Rama 3 Intersection | Updated `CAMERA_CURATION[75]` (`location_detail_th` & `location_detail_en`) in `clean_dataset_v1.py` | `location_detail_th`: `รถมาจากแยกด่วนสาธุประดิษฐ์` -> `รถมาจากแยกนราธิวาส-พระราม 3`; `location_detail_en`: `From Sathu Pradit Expressway Intersection` -> `From Naradhiwas-Rama 3 Intersection` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-02` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=88` (Batch 3) | Two-way road with no median (`Chan Rd` near Soi `18/6`); YOLO counts both inbound (right lane towards Chan-Naradhiwas) and outbound (left lane towards camera) vehicles together in one frame | Changed `CAMERA_CURATION[88]["direction"]` from `"Inbound"` to `"None"` in `clean_dataset_v1.py` to avoid polluting Macro Directional Flow (`04`) | `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-03` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=186` (Batch 3) | Peer QA verification of `cctv_images/186/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified all images and metadata against Google Maps; no broken frames or metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-04` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=188` (Batch 3) | Peer QA verification of `cctv_images/188/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified all images and metadata against Google Maps; no broken frames or metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-05` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=194` (Batch 3) | Metadata listed South Sathon Rd (`Inbound`, towards Witthayu), whereas night/day imagery shows primary foreground traffic on North Sathon Rd coming from Witthayu towards Sathon-Naradhiwas (`Outbound`) | Updated `CAMERA_CURATION[194]` (`location_th`, `location_detail_th`, `location_en`, `location_detail_en`, `direction`) in `clean_dataset_v1.py` | `ถนนสาทรใต้` -> `ถนนสาทรเหนือ`; `รถมาจากแยกสาทร-นราธิวาส มุ่งหน้าแยกวิทยุ` -> `รถมาจากแยกวิทยุ มุ่งหน้าแยกสาทร-นราธิวาส`; `direction`: `Inbound` -> `Outbound` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-06` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=196` (Batch 3) | Peer QA verification of `cctv_images/196/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified all images and metadata against Google Maps; no broken frames or metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-07` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=206` (Batch 3) | Metadata listed `ใกล้ซอยนราธิวาสราชนครินทร์ 20`, `รถมาจากแยกรัชดา-นราธิวาส มุ่งหน้าแยกจันทน์-นราธิวาส` (`Inbound`), and raw coordinates (`13.70545, 100.53835`) on the opposite side; also 6 frames (`5` severe gray P-frame corruptions, `1` heavy lens blur/smear) slipped past baseline thresholds | Updated `CAMERA_CURATION[206]` (`location_*`, `direction`, `lat`, `lon`), added optional `lat`/`lon` override in `build_cleaned_metadata()`, and added 6 filenames to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` | `ใกล้ซอย...` -> `ตรงข้ามซอยนราธิวาสราชนครินทร์ 20`; `รถมาจากแยกรัชดา...` -> `รถมาจากแยกจันทน์-นราธิวาส มุ่งหน้าแยกรัชดา-นราธิวาส`; `Inbound` -> `Outbound`; `13.70545, 100.53835` -> `13.70555, 100.53865`; `-6` broken images queued | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-08` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=211` (Batch 1) | Peer QA verification of `cctv_images/211/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified all images and metadata; no broken frames or metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-09` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=599` (Batch 3) | Wide intersection-box view at Surasak Intersection (`สีลม–สุรศักดิ์–มเหสักข์`) where YOLO counts cross-traffic across the junction box and both sides of the median simultaneously | Changed `CAMERA_CURATION[599]["direction"]` from `"Inbound"` to `"None"` in `clean_dataset_v1.py` | `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-10` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=603` (Batch 3) | `location_detail_th`/`en` stated `From Surasak Intersection` (only the side stop-line on Silom Rd left edge), whereas the main corridor stretching ahead is Naradhiwas Rd Northbound (`no BTS viaduct`, `tree-lined median`) fed from Sathon-Naradhiwas Intersection | Updated `CAMERA_CURATION[603]` (`location_detail_th`, `location_detail_en`) in `clean_dataset_v1.py` | `location_detail_th`: `รถมาจากแยกสุรศักดิ์` -> `รถมาจากแยกสาทร-นราธิวาส`; `location_detail_en`: `From Surasak Intersection` -> `From Sathon-Naradhiwas Intersection` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-11` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=604` (Batch 3) | Full 4-way Silom–Naradhiwas junction view capturing both southbound (`Outbound`) & northbound (`Inbound`) carriageways on Naradhiwas Rd under the BTS viaduct plus Silom Rd cross-traffic; old label also referenced `แยกศาลาแดง` which is off-axis on Silom Rd | Updated `CAMERA_CURATION[604]` (`location_detail_th`, `location_detail_en`, `direction`) in `clean_dataset_v1.py` | `location_detail_th`: `ท้ายรถมุ่งหน้าแยกศาลาแดง / แยกสาทร-นราธิวาส` -> `บริเวณแยกสีลม-นราธิวาส (ด้านถนนนราธิวาสฯ มุ่งหน้าแยกสาทร-นราธิวาส)`; `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-12` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=11` (Batch 3) | Divided 5-lane Ratchawithi Rd view near Soi Ratchawithi 6 showing both eastbound (`Outbound`, left 1 lane + center 2 lanes from Victory Monument) and westbound (`Inbound`, right 2 lanes towards Victory Monument) simultaneously; description also mentioned only Victory Monument | Updated `CAMERA_CURATION[11]` (`location_detail_th`, `location_detail_en`, `direction`) in `clean_dataset_v1.py` | `location_detail_th`: `รถมาจากอนุสาวรีย์ชัยสมรภูมิ` -> `ช่วงอนุสาวรีย์ชัยสมรภูมิ – แยกสามเหลี่ยมดินแดง (ทั้งสองทิศทาง)`; `direction`: `Outbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-13` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=82` (Batch 3) | `V1.0` metadata stated `From Mo Leng towards Pratu Nam` (`Inbound`), describing only the 1 leftmost contraflow bus lane; time-sliced imagery (`06:01`–`20:51`) confirms the 4 main right lanes flow northbound (`Pratu Nam -> Mo Leng`, `Outbound`) all day while the 1 left lane runs southbound contraflow traffic (`Inbound`, active mainly in morning hours) | Updated `CAMERA_CURATION[82]` (`location_detail_th`, `location_detail_en`, `direction`) in `clean_dataset_v1.py` | `location_detail_th`: `รถมาจากแยกหมอเหล็ง มุ่งหน้าแยกประตูน้ำ` -> `ช่วงแยกประตูน้ำ – แยกหมอเหล็ง (ทั้งสองทิศทาง: 4 เลนไปหมอเหล็ง / 1 เลนไปประตูน้ำ)`; `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-14` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=239` (Batch 3) | Peer QA verification of `cctv_images/239/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified imagery (`From Pathum Wan towards Sam Yan`, 4 main southbound `Inbound` lanes in front of Triam Udom Suksa School; only a small fringe of the opposite northbound carriageway appears at far top-left); no metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-15` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=432` (Batch 3) | `V1.0` listed generic `Sam Yan Intersection` with `direction="None"`, whereas imagery shows a single clear westbound approach on Rama 4 Rd (`4` straight lanes + `1` left-turn slip lane onto Si Phraya Rd, looking East under the Thai-Japanese Flyover towards Henri Dunant / Silom) | Updated `CAMERA_CURATION[432]` (`location_detail_th`, `location_detail_en`, `direction`) in `clean_dataset_v1.py` | `location_detail_th`: `บริเวณแยกสามย่าน (ถนนพญาไท-พระรามที่ 4)` -> `รถมาจากสีลม มุ่งหน้าไปหัวลำโพง (บริเวณแยกสามย่าน ถนนพระรามที่ 4)`; `direction`: `None` -> `Inbound` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B3-16` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=542` (Batch 3) | Peer QA verification of `cctv_images/542/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified bidirectional Sarasin–Lang Suan junction view beside Lumphini Park (`3` eastbound lanes left + `3` westbound lanes right, `direction="None"`) across day/night samples; no broken images or metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-17` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=619` (Batch 3) | Peer QA verification of `cctv_images/619/` and metadata (`location_*`, `district`, `corridor`, `direction`) | Verified multi-direction Henri Dunant Intersection box view under the Thai-Japanese Flyover (`PT-06-CH2`, cross-traffic across Henri Dunant Rd & Rama 4 Rd, `direction="None"`); no broken images or metadata errors found | No changes (`V1.0` baseline confirmed) | Yes (`clean_dataset_v1.py` unchanged) |
-| `CHG-B3-18` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=277` (Batch 3) | `V1.0` listed `Footbridge near Soi Rang Nam on Phayathai Road (Victory Monument)` / `รถมุ่งหน้าไปแยกพญาไท (ซอยรางน้ำ)` with `direction="Inbound"`, whereas `RW-3-3-CAM2` (`13.76429, 100.53867`) captures the Victory Monument Roundabout (`Phayathai Island` corner under the BTS Skywalk) with traffic circulating clockwise around the roundabout and splitting/entering across multiple directions | Updated `CAMERA_CURATION[277]` (`location_th`, `location_detail_th`, `location_en`, `location_detail_en`, `direction`) in `clean_dataset_v1.py` | `location_en`: `Footbridge near Soi Rang Nam...` -> `Victory Monument Roundabout`; `location_detail_th`: `รถมุ่งหน้าไปแยกพญาไท (ซอยรางน้ำ)` -> `บริเวณวงเวียนอนุสาวรีย์ชัยสมรภูมิ (มุมเกาะพญาไท เห็นรถวนรอบวงเวียนและแยกออกหลายทิศทาง)`; `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-01` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=26`, `cam_id=1195` (Batch 4) | Both `26` and `1195` watch Charoen Nakhon Rd from opposite sides of Bukkhalo Intersection (neither feed captures Mahai Sawan Rd); `1195` faces Outbound rather than Inbound | Updated `CAMERA_CURATION` in `clean_dataset_v1.py` and `CAMERA_AUDIT_CHECKLIST.md` (`pair_id`, `pair_type`, `1195` `location_*` & `direction`) | `pair_id`: `PAIR_JX_BUKKHALO` -> `PAIR_ARM_BUKKHALO`; `pair_type`: `perpendicular_junction` -> `opposite_intersection_arm`; `1195` `direction`: `Inbound` -> `Outbound`; `1195` Mahai Sawan labels -> Charoen Nakhon Rd | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-02` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=500`, `cam_id=1188` (Batch 4) | `500` contains a significant proportion (`>10%`) of unusable artifact images; `1188` is a wide-angle view whose nighttime frames are completely unusable due to tiny vehicles and severe glare | Logged recommendation to remove `500` and `1188` from the downstream dataset (kept `clean_dataset_v1.py`, `CAMERA_AUDIT_CHECKLIST.md`, and 100-cam contract unchanged pending team/maintainer decision & location detail verification) | Pending exclusion decision (`100 -> 98` cameras or `0` valid images retained for `500`/`1188`) | No (Pending decision) |
-| `CHG-B4-03` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=32` (Batch 4) | Location labels are accurate, but the camera view clearly captures traffic flowing in both directions along Thoet Thai Rd | Updated `direction` to `"None"` in `CAMERA_CURATION` (`clean_dataset_v1.py`) and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=32` `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-04` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=36` (Batch 4) | Wide view of Ratchada-Ratchaphruek intersection with traffic going in multiple directions; camera is on the Ratchadaphisek Rd side with traffic approaching from Mahai Sawan Intersection (not Ratchaphruek Rd / Taksin) | Updated `location_*`, `location_detail_*`, and `direction` in `CAMERA_CURATION` (`clean_dataset_v1.py`) and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=36`: `location_*` Ratchaphruek Rd -> Ratchadaphisek Rd; `location_detail_*` Taksin -> Mahai Sawan Intersection; `direction`: `Outbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-05` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=158` (Batch 4) | Dominant 3-lane foreground carriageway flows Outbound (towards Bukkhalo Intersection); `location_detail_th` also said `ขาเข้า` | Updated `direction` to `"Outbound"` and aligned `location_detail_th` (`ขาเข้า` -> `ขาออก`) in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=158`: `direction`: `Inbound` -> `Outbound`; `location_detail_th`: `ขาเข้า` -> `ขาออก` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-06` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=251` (Batch 4) | English temple spelling mismatch vs. Google Maps (`Wat Dishongsaram` -> `Wat Ditsahongsaram (Wat Makkasan)`) and flow direction is Outbound (away from CBD towards Mit Samphan) | Updated `location_en` and `direction` in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=251`: `location_en` `Wat Dishongsaram` -> `Wat Ditsahongsaram (Wat Makkasan)`; `direction`: `Inbound` -> `Outbound` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-07` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=256` (Batch 4) | Centered two-way view over undivided Phetchaburi Rd (2 left lanes often congested vs. 4-5 opposing lanes free-flowing, plus tidal contraflow); expressway destination is Chalerm Maha Nakhon Expressway (`ใต้ทางด่วนเฉลิมมหานคร`) | Updated `direction` to `"None"` and refined `location_detail_th` / `location_detail_en` in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=256`: `direction`: `Outbound` -> `None`; `location_detail_*`: `Phetchaburi Expressway Intersection` -> `Chalerm Maha Nakhon Expressway` (`ใต้ทางด่วนเฉลิมมหานคร`) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-08` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=500` (Batch 4) | Coordinates `(13.75001, 100.54103)` and map view confirm `500` is actually Pratu Nam Intersection (not Mit Samphan Intersection), with traffic from Ratchathewi heading towards `cam_id=256` and multi-directional intersection flow | Updated `location_*`, `location_detail_*`, and `direction` (`"None"`) in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` (`CHG-003` removal proposal remains open) | `cam_id=500`: `location_*` Mit Samphan -> Pratu Nam Intersection (`แยกประตูน้ำ`); `direction`: `Inbound` -> `None` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-09` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=529` (Batch 4) | Crossing interchange view split ~50/50 across roads with neither direction heading directly into central Bangkok | Updated `direction` to `"None"`, dropped `(Inbound)` / `(ฝั่งขาเข้า)` from `location_*` and `location_detail_*` in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=529`: `direction`: `Inbound` -> `None`; removed `(Inbound)` / `(ฝั่งขาเข้า)` from location labels | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-10` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=572` (Batch 4) | Ramp traffic flows Inbound onto the elevated highway and is strictly ascending (not ascending/descending) | Updated `direction` to `"Inbound"` and `location_detail_en` (`Taling Chan ascending/descending ramp` -> `Taling Chan ascending ramp`) in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=572`: `direction`: `None` -> `Inbound`; `location_detail_en`: `ascending/descending` -> `ascending` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-11` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=595` (Batch 4) | Wide fisheye view of Ban Khaek Intersection covering crossing traffic on both Itsaraphap and Prajadhipok (`ประชาธิปก`) Roads (with left leg barriered off) | Added Prajadhipok Rd (`ประชาธิปก`) to `location_detail_*` and set `direction` to `"None"` in `CAMERA_CURATION` (`clean_dataset_v1.py`), and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` | `cam_id=595`: `direction`: `Inbound` -> `None`; `location_detail_*` updated to include `ประชาธิปก` / `Prajadhipok Roads` | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-12` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=1188` (Batch 4) | Camera overlooks Kanchanaphisek Road (Motorway 9 / Western Outer Ring Rd) facing towards Bang Chueak Nang Interchange (`ทางแยกต่างระดับบางเชือกหนัง`) in both directions, rather than Borommaratchachonnani / Phutthamonthon Sai 2 | Updated `location_*` and `location_detail_*` in `CAMERA_CURATION` (`clean_dataset_v1.py`), kept `direction="None"`, and checked off `[x]` in `CAMERA_AUDIT_CHECKLIST.md` (`CHG-003` removal proposal remains open) | `cam_id=1188`: `location_*` Borommaratchachonnani / Phutthamonthon Sai 2 -> Kanchanaphisek Road (Chimphli Interchange) towards Bang Chueak Nang Interchange | Yes (`clean_dataset_v1.py`) |
-| `CHG-B4-13` | `2026-11-15` | `V1.1` | สอง (@theme222) | `cam_id=32, 158, 529, 595, 1076` (Batch 4) | Visual sweep flagged `22` unusable frames slipping past automated gates (`2` `scanline_smear`, `17` `corrupt_artifact`, `1` `frozen_visual`, `2` `blocked_lens` rainwater) | Added all `22` filenames to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` | `-22` broken images queued for exclusion (`32`: 2, `158`: 8, `529`: 9, `595`: 1, `1076`: 2) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B5-01` | `2026-11-16` | `V1.1` | นิว (`@Pranithi-New`) | `cam_id=169` (Batch 5) | `19` `partial_gray_pframe` frames (`gray128_ratio` `0.483–0.717`) plus `169_20260829_195620.jpg` (`gray128_ratio=0.348`) show massive gray P-frame blocks occluding >50–80% of road ROI | Added all `20` corrupted filenames to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` | `cam_id=169`: `598 -> 578` valid images (`-20` `corrupt_artifact`); `direction`: `Inbound` confirmed | Yes (`clean_dataset_v1.py`) |
-| `CHG-B5-02` | `2026-11-16` | `V1.1` | นิว (`@Pranithi-New`) | Batch 5 two-way / multi-directional cams (`18`, `70`, `1361`, `150`, `230`, `233`, `1063`, `301`, `332`, `363`, `370`, `371`) | Visual & Google Maps/Street View audit showed both opposing flows (incl. undivided roads, contraflow lanes) or multi-directional intersection views in single frames | Updated `CAMERA_CURATION` `direction` -> `"None"` and clarified `location_detail_th`/`en` for those `12` cameras in `clean_dataset_v1.py` | `12` cameras updated to `direction="None"` (`18`, `150`, `301`, `1063`, `1361` `Outbound -> None`; `70`, `230`, `233`, `332`, `363`, `370`, `371` `Inbound -> None`) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B5-03` | `2026-11-16` | `V1.1` | นิว (`@Pranithi-New`) | Batch 5 visual checks (`370`, `371`, `546`, `1368`, `915`, `1028`) | Verified `370/371` low `contrast_std < 20` (`7,103–9,481 B` small JPEGs) and `546/1368` nighttime wet-road glare (`glare_ratio > 0.15`) + verified `(lat, lon)` & Aug 25 vs Aug 31 angle stability | Confirmed `370/371` sensors healthy (low contrast from uniform grey asphalt) & `546/1368` wet-road glare needed for Task 04; kept all frames; `1028` unchanged | `0` images removed; `0` angle shifts detected across Batch 5 | Yes (`clean_dataset_v1.py`) |
-| `CHG-B5-04` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | Batch 5 Street View & OSM audit (`915`, `301`, `370`, `546`, `1368`) | `915` raw pin (`13.72639, 100.49213`) sat ~95 m NW on Intharaphithak Rd footbridge instead of SW roundabout corner; `301` looks along Nakhon Ratchasima Rd (not U Thong Nok Rd); `370` looks SE along Krung Kasem Rd (not bridge crossing) | Added `"lat": 13.72572, "lon": 100.49268` for `cam_id=915` and updated `location_detail_th/en` for `915`, `301`, `370`, `546`, `1368` in `clean_dataset_v1.py` | `cam_id=915` pin moved ~95 m SE to SW roundabout quadrant; road/landmark descriptions aligned to Street View & OSM | Yes (`clean_dataset_v1.py`) |
-| `CHG-B5-05` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `cam_id=332` (Batch 5 full pixel scan across `10,217` valid frames) | `5` frames (`20260825_163054`, `164054`, `165052`, `20260826_064052`, `20260828_112105`) exhibit severe vertical `scanline_smear` / `stretched_frame` corruption occluding >50%–90% of the Ratchawat intersection | Added all `5` filenames with `"scanline_smear"` to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` (total `25` Batch 5 manual exclusions) | `cam_id=332`: `611 -> 606` valid images (`-5` `scanline_smear`) | Yes (`clean_dataset_v1.py`) |
-| `CHG-B6-01` | `2026-11-16` | `V1.1` | Chawin Sinman (@moaqilo) | Old Town batch: cams `68,228,395,411,412,413,414,556,569,576,630,913,1039,1060,1362,1589` | Wrong/missing direction & detail on `68,414,556,576,630,1039,1060`; `32` bad frames (cam `630`: 25 corrupt/stretched/blurry; cam `1039`: 5 overexposed; `68`: 1 crow; `413`: 1 pickup) | `CAMERA_CURATION`: `direction` 68 Inbound->None, 414 None->Inbound, 576 None->Inbound, 630 Outbound->Inbound, 1039 Outbound->None; `location_detail` fixed for 414,556,576,630,1060; added `32` files to `MANUAL_EXCLUDED_IMAGES`; cam `1362`: `location` แยกสามเสน -> ถนนสามเสน (Samsen Road), detail -> มุ่งหน้าท่าวาสุกรี, `lat/lon` -> `13.7746377, 100.5067094` | `32` images excluded; `8` cams metadata changed; `16/16` cams ticked | Yes (`clean_dataset_v1.py`) |
+| `CHG-B1-01` | `2026-11-15` | `V1.1` | ปลื้ม (`@siravidthongsook`) | Batch 1 (`17` cams, Ratchadaphisek — PR #6) | Pair cameras `119/120` & `224/225` swapped `(lat, lon)`; `127` pin on median; `120` labelled `Inbound` despite bidirectional side-arm view; `0` bad frames (`225` visual sweep pending) | Added optional `lat`/`lon` override support in `CAMERA_CURATION` / `build_cleaned_metadata()` + applied `5` coord fixes & `1` `direction` fix | `119/120`, `224/225` pins restored; `127` re-pinned `~25 m` to outbound span; `120`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-01` | `2026-11-15` | `V1.1` | กร (`@kkooAAA`) | Batch 2 (`16` cams — PR #7) | District mismatch on `938`, `1815`; no defective frames missed by automated gates (`28` Drive duplicates in `136/176` noted as harmless) | Updated `district` in `CAMERA_CURATION` (`938`, `1815`); logged open items | `938` district: `Suan Luang -> Bang Kapi`; `1815` district: `Huai Khwang -> Din Daeng` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-02` | `2026-11-15` | `V1.1` | กร (`@kkooAAA`) | `cam_id=1815` (`18` frames — PR #7) | Camera panned ~180° from `2026-08-31 18:10:44` to end of capture; frames no longer match `location_detail` / `direction` | Added the `18` changed-view filenames (`18:10:44`–`21:00:44`) to `MANUAL_EXCLUDED_IMAGES` (`"camera_view_changed"`) | `cam_id=1815`: `611 -> 593` valid images (`-18`) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-03` | `2026-11-16` | `V1.1` | กร (`@kkooAAA`) | `1112` + Batch 2 location audit (PR #7) | `1112` labelled with Vibhavadi Rangsit Rd instead of Sutthisan Winitchai Rd; `1815` road clarified as Rama 9 Road; `178/179` distance notes verified | Updated `location_en`/`location_th` (`1112`) and added code comments (`178/179`) | `1112` road: `Vibhavadi Rangsit -> Sutthisan Winitchai` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-04` | `2026-11-17` | `V1.1` | กร (`@kkooAAA`) | `939`, `1112`, `1804` (PR #7) | `939` detail named Ramkhamhaeng Rd instead of Ramkhamhaeng Bridge; `1112`/`1804` detail & `direction` mismatched camera view | Updated `location_detail_th/en` (`939, 1112, 1804`) & `direction` (`1112, 1804`); `1112` temporarily reverted to Vibhavadi (superseded by `CHG-B2-05`) | `1112` `direction`: `Inbound -> None`; `1804` `direction`: `Outbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-05` | `2026-11-17` | `V1.1` | กร (`@kkooAAA`) | `cam_id=1112` (PR #7) | Final confirmation that `1112` views Sutthisan Winitchai Rd, not Vibhavadi Rangsit Rd | Set `location_th/en` & `location_detail_th/en` to Sutthisan Winitchai Rd (supersedes `CHG-B2-04` road revert); `direction="None"` kept | `1112`: `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)` / `Sutthisan Intersection (Sutthisan Winitchai Road)` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-01` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=75` (Batch 3 — PR #2) | `location_detail` misstated Sathu Pradit Expressway instead of BRT median lane inbound from Naradhiwas–Rama 3 Intersection | Updated `CAMERA_CURATION[75]` (`location_detail_th`, `location_detail_en`) | `รถมาจากแยกด่วนสาธุประดิษฐ์ -> รถมาจากแยกนราธิวาส-พระราม 3` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-02` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=88` (Batch 3 — PR #2) | Two-way road with no median (`Chan Rd` near Soi `18/6`); YOLO counts both opposing flows in one frame | Updated `CAMERA_CURATION[88]["direction"]` from `"Inbound"` to `"None"` | `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-03` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=186` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/186/` & metadata | Verified against Google Maps; no broken frames or metadata errors found | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-04` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=188` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/188/` & metadata | Verified against Google Maps; no broken frames or metadata errors found | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-05` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=194` (Batch 3 — PR #2) | Metadata listed South Sathon Rd (`Inbound`), whereas imagery shows North Sathon Rd from Witthayu towards Sathon-Naradhiwas (`Outbound`) | Updated `CAMERA_CURATION[194]` (`location_*`, `location_detail_*`, `direction`) | `สาทรใต้ -> สาทรเหนือ`; `Inbound -> Outbound` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-06` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=196` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/196/` & metadata | Verified against Google Maps; no broken frames or metadata errors found | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-07` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=206` (Batch 3 — PR #2) | Camera sits opposite Soi Naradhiwas 20 (`Outbound`, east carriageway); `6` unusable frames (`5` severe gray P-frame, `1` central lens smear) slipped past Gates | Updated `CAMERA_CURATION[206]` (`location_*`, `direction`, `lat=13.70555`, `lon=100.53865`) + added `6` files to `MANUAL_EXCLUDED_IMAGES` | `ใกล้ซอย -> ตรงข้ามซอย`; `Inbound -> Outbound`; `-6` images (`5` `corrupt_artifact`, `1` `blocked_lens`) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-08` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=211` (Batch 1 cross-check — PR #2) | Peer QA verification of `cctv_images/211/` & metadata | Verified all images & metadata; no broken frames or metadata errors found | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-09` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=599` (Batch 3 — PR #2) | Wide Surasak Intersection view capturing cross-traffic & both carriageways simultaneously | Changed `CAMERA_CURATION[599]["direction"]` from `"Inbound"` to `"None"` | `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-10` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=603` (Batch 3 — PR #2) | `location_detail` stated Surasak Intersection; main corridor ahead is Naradhiwas Rd Northbound fed from Sathon-Naradhiwas | Updated `CAMERA_CURATION[603]` (`location_detail_th`, `location_detail_en`) | `รถมาจากแยกสุรศักดิ์ -> รถมาจากแยกสาทร-นราธิวาส` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-11` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=604` (Batch 3 — PR #2) | Full 4-way Silom–Naradhiwas junction view capturing both Naradhiwas flows + Silom cross-traffic; old label cited off-axis `แยกศาลาแดง` | Updated `CAMERA_CURATION[604]` (`location_detail_*`, `direction="None"`) | Detail updated; `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-12` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=11` (Batch 3 — PR #2) | Divided 5-lane Ratchawithi Rd shows all 3 eastbound (`Outbound`) + 2 westbound (`Inbound`) lanes together | Updated `CAMERA_CURATION[11]` (`location_detail_*`, `direction="None"`) | Detail updated; `direction`: `Outbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-13` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=82` (Batch 3 — PR #2) | Old label only described the 1 southbound contraflow bus lane; 4 main lanes flow northbound (`Outbound`) | Updated `CAMERA_CURATION[82]` (`location_detail_*`, `direction="None"`) | Detail updated (4+1 lanes); `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-14` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=239` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/239/` & metadata | Confirmed 4 primary southbound `Inbound` lanes in front of Triam Udom Suksa School | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-15` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=432` (Batch 3 — PR #2) | Generic label with `direction="None"`, whereas imagery shows clear westbound incoming approach on Rama 4 Rd from Silom towards Hua Lamphong (`Inbound`) | Updated `CAMERA_CURATION[432]` (`location_detail_*`, `direction="Inbound"`) | Detail clarified; `direction`: `None -> Inbound` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-16` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=542` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/542/` & metadata | Confirmed bidirectional Sarasin–Lang Suan view (`direction="None"`); no bad frames | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-17` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=619` (Batch 3 — PR #2) | Peer QA verification of `cctv_images/619/` & metadata | Confirmed multi-directional Henri Dunant junction view (`direction="None"`); no bad frames | No changes (`V1.0` confirmed) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B3-18` | `2026-11-15` | `V1.1` | เฟิร์ม (`@nontaphatfirm`) | `cam_id=277` (Batch 3 — PR #2) | Mislabelled as footbridge near Soi Rang Nam (`Inbound`), whereas `(13.76429, 100.53867)` captures Victory Monument Roundabout (Phayathai Island side) | Updated `CAMERA_CURATION[277]` (`location_*`, `location_detail_*`, `direction="None"`) | `Victory Monument Roundabout`; `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-01` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=26`, `cam_id=1195` (Batch 4 — PR #4) | Both cameras watch Charoen Nakhon Rd from opposite sides of Bukkhalo Intersection; `1195` faces `Outbound` rather than `Inbound` | Updated `pair_id`, `pair_type`, and `1195` `location_*` / `direction` | `PAIR_JX_BUKKHALO -> PAIR_ARM_BUKKHALO`; `perpendicular_junction -> opposite_intersection_arm`; `1195`: `Inbound -> Outbound` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-02` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=500`, `cam_id=1188` (Batch 4 — PR #4) | `500` has `>10%` artifact images; `1188` wide-angle nighttime frames show tiny vehicles & heavy glare | Logged downstream exclusion proposal (kept `clean_dataset_v1.py` 100-cam contract intact pending team consensus) | Pending team decision (`100 -> 98` cameras or downstream filter) | No (Pending decision) |
+| `CHG-B4-03` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=32` (Batch 4 — PR #4) | View clearly captures both opposing flows along Thoet Thai Rd | Set `CAMERA_CURATION[32]["direction"]` to `"None"` | `direction`: `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-04` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=36` (Batch 4 — PR #4) | Wide multi-directional view on Ratchadaphisek Rd side with traffic approaching from Mahai Sawan Intersection (not Ratchaphruek/Taksin) | Updated `location_*`, `location_detail_*`, `direction="None"` | `Ratchaphruek Rd -> Ratchadaphisek Rd`; `Taksin -> Mahai Sawan`; `Outbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-05` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=158` (Batch 4 — PR #4) | Dominant 3-lane foreground flows `Outbound` towards Bukkhalo Intersection; `location_detail_th` also said `ขาเข้า` | Updated `direction="Outbound"` and `location_detail_th` (`ขาเข้า -> ขาออก`) | `direction`: `Inbound -> Outbound`; `ขาเข้า -> ขาออก` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-06` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=251` (Batch 4 — PR #4) | English temple spelling mismatch (`Wat Dishongsaram`) and flow moves `Outbound` towards Mit Samphan | Updated `location_en` and `direction="Outbound"` | `Wat Ditsahongsaram (Wat Makkasan)`; `Inbound -> Outbound` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-07` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=256` (Batch 4 — PR #4) | Centered two-way undivided view over Phetchaburi Rd; expressway is Chalerm Maha Nakhon Expressway (`ใต้ทางด่วนเฉลิมมหานคร`) | Updated `direction="None"` & `location_detail_*` | `Outbound -> None`; expressway name updated | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-08` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=500` (Batch 4 — PR #4) | Coords `(13.75001, 100.54103)` confirm Pratu Nam Intersection (not Mit Samphan), multi-directional junction view | Updated `location_*`, `location_detail_*`, `direction="None"` | `แยกมิตรสัมพันธ์ -> แยกประตูน้ำ`; `Inbound -> None` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-09` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=529` (Batch 4 — PR #4) | Crossing interchange split ~50/50 across roads | Set `direction="None"` and dropped `(Inbound)` / `(ฝั่งขาเข้า)` from location labels | `Inbound -> None`; labels generalized | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-10` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=572` (Batch 4 — PR #4) | Traffic is strictly ascending onto the elevated highway (`Inbound`) | Updated `direction="Inbound"` and `location_detail_en` (`ascending/descending -> ascending`) | `None -> Inbound`; `Taling Chan ascending ramp` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-11` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=595` (Batch 4 — PR #4) | Wide fisheye view covering crossing flows on both Itsaraphap & Prajadhipok (`ประชาธิปก`) Roads | Added Prajadhipok Rd to `location_detail_*` and set `direction="None"` | `Inbound -> None`; added `ประชาธิปก` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-12` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=1188` (Batch 4 — PR #4) | Camera overlooks Kanchanaphisek Rd (Motorway 9) towards Bang Chueak Nang Interchange in both directions | Updated `location_*` & `location_detail_*`; kept `direction="None"` | `Kanchanaphisek Road (Chimphli Interchange)` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B4-13` | `2026-11-15` | `V1.1` | สอง (`@theme222`) | `cam_id=32, 158, 529, 595, 1076` (Batch 4 — PR #4) | Visual sweep flagged `22` unusable frames (`2` `scanline_smear`, `17` `corrupt_artifact`, `1` `frozen_visual`, `2` `blocked_lens` rainwater) | Added all `22` filenames to `MANUAL_EXCLUDED_IMAGES` | `-22` images queued (`32`: 2, `158`: 8, `529`: 9, `595`: 1, `1076`: 2) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B5-01` | `2026-11-16` | `V1.1` | นิว (`@Pranithi-New`) | `cam_id=169` (Batch 5 — PR #9) | `19` `partial_gray_pframe` frames (`gray128_ratio` `0.483–0.717`) + `169_20260829_195620.jpg` (`0.348`) occlude >50–80% of road ROI | Added all `20` corrupted filenames to `MANUAL_EXCLUDED_IMAGES` | `cam_id=169`: `598 -> 578` valid images (`-20` `corrupt_artifact`) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B5-02` | `2026-11-16` | `V1.1` | นิว (`@Pranithi-New`) | Batch 5 two-way / multi-dir cams (`18, 70, 1361, 150, 230, 233, 1063, 301, 332, 363, 370, 371` — PR #9) | Visual & Street View audit confirmed opposing flows (undivided / contraflow lanes) or multi-directional intersections in single frames | Updated `direction="None"` and clarified `location_detail_th/en` for all `12` cameras | `12` cameras moved to `direction="None"` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B5-03` | `2026-11-16` | `V1.1` | นิว (`@Pranithi-New`) | `370, 371, 546, 1368, 915, 1028` (Batch 5 — PR #9) | Audited `370/371` low `contrast_std < 20` & `546/1368` night wet-road glare + Aug 25 vs Aug 31 angle stability | Confirmed optics healthy & glare needed for Task 04; kept all frames; `1028` unchanged | `0` frames removed; `0` camera rotations found | Yes (`clean_dataset_v1.py`) |
+| `CHG-B5-04` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `915, 301, 370, 546, 1368` (Batch 5 — PR #9) | `915` raw pin sat ~95 m NW on Intharaphithak Rd; `301` looks along Nakhon Ratchasima Rd; `370` looks SE along Krung Kasem Rd | Added `"lat": 13.72572, "lon": 100.49268` for `915` + refined `location_detail_th/en` (`915, 301, 370, 546, 1368`) | `cam_id=915` re-pinned ~95 m SE; road details aligned to Street View & OSM | Yes (`clean_dataset_v1.py`) |
+| `CHG-B5-05` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `cam_id=332` (Batch 5 — PR #9) | Full pixel scan across `10,217` Batch 5 frames uncovered `5` severe vertical `scanline_smear` / stretched frames (>50–90% occluded) | Added all `5` filenames to `MANUAL_EXCLUDED_IMAGES` (`"scanline_smear"`) | `cam_id=332`: `611 -> 606` valid images (`-5`) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B6-01` | `2026-11-16` | `V1.1` | โม่ (`@moaqilo`) | Batch 6 Old Town (`16` cams — PR #8) | Wrong/missing `direction` & `location_detail` (`68, 414, 556, 576, 630, 1039, 1060, 1362`); `1362` coords offset; `32` unusable frames (`68`: 1, `413`: 1, `630`: 25, `1039`: 5) | Updated `8` cameras in `CAMERA_CURATION` (incl. `1362` `lat=13.7746377, lon=100.5067094`) + added `32` filenames to `MANUAL_EXCLUDED_IMAGES` | `8` cams metadata updated; `-32` images queued; `16/16` ticked | Yes (`clean_dataset_v1.py`) |
 
 ---
 
@@ -114,574 +114,178 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 - **Repaired Truncated Thai Labels:** Completed `53` camera entries whose `location` / `location_detail` strings were cut off around ~28 characters in the raw CSV.
 - **Spatial & Network Enrichment:** Assigned BMA `district`, `7` arterial `corridor` zones, traffic `direction` (`Inbound`: 51, `Outbound`: 29, `"None"`: 20), `ip_subnet` (`18` subnets), `img_width`/`img_height` (preserving `348x261` exception on `cam_id=395`), and `pair_id` / `pair_type` (identifying `6` true bidirectional footbridge pairs among `21` proximity pairs `<= 100m`).
 
-#### 3. Open Items & Decisions Deferred to `V1.1` / `V2.0`
-- **Team Batch Verification (100 Cameras):** Distributed physical location, direction, and pair verification across Batch 1-6 (ปลื้ม, กร, เฟิร์ม, สอง, นิว, โม่).
-- **Low-Contrast Night / Foggy Camera Check (`321` valid frames with `contrast_std < 20`):** Heavy concentration at Cam `370` (`169` frames) and `371` (`140` frames) requires visual check to separate lens blur/hardware darkness from real weather conditions.
-- **High-Glare Headlight Check (`78` valid frames with `glare_ratio > 0.15`):** Concentrated at `cam_id=546` (`44` frames) and `cam_id=1368` (`31` frames).
-- **`quality_warning` (`32` frames):** Team decision required on whether `partial_gray_pframe` (`169`, `206`) and `partial_green_screen` (`500`, `630`) affect vehicle ROI or can stay flagged without removal.
+#### 3. Open Items & Decisions Deferred from `V1.0` -> `V1.1`
+- **Team Batch Verification (100 Cameras):** Distributed physical location, direction, and pair verification across Batch 1-6 (ปลื้ม, กร, เฟิร์ม, สอง, นิว, โม่). *(Completed in `V1.1`, `99/100` visual sweeps + `100/100` metadata)*
+- **Low-Contrast Night / Foggy Camera Check (`370/371`):** Resolved in Batch 5 (`CHG-B5-03`) — sensors verified healthy, all frames retained.
+- **High-Glare Headlight Check (`546/1368`):** Resolved in Batch 5 (`CHG-B5-03`) — wet-road glare needed for Task 04, all frames retained.
+- **`quality_warning` (`32` frames):** Checked during Batches 3, 4, and 6: `cam_id=169` (`19` warnings + `1` extra = `20` frames) and `206` (`5` gray P-frames + `1` smear = `6` frames) excluded manually; remaining mild warnings kept or flagged under Batch 4 (`500`) proposal.
 
 ---
 
-### `V1.1` -- `2026-11-15` *(In Progress: Peer QA & Refinement)*
+### `V1.1` -- `2026-11-17` *(Consolidated Team Peer QA -- Batches 1–6)*
 
-#### Batch 1 -- ปลื้ม (@siravidthongsook): Ratchadaphisek Corridor (17 cameras)
-
-- **Date:** `2026-11-15`
-- **Editor:** ปลื้ม (@siravidthongsook)
-- **Batch / Scope:** Batch 1 -- `17` cameras (`112`, `118`, `119`, `120`, `123`, `124`, `125`, `126`, `127`, `135`, `211`, `212`, `215`, `219`, `224`, `225`, `1408`)
-- **Problem Found:**
-  - `cam_id=119` / `cam_id=120` (Ratchada-Sutthisan, `PAIR_ARM_SUTTHISAN`): the two opposite arms carried each other's coordinates, so the Ratchadaphisek Road camera sat on the Sutthisan Winitchai Road arm and vice versa (≈ `30-40 m` cross-arm error).
-  - `cam_id=224` / `cam_id=225` (Criminal Court footbridge, `FB_04_CriminalCourt`): same pattern -- longitudes swapped between the inbound and outbound spans.
-  - `cam_id=127` (Soi Ratchadaphisek 30, `FB_03_Ratchada30`): the pin sat on the road median, not on the outbound footbridge span.
-  - `cam_id=120`: labelled `Inbound`, but the frame is a side-arm view carrying traffic in both directions.
-  - Image sweep: `0` unusable frames across all `17` folders (no heavily corrupted, blocked, pitch-black, or residual frozen frames) -> nothing added to `MANUAL_EXCLUDED_IMAGES`.
-  - `cam_id=225`: metadata verified, but its image folder was not visually swept in this pass (still unchecked in the audit checklist).
-- **Fix / Decision Applied:**
-  - Extended `CAMERA_CURATION` in [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](../00_data_cleaning_and_qa/src/clean_dataset_v1.py) with optional `lat` / `lon` keys that override the raw `cctv_info.csv` pin inside `build_cleaned_metadata()`:
-    ```python
-    "lat": float(meta.get("lat", row["latitude"])),
-    "lon": float(meta.get("lon", row["longitude"])),
-    ```
-  - Applied `5` coordinate corrections and `1` direction correction in the same table; no threshold or gate changes.
-- **Quantitative Impact (Before -> After):**
-  - Metadata fields changed (`cctv_info_cleaned` after the maintainer re-runs the script):
-    - `cam_id=119`: `lat` `13.78971 -> 13.789680`, `lon` `100.57410 -> 100.574437`
-    - `cam_id=120`: `lat` `13.78968 -> 13.789785`, `lon` `100.57441 -> 100.574031`, `direction` `Inbound -> None`
-    - `cam_id=127`: `lat` `13.81001 -> 13.810192`, `lon` `100.57511 -> 100.575261`
-    - `cam_id=224`: `lat` `13.81524 -> 13.815228`, `lon` `100.57553 -> 100.575355`
-    - `cam_id=225`: `lat` `13.81523 -> 13.815248`, `lon` `100.57533 -> 100.575513`
-  - Direction distribution now: `Inbound` `50`, `Outbound` `29`, `None` `21` (was `51 / 29 / 20`).
-  - Images affected: `0` (`60,210` valid images stay `60,210`; metadata-only change).
-- **Verification:** `CAMERA_CURATION` parsed and compared field-by-field against the Batch 1 review answers (`17/17` cameras match); `py_compile` `PASS`. PR (`chore/00-qa-siravid` -> `main`) -> final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` run `[Pending Maintainer Run]`.
+#### Maintainer Merge & Post-QA Summary
+- **PRs Merged into `main`:** `#6` (`chore/00-qa-siravid`), `#7` (`chore/00-qa-kkooAAA`), `#2` (`chore/00-qa-firm`), `#4` (`chore/00-qa-song`), `#9` (`chore/00-qa-new`), `#8` (`chore/00-qa-moag`).
+- **Direction Distribution Shift (`V1.0 -> V1.1`):**
+  - `Inbound`: `51 -> 32`
+  - `Outbound`: `29 -> 23`
+  - `"None"`: `20 -> 45` *(normalized 5 Python `None` values from Batch 3 `11, 82, 277, 599, 604` to literal `"None"`)*
+- **Cameras Edited in `CAMERA_CURATION`:** `56 / 100` *(incl. `8` `(lat, lon)` coordinate overrides: `119, 120, 127, 206, 224, 225, 915, 1362`)*.
+- **Manual Exclusions (`MANUAL_EXCLUDED_IMAGES`):** `103` frames excluded (`Batch 2`: `18`, `Batch 3`: `6`, `Batch 4`: `22`, `Batch 5`: `25`, `Batch 6`: `32`).
+- **Rebuild Status (`clean_dataset_v1.py`, `2026-11-17`, `295.76s`):**
+  - `total_raw_images`: `61,319` -> **`total_valid_images`: `60,107` (`98.0235%`)**, `total_filtered_images`: `1,212`
+  - `status_counts`: `valid = 60,107`, `frozen = 553`, `white_error = 504`, `manual_excluded = 103`, `no_signal_error = 33`, `corrupt_color = 19`
+  - `quality_warning` among valid frames dropped from `32` -> **`7`** (`partial_green_screen` on `cam_id=500` only; all `24` `partial_gray_pframe` on `169`/`206` and `1` `partial_green_screen` on `630` were excluded)
+  - `run_pipeline.py --check-contract`: **PASS** on Tables 1, 2, 4 (`Table 1`: `100 x 25`, `Table 2`: `61,319 x 36`, `Table 4`: `16,800 x 17`)
 
 ---
 
-#### `CHG-002` -- `2026-11-15` (`cam_id=75` Approach Origin Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=75`)
+#### Batch 1 -- ปลื้ม (`@siravidthongsook`): Ratchadaphisek Corridor (`17` Cameras, PR #6)
+
+- **Scope:** `112, 118, 119, 120, 123, 124, 125, 126, 127, 135, 211, 212, 215, 219, 224, 225, 1408` (`CHG-B1-01`).
 - **Problem Found:**
-  - `cam_id=75` (`แยกรัชดา-นราธิวาส (ด้านถนนนราธิวาสฯ)`): raw metadata stated `รถมาจากแยกด่วนสาธุประดิษฐ์` / `From Sathu Pradit Expressway Intersection` (which lies on Ratchadaphisek Rd), whereas camera images show the BRT median lane and inbound Naradhiwas Ratchanakharin traffic approaching from Naradhiwas–Rama 3 Intersection.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[75]` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` (`lat`/`lon` `13.70057, 100.54130` confirmed accurate).
-- **Quantitative Impact (Before -> After):**
-  - `location_detail_th`: `รถมาจากแยกด่วนสาธุประดิษฐ์` -> `รถมาจากแยกนราธิวาส-พระราม 3`
-  - `location_detail_en`: `From Sathu Pradit Expressway Intersection` -> `From Naradhiwas-Rama 3 Intersection`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py --skip-copy` + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-003` -- `2026-11-15` (`cam_id=88` Bidirectional No-Median Direction Adjustment)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=88`)
-- **Problem Found:**
-  - `cam_id=88` (`แยกจันทน์-สาธุประดิษฐ์`): road has no median and clearly captures both opposing traffic directions in the same frame (inbound towards Chan-Naradhiwas on the right lane and outbound towards Charoen Krung on the left lane). Since Task 03 YOLO counts all vehicles across the full road ROI, labeling this camera `Inbound` would mix outbound congestion into Macro Directional Flow (`04`).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[88]["direction"]` from `"Inbound"` to `"None"` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `direction`: `Inbound` -> `None`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py --skip-copy` + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-004` -- `2026-11-15` (`cam_id=186` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=186`)
-- **Findings:** Verified `cctv_images/186/` and metadata (`โครงสร้างป้ายบอกทางขึ้นสะพานพระราม 3 ถนนรัชดาภิเษก`, `Outbound`); all images and metadata match `V1.0` baseline with no corrections needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-005` -- `2026-11-15` (`cam_id=188` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=188`)
-- **Findings:** Verified `cctv_images/188/` and metadata (`สะพานลอยใกล้ซอยพระรามที่ 3 ซอย 68 ถนนพระรามที่ 3`, `Outbound`); all images and metadata match `V1.0` baseline with no corrections needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-006` -- `2026-11-15` (`cam_id=194` North/South Sathon Side & Direction Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=194`)
-- **Problem Found:**
-  - `cam_id=194`: raw metadata stated South Sathon Rd (`รถมาจากแยกสาทร-นราธิวาส มุ่งหน้าแยกวิทยุ`, `Inbound`), whereas CCTV imagery shows the primary foreground carriageway on North Sathon Rd with vehicles approaching from Witthayu Intersection towards Sathon-Naradhiwas Intersection (leaving the Witthayu/Silom core westbound, `Outbound`).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[194]` (`location_th`, `location_detail_th`, `location_en`, `location_detail_en`, `direction`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `location_th`: `สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรใต้` -> `สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรเหนือ`
-  - `location_detail_th`: `รถมาจากแยกสาทร-นราธิวาส มุ่งหน้าแยกวิทยุ` -> `รถมาจากแยกวิทยุ มุ่งหน้าแยกสาทร-นราธิวาส`
-  - `location_en`: `Footbridge near Soi Convent on South Sathon Road` -> `Footbridge near Soi Convent on North Sathon Road`
-  - `location_detail_en`: `From Sathon-Naradhiwas Intersection towards Witthayu Intersection` -> `From Witthayu Intersection towards Sathon-Naradhiwas Intersection`
-  - `direction`: `Inbound` -> `Outbound`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py --skip-copy` + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-007` -- `2026-11-15` (`cam_id=196` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=196`)
-- **Findings:** Verified `cctv_images/196/` and metadata (`สะพานลอยหน้าแม็คโคร ถนนนราธิวาสราชนครินทร์`, `Outbound`); all images and metadata match `V1.0` baseline with no corrections needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-008` -- `2026-11-15` (`cam_id=206` Road Side, Direction, Coordinates & Manual Image Exclusions)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=206`)
-- **Problem Found:**
-  - `cam_id=206` metadata: raw metadata stated `ใกล้ซอยนราธิวาสราชนครินทร์ 20`, traffic from Ratchada-Naradhiwas towards Chan-Naradhiwas (`Inbound`), and coordinates `13.70545, 100.53835`, whereas daytime/nighttime imagery (`206_20260825_120109.jpg`, `206_20260825_190105.jpg`) shows Khlong Chong Nonsi canal and the BRT busway on the left looking north toward the Sathon/Silom skyscrapers, with all foreground vehicles driving southbound towards the camera (`Outbound`) on the east carriageway (opposite Soi 20).
-  - `cam_id=206` imagery: visual sweep found `6` unusable frames in `Dataset_Clean_V1/cctv_images/206/` — `5` with severe partial gray-128 P-frame corruption (`206_20260825_183106.jpg`, `206_20260827_120106.jpg`, `206_20260828_130705.jpg`, `206_20260828_171605.jpg`, `206_20260831_104606.jpg`) and `1` with heavy central lens condensation/water smear occluding the road (`206_20260831_164105.jpg`).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[206]` (`location_th`, `location_detail_th`, `location_en`, `location_detail_en`, `direction`, `lat`, `lon`), added optional `meta.get("lat")` / `meta.get("lon")` override support in `build_cleaned_metadata()`, and added the `6` filenames to `MANUAL_EXCLUDED_IMAGES` inside `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `location_th`: `สะพานลอยใกล้ซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์` -> `สะพานลอยตรงข้ามซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์`
-  - `location_detail_th`: `รถมาจากแยกรัชดา-นราธิวาส มุ่งหน้าแยกจันทน์-นราธิวาส` -> `รถมาจากแยกจันทน์-นราธิวาส มุ่งหน้าแยกรัชดา-นราธิวาส`
-  - `location_en`: `Footbridge near Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road` -> `Footbridge opposite Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road`
-  - `location_detail_en`: `From Ratchada-Naradhiwas Intersection towards Chan-Naradhiwas Intersection` -> `From Chan-Naradhiwas Intersection towards Ratchada-Naradhiwas Intersection`
-  - `direction`: `Inbound` -> `Outbound`
-  - `lat, lon`: `13.70545, 100.53835` -> `13.70555, 100.53865` (~34 m east to the east carriageway footbridge)
-  - Images excluded (`MANUAL_EXCLUDED_IMAGES`): `6` images (`5` `corrupt_artifact`, `1` `blocked_lens`)
-- **Verification:** Pending final `clean_dataset_v1.py` regeneration + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-009` -- `2026-11-15` (`cam_id=211` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 1 (`cam_id=211`)
-- **Findings:** Verified `cctv_images/211/` and metadata (`สะพานลอยใกล้ซอยรัชดาภิเษก 3 ถนนรัชดาภิเษก`, `Outbound`); all images and metadata match `V1.0` baseline with no corrections needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-010` -- `2026-11-15` (`cam_id=599` Multi-Directional Intersection `direction` Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=599`)
-- **Problem Found:**
-  - `cam_id=599`: labeled `Inbound` despite showing the full Surasak Intersection box (cross-traffic across the junction plus both sides of the Surasak Road median in the background), causing YOLO detections to mix multiple flow directions.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[599]["direction"]` from `"Inbound"` to `None` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `direction`: `Inbound` -> `None`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py` regeneration + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-011` -- `2026-11-15` (`cam_id=603` Approach Origin Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=603`)
-- **Problem Found:**
-  - `cam_id=603`: raw metadata stated `From Surasak Intersection` (`รถมาจากแยกสุรศักดิ์`), whereas looking NNW from the SE corner (`13.72620, 100.52797`) shows Naradhiwas Ratchanakharin Rd Northbound (tree-lined median, no BTS viaduct) as the primary corridor stretching ahead—fed from Sathon-Naradhiwas Intersection—while the Surasak/Silom West approach is only the side stop-line at the left red crosswalk.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[603]` (`location_detail_th`, `location_detail_en`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `location_detail_th`: `รถมาจากแยกสุรศักดิ์` -> `รถมาจากแยกสาทร-นราธิวาส`
-  - `location_detail_en`: `From Surasak Intersection` -> `From Sathon-Naradhiwas Intersection`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py` regeneration + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-012` -- `2026-11-15` (`cam_id=604` Multi-Directional Intersection `direction` & Description Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=604`)
-- **Problem Found:**
-  - `cam_id=604`: labeled `Inbound` and `ท้ายรถมุ่งหน้าแยกศาลาแดง / แยกสาทร-นราธิวาส`, whereas the camera faces straight south along Naradhiwas Rd under the BTS viaduct towards Sathon-Naradhiwas (Sala Daeng is off-axis on Silom Rd to the left) and captures the full junction box—Naradhiwas southbound (`Outbound`), northbound (`Inbound`), and Silom cross-traffic simultaneously.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[604]` (`location_detail_th`, `location_detail_en`, `direction`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `location_detail_th`: `ท้ายรถมุ่งหน้าแยกศาลาแดง / แยกสาทร-นราธิวาส` -> `บริเวณแยกสีลม-นราธิวาส (ด้านถนนนราธิวาสฯ มุ่งหน้าแยกสาทร-นราธิวาส)`
-  - `location_detail_en`: `Towards Sala Daeng / Sathon-Naradhiwas Intersection` -> `Silom-Naradhiwas Intersection (Naradhiwas Rd towards Sathon-Naradhiwas Intersection)`
-  - `direction`: `Inbound` -> `None`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py` regeneration + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-013` -- `2026-11-15` (`cam_id=11` Bidirectional Road `direction` & Description Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=11`)
-- **Problem Found:**
-  - `cam_id=11`: labeled `Outbound` and `รถมาจากอนุสาวรีย์ชัยสมรภูมิ`, whereas daylight/night imagery (`11_20260828_152008.jpg`, `11_20260831_205509.jpg`) shows all 5 lanes of Ratchawithi Rd simultaneously—3 eastbound lanes (`Outbound` away from Victory Monument on the left/center) and 2 westbound lanes (`Inbound` from Din Daeng Intersection on the right)—causing YOLO counts to mix both directions.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[11]` (`location_detail_th`, `location_detail_en`, `direction`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `location_detail_th`: `รถมาจากอนุสาวรีย์ชัยสมรภูมิ` -> `ช่วงอนุสาวรีย์ชัยสมรภูมิ – แยกสามเหลี่ยมดินแดง (ทั้งสองทิศทาง)`
-  - `location_detail_en`: `From Victory Monument` -> `Between Victory Monument and Din Daeng Intersection (both directions)`
-  - `direction`: `Outbound` -> `None`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py` regeneration + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-014` -- `2026-11-15` (`cam_id=82` Main Corridor Direction, Contraflow Bus Lane & `None` Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=82`)
-- **Problem Found:**
-  - `cam_id=82`: metadata stated `From Mo Leng Intersection towards Pratu Nam Intersection` (`Inbound`), which only matches the 1 leftmost contraflow bus lane (separated by a yellow dashed line, especially busy southbound in early morning frames `82_20260825_060116.jpg`, `82_20260825_070609.jpg`). Across all inspected timestamps (`06:01`–`20:51`), the 4 main lanes in front of Indra Square flow northbound towards the camera (`Pratu Nam -> Mo Leng`, `Outbound`). Because YOLO counts all 5 lanes across opposing flows, keeping `Inbound` (or `Outbound`) mixes bidirectional counts.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[82]` (`location_detail_th`, `location_detail_en`, `direction`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-- **Quantitative Impact (Before -> After):**
-  - `location_detail_th`: `รถมาจากแยกหมอเหล็ง มุ่งหน้าแยกประตูน้ำ` -> `ช่วงแยกประตูน้ำ – แยกหมอเหล็ง (ทั้งสองทิศทาง: 4 เลนไปหมอเหล็ง / 1 เลนไปประตูน้ำ)`
-  - `location_detail_en`: `From Mo Leng Intersection towards Pratu Nam Intersection` -> `Between Pratu Nam and Mo Leng Intersections (both directions: 4 northbound / 1 southbound contraflow lane)`
-  - `direction`: `Inbound` -> `None`
-  - Images affected: `0` (metadata-only update)
-- **Verification:** Pending final `clean_dataset_v1.py` regeneration + `run_pipeline.py --check-contract` after Batch 1–6 PRs merge.
-
-#### `CHG-015` -- `2026-11-15` (`cam_id=239` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=239`)
-- **Findings:** Verified `cctv_images/239/` (`239_20260828_151102.jpg`, `239_20260831_205604.jpg`, `239_20260825_062108.jpg`) and metadata (`สะพานลอยใกล้โรงเรียนเตรียมอุดมศึกษา ถนนพญาไท`, `รถมาจากแยกปทุมวัน มุ่งหน้าแยกสามย่าน`, `Inbound`). The 4 primary foreground lanes on the Triam Udom Suksa School side flow southbound from Pathum Wan towards Sam Yan (`Inbound`); only a minor strip of the opposite northbound carriageway is visible at the far top-left. `V1.0` baseline confirmed with no changes needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-016` -- `2026-11-15` (`cam_id=432` Peer QA Metadata & Direction Update)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=432`)
-- **Problem Found:**
-  - `V1.0` metadata used a generic label (`บริเวณแยกสามย่าน (ถนนพญาไท-พระรามที่ 4)` / `Sam Yan Intersection (Phayathai-Rama 4 Road)`) with `direction="None"`.
-  - Visual inspection of `cctv_images/432/` (`432_20260828_150521.jpg`, `432_20260825_060937.jpg`, `432_20260825_091020.jpg`, `432_20260831_205021.jpg`) and solar shadow / left-hand-traffic geometry at `(13.73258, 100.52896)` confirm the camera faces East along Rama 4 Road under the Thai-Japanese Flyover, capturing a single clear westbound incoming carriageway (`4` main straight lanes stopping at the `MC` box + `1` left-turn slip lane onto Si Phraya Road) carrying traffic from the Silom / Sala Daeng / Henri Dunant side towards Saphan Lueang / Hua Lamphong (`Inbound`). The opposing eastbound carriageway sits behind the median shrubs and flyover piers, mostly occluded.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[432]` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`:
-    - `location_detail_th` -> `"รถมาจากสีลม มุ่งหน้าไปหัวลำโพง (บริเวณแยกสามย่าน ถนนพระรามที่ 4)"`
-    - `location_detail_en` -> `"From Silom towards Hua Lamphong (Sam Yan Intersection, Rama 4 Road)"`
-    - `direction` -> `"Inbound"`
-- **Quantitative Impact (Before -> After):**
-  - `location_detail_th`: `บริเวณแยกสามย่าน (ถนนพญาไท-พระรามที่ 4)` -> `รถมาจากสีลม มุ่งหน้าไปหัวลำโพง (บริเวณแยกสามย่าน ถนนพระรามที่ 4)`
-  - `location_detail_en`: `Sam Yan Intersection (Phayathai-Rama 4 Road)` -> `From Silom towards Hua Lamphong (Sam Yan Intersection, Rama 4 Road)`
-  - `direction`: `"None"` -> `"Inbound"`
-  - Images affected: `0` (`604` clean images retained).
-- **Verification:** `python -m py_compile 00_data_cleaning_and_qa/src/clean_dataset_v1.py` & module import passed; awaiting final dataset regeneration.
-
-#### `CHG-017` -- `2026-11-15` (`cam_id=542` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=542`)
-- **Findings:** Verified `cctv_images/542/` (`608` clean images, min size `15,778` bytes; inspected `542_20260825_060939.jpg`, `542_20260828_150523.jpg`, `542_20260831_210021.jpg`) and `CAMERA_CURATION[542]` (`ทางแยกหลังสวน (สารสิน-หลังสวน)`, `แยกสารสิน-หลังสวน ริมสวนลุมพินี`, `Pathum Wan`, `direction="None"`). View clearly shows Sarasin Rd (`3` eastbound lanes on the left, `3` westbound lanes on the right) beside Lumphini Park with Lang Suan Rd joining at the bottom-left (`PT-11-C1`). `V1.0` baseline confirmed with no changes needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-018` -- `2026-11-15` (`cam_id=619` Peer QA Verification — No Changes Needed)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=619`)
-- **Findings:** Verified `cctv_images/619/` (`607` clean images, min size `11,591` bytes; inspected `619_20260825_060940.jpg`, `619_20260828_150524.jpg`, `619_20260825_173024.jpg`, `619_20260831_205524.jpg`) and `CAMERA_CURATION[619]` (`ทางแยกอังรีดูนังต์`, `บริเวณแยกอังรีดูนังต์`, `Pathum Wan`, `direction="None"`). Camera `PT-06-CH2` captures multi-directional junction traffic at Henri Dunant Intersection under the Thai-Japanese Flyover across Henri Dunant Rd and Rama 4 Rd. `V1.0` baseline confirmed with no changes needed.
-- **Quantitative Impact (Before -> After):** None (`0` metadata / `0` image changes).
-
-#### `CHG-019` -- `2026-11-15` (`cam_id=277` Peer QA Roundabout & Direction Correction)
-- **Editor:** เฟิร์ม (`@nontaphatfirm`)
-- **Batch / Scope:** Batch 3 (`cam_id=277`)
-- **Problem Found:**
-  - `V1.0` carried over the raw CSV mislabeling `"Footbridge near Soi Rang Nam on Phayathai Road (Victory Monument)"` / `"รถมุ่งหน้าไปแยกพญาไท (ซอยรางน้ำ)"` and `"Inbound"`, even though coordinates `(13.76429, 100.53867)` (`26 m` from Phayathai Island bus stop) and camera `RW-3-3-CAM2` (`277_20260825_060939.jpg`, `277_20260828_151024.jpg`, `277_20260831_205524.jpg`) actually look across the **Victory Monument Roundabout** (central roundabout grass island on the far left, BTS viaduct & skywalk over the Phayathai Island bus bays at top). Traffic circulates around the roundabout and splits/enters across multiple branches (Phayathai Rd, Ratchawithi Rd, Phahon Yothin Rd, Din Daeng Rd), not a single `Inbound` stream towards Phayathai Intersection.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[277]` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`:
-    - `location_th` -> `"วงเวียนอนุสาวรีย์ชัยสมรภูมิ"`
-    - `location_detail_th` -> `"บริเวณวงเวียนอนุสาวรีย์ชัยสมรภูมิ (มุมเกาะพญาไท เห็นรถวนรอบวงเวียนและแยกออกหลายทิศทาง)"`
-    - `location_en` -> `"Victory Monument Roundabout"`
-    - `location_detail_en` -> `"Victory Monument Roundabout (Phayathai Island side, multi-directional roundabout traffic)"`
-    - `direction` -> `None`
-- **Quantitative Impact (Before -> After):**
-  - `location_th`: `ทางแยกอนุสาวรีย์ชัยสมรภูมิ` -> `วงเวียนอนุสาวรีย์ชัยสมรภูมิ`
-  - `location_en`: `Footbridge near Soi Rang Nam on Phayathai Road (Victory Monument)` -> `Victory Monument Roundabout`
-  - `location_detail_th`: `รถมุ่งหน้าไปแยกพญาไท (ซอยรางน้ำ)` -> `บริเวณวงเวียนอนุสาวรีย์ชัยสมรภูมิ (มุมเกาะพญาไท เห็นรถวนรอบวงเวียนและแยกออกหลายทิศทาง)`
-  - `location_detail_en`: `From Victory Monument towards Phayathai Intersection` -> `Victory Monument Roundabout (Phayathai Island side, multi-directional roundabout traffic)`
-  - `direction`: `"Inbound"` -> `None`
-  - Images affected: `0` (`606` clean images retained).
-- **Verification:** `python -m py_compile 00_data_cleaning_and_qa/src/clean_dataset_v1.py` & module import passed; awaiting final dataset regeneration.
-
-#### Batch 5 -- นิว (`@Pranithi-New`): Dusit - Rama 5 - Samsen Corridor (`17` Cameras)
-
-- **Date:** `2026-11-16`
-- **Editor:** นิว (`@Pranithi-New`)
-- **Batch / Scope:** Batch 5 (`17` cameras: `915`, `18`, `1028`, `70`, `1361`, `150`, `169`, `230`, `233`, `1063`, `301`, `332`, `363`, `370`, `371`, `546`, `1368`) — Google Drive visual inspection + Google Maps/Street View verification + Aug 25 vs Aug 31 angle stability check.
-- **Problems & Findings Observed:**
-  1. **Severe Gray P-Frame Corruption (`cam_id=169`) & Vertical Scanline Smear (`cam_id=332`):**
-     - `cam_id=169`: All `19` frames tagged `partial_gray_pframe` (`gray128_ratio` `0.483–0.717`) plus `169_20260829_195620.jpg` (`gray128_ratio=0.348`) show massive gray P-frame corruption blocks covering `>50–80%` of the frame and obscuring the road ROI (far exceeding the team's `>30%` exclusion threshold). Divided Wong Sawang Road `Inbound` direction and `(lat, lon)` confirmed accurate.
-     - `cam_id=332`: Full pixel scan across all `10,217` valid Batch 5 frames uncovered `5` frames (`332_20260825_163054.jpg`, `332_20260825_164054.jpg`, `332_20260825_165052.jpg`, `332_20260826_064052.jpg`, `332_20260828_112105.jpg`) with severe vertical `scanline_smear` / stretched-frame corruption occluding >50%–90% of the Ratchawat intersection.
-  2. **Two-Way / Contraflow / Multi-Directional Views (`direction` -> `"None"`):** Per team rule (*if opposing flows are clearly visible in one frame, set `direction` to `"None"`*):
-     - Undivided two-way / contraflow streets (`70`, `1361` Sam Sen Rd BOT contraflow lane; `150` Rama 6 Rd double-yellow line; `230`, `233`, `1063` Rama 5 Rd; `301` Nakhon Ratchasima Rd one-way + contraflow bus lane): both opposing directions are clearly visible in the same frame.
-     - Multi-directional bridge / intersection views (`18` Saphan Daeng Bridge showing both outbound bridge flow & inbound red-light queue; `332` Ratchawat Intersection; `363` Khet Dusit Intersection; `370` Krung Kasem Rd two-way along Khlong Phadung Krung Kasem & `371` Thewet Intersection): cross-traffic or opposing flows occupy the frame.
-  3. **Street View & OSM Coordinate / Road Name Corrections (`915`, `301`, `370`, `546`, `1368`):**
-     - **`cam_id=915` (Wongwian Yai):** Raw CSV pin (`13.72639, 100.49213`) was offset ~95 m NW on the Intharaphithak Rd footbridge; corrected to **`13.72572, 100.49268`** (SW roundabout quadrant looking NNE across the roundabout).
-     - **`cam_id=301` (U Thong Nok Intersection):** Corrected road name in detail from U Thong Nok Rd to **Nakhon Ratchasima Rd** (4 one-way NE lanes + 1 contraflow bus lane visible on road stencils & OSM).
-     - **`cam_id=370` (Thewet Intersection):** Corrected description from bridge approach to **Krung Kasem Rd** heading SE towards Pracha Kasem along Khlong Phadung Krung Kasem (two-way traffic).
-     - **`cam_id=546` & `1368` (Panichayakarn Intersection):** Clarified Phitsanulok Rd view towards Chamai Maruchet Bridge / Government House (`546`) and Rama 5 Rd view past RMUTP (`1368`).
-  4. **Open `V1.0` Items Verified Healthy (Keep All Frames):**
-     - **`cam_id=370` & `371` (`contrast_std < 20`):** Visual check of daytime, dawn, and smallest-file nighttime frames (`370_20260829_190537.jpg` `7,103 B`, `370_20260830_070536.jpg` `7,748 B`, `370_20260829_202540.jpg` `7,869 B`, `371_20260830_060042.jpg` `9,481 B`) confirms camera optics are healthy; low contrast is caused by steep downward framing onto uniform grey asphalt. All frames kept.
-     - **`cam_id=546` & `1368` (`glare_ratio > 0.15`):** Nighttime glare comes from wet asphalt reflections and vehicle headlights needed for Task 04 CV rain/wet-road detection. All frames kept.
-     - **Verified Unchanged (`V1.0` direction/coords confirmed):** `1028`, `546`, `1368` (`direction="None"` and coordinates accurate); no mid-week camera rotation found comparing Aug 25 vs Aug 31 frames.
-- **Fix / Decision Applied:**
-  - Added `25` corrupted filenames (`20` `cam_id=169` `"corrupt_artifact"` + `5` `cam_id=332` `"scanline_smear"`) to `MANUAL_EXCLUDED_IMAGES` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`.
-  - Updated `CAMERA_CURATION` `direction` to `"None"` and clarified `location_detail_th` / `location_detail_en` for `12` cameras (`18`, `70`, `1361`, `150`, `230`, `233`, `1063`, `301`, `332`, `363`, `370`, `371`), plus refined `546`, `1368`, and corrected `cam_id=915` coordinates (`13.72572, 100.49268`).
-  - Added `meta.get("lat", ...)` / `meta.get("lon", ...)` support in `build_cleaned_metadata()` for clean compatibility across team PRs.
-  - Checked `[x]` all `17/17` Batch 5 cameras in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=169` valid images: `598 -> 578` (`-20` `corrupt_artifact` frames).
-  - `cam_id=332` valid images: `611 -> 606` (`-5` `scanline_smear` frames).
-  - Total Batch 5 manual exclusions: `25` frames.
-  - Batch 5 `direction` changes: `12` cameras moved from `Inbound`/`Outbound` to `"None"`; `1` remains `"Inbound"` (`169`); `4` remain `"None"` (`915`, `1028`, `546`, `1368`).
-- **Verification:** Bytecode compile (`py_compile.compile` to temp `.pyc`), `ast.parse`, and `CAMERA_CURATION` / `MANUAL_EXCLUDED_IMAGES` check against `image_quality_manifest.parquet` (`100` cameras, `25` excluded filenames) `[PASS]`; PR (`chore/00-qa-new` -> `main`) `[Pending Maintainer Merge & Final Run]`.
+  - `cam_id=119` / `cam_id=120` (`PAIR_ARM_SUTTHISAN`): opposite arms carried each other's `(lat, lon)` (`~30-40 m` cross-arm swap).
+  - `cam_id=224` / `cam_id=225` (`FB_04_CriminalCourt`): longitudes swapped between inbound and outbound spans.
+  - `cam_id=127` (`FB_03_Ratchada30`): pin sat on the road median instead of the outbound footbridge span.
+  - `cam_id=120`: labelled `Inbound`, but side-arm view captures traffic in both directions (`None`).
+  - Image sweep: `0` unusable frames across `16` swept folders (`cam_id=211` also independently verified by `@nontaphatfirm`). `cam_id=225` metadata verified, **visual folder sweep still pending**.
+- **Fix Applied & Quantitative Impact:**
+  - Extended `CAMERA_CURATION` / `build_cleaned_metadata()` with optional `lat`/`lon` overrides:
+    - `cam_id=119`: `lat 13.78971 -> 13.789680`, `lon 100.57410 -> 100.574437`
+    - `cam_id=120`: `lat 13.78968 -> 13.789785`, `lon 100.57441 -> 100.574031`, `direction`: `Inbound -> None`
+    - `cam_id=127`: `lat 13.81001 -> 13.810192`, `lon 100.57511 -> 100.575261`
+    - `cam_id=224`: `lat 13.81524 -> 13.815228`, `lon 100.57553 -> 100.575355`
+    - `cam_id=225`: `lat 13.81523 -> 13.815248`, `lon 100.57533 -> 100.575513`
+  - Manual exclusions: `0`.
 
 ---
 
-> **Instructions for Contributors:** When adding `V1.1` or `V2.0` updates, copy the template below, fill in exact details, and add a summary row to the **Modification Ledger** above.
+#### Batch 2 -- กร (`@kkooAAA`): Phahon Yothin - Lat Phrao & East Bangkok (`16` Cameras, PR #7)
 
-#### `CHG-002` -- Batch 4 Peer Audit: Bukkhalo Intersection Pair (`cam_id=26`, `cam_id=1195`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=26`, `cam_id=1195`)
-- **Problem Found:**
-  - `cam_id=26` & `cam_id=1195`: Visual audit confirmed both cameras sit on opposite sides of Bukkhalo Intersection watching Charoen Nakhon Road (`26` Inbound, `1195` Outbound), and neither camera captures Mahai Sawan Road.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=26`: `pair_id` `PAIR_JX_BUKKHALO` -> `PAIR_ARM_BUKKHALO`; `pair_type` `perpendicular_junction` -> `opposite_intersection_arm`.
-  - `cam_id=1195`: `pair_id` `PAIR_JX_BUKKHALO` -> `PAIR_ARM_BUKKHALO`; `pair_type` `perpendicular_junction` -> `opposite_intersection_arm`; `direction` `Inbound` -> `Outbound`; `location_th` `แยกบุคคโล (ถนนมไหสวรรย์ ขาเข้า)` -> `แยกบุคคโล (ด้านถนนเจริญนคร)`; `location_en` `Bukkhalo Intersection (Mahai Sawan Road Inbound)` -> `Bukkhalo Intersection (Charoen Nakhon Road)`; `location_detail_th` `รถมาจากถนนเจริญนคร` -> `ถนนเจริญนคร ขาออก`; `location_detail_en` `From Charoen Nakhon Road` -> `Charoen Nakhon Road (Outbound)`.
-  - Images affected: `0` valid images (`60,210` unchanged; metadata-only update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+- **Scope:** `1815, 136, 137, 139, 141, 170, 176, 177, 178, 179, 1070, 1071, 1112, 938, 939, 1804` (`CHG-B2-01` – `CHG-B2-05`).
+- **Fixes Applied & Quantitative Impact:**
+  - **`CHG-B2-01` (`2026-11-15` — District Fixes):**
+    - `cam_id=938`: `district` `Suan Luang -> Bang Kapi`.
+    - `cam_id=1815`: `district` `Huai Khwang -> Din Daeng` (final documented road: **Rama 9 Road**, `Inbound`).
+  - **`CHG-B2-02` (`2026-11-15` — `cam_id=1815` View-Change Exclusion):**
+    - Camera panned ~180° from `1815_20260831_181044.jpg` through `1815_20260831_210044.jpg` (original view ends at `1815_20260831_180044.jpg`).
+    - Excluded `18` frames (`"camera_view_changed"`): `1815_20260831_181044.jpg`, `182046`, `183044`, `184044`, `185044`, `190044`, `191044`, `192044`, `193044`, `194046`, `195044`, `200044`, `201046`, `202044`, `203044`, `204044`, `205044`, `210044`. (`cam_id=1815`: `611 -> 593` valid frames).
+  - **`CHG-B2-03` / `CHG-B2-04` / `CHG-B2-05` (`2026-11-16` to `2026-11-17` — Location & Direction Refinements):**
+    - `cam_id=939`: `location_detail_th`: `บริเวณแยกมหาดไทย (ถนนรามคำแหง) -> บริเวณแยกมหาดไทย (สะพานรามคำแหง)`; `location_detail_en`: `Mahadthai Intersection (Ramkhamhaeng Road) -> Mahadthai Intersection (Ramkhamhaeng Bridge)`; `direction="None"` kept.
+    - `cam_id=1112`: Final road set to Sutthisan Winitchai Road (`แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)` / `Sutthisan Intersection (Sutthisan Winitchai Road)` in `location_*` & `location_detail_*`); `direction`: `Inbound -> None`.
+    - `cam_id=1804`: `location_detail_th`: `ท้ายรถมุ่งหน้าแยกสวนหลวง -> ปากซอยอ่อนนุช 33 ถนนอ่อนนุช`; `location_detail_en`: `Towards Suan Luang Intersection -> Entrance to Soi On Nut 33 on On Nut Road`; `direction`: `Outbound -> None`.
+    - `cam_id=178` / `179`: physical reference comments (~180 m / ~120 m after turning right from Phyathai 2 Hospital) added in `CAMERA_CURATION`.
+- **Informational Note (Drive Deduplication for `V2.0`):** `28` byte-identical duplicate image copies exist on Google Drive (`18` in `136/`, e.g. `136_20260825_111611.jpg`; `10` in `176/`, e.g. `176_20260829_085616.jpg`). Do **not** add to `MANUAL_EXCLUDED_IMAGES`; remove duplicates during `V2.0` Drive sync.
 
-#### `CHG-003` -- Batch 4 Peer Audit: Proposed Exclusion of `cam_id=500` & `cam_id=1188`
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=500`, `cam_id=1188`)
-- **Problem Found:**
-  - `cam_id=500` (Mit Samphan Intersection): Visual sweep shows a significant proportion (`>10%`) of unusable artifact images.
-  - `cam_id=1188` (Borommaratchachonnani - Kanchanaphisek Interchange): Wide-angle view where nighttime frames are completely unusable because vehicles are too tiny and headlight glare is severe.
-- **Fix / Decision Applied:**
-  - Logged recommendation to remove `cam_id=500` and `cam_id=1188` from the downstream dataset.
-  - Kept `clean_dataset_v1.py`, `CAMERA_AUDIT_CHECKLIST.md` (location verification still pending), `run_pipeline.py`, and `DATA_CONTRACT.md` unchanged for now because `clean_dataset_v1.py` and downstream contracts currently enforce all `100` camera IDs (`expected_min_rows=100`).
-- **Quantitative Impact (Before -> After):**
-  - Pending team/maintainer decision (`100 -> 98` cameras or marking all frames of `500` & `1188` invalid in `clean_dataset_v1.py` / downstream filtering).
-  - Images affected: `0` changed in script so far (`V1.0` counts unchanged).
-- **Verification:** Branch `chore/00-qa-song` `[Pending team/maintainer decision & location detail verification]`
+---
 
-#### `CHG-004` -- Batch 4 Peer Audit: Bang Yi Ruea Intersection (`cam_id=32`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=32`)
-- **Problem Found:**
-  - `cam_id=32`: Location names are accurate, but visual inspection confirms the camera clearly captures both opposing traffic directions on Thoet Thai Road rather than a single `Inbound` stream.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[32]["direction"]` to `"None"` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=32`: `direction` `Inbound` -> `None`.
-  - Images affected: `0` valid images from this metadata edit (note: `2` `scanline_smear` frames on `cam_id=32` are tracked in `MANUAL_EXCLUDED_IMAGES`).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+#### Batch 3 -- เฟิร์ม (`@nontaphatfirm`): Sathon - Naradhiwas - Rama 3 & Pathum Wan (`17` Cameras + `211`, PR #2)
 
-#### `CHG-005` -- Batch 4 Peer Audit: Ratchada-Ratchaphruek Intersection (`cam_id=36`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=36`)
-- **Problem Found:**
-  - `cam_id=36`: Camera overlooks a large multi-directional intersection view (no single dominant direction), and is actually positioned on the Ratchadaphisek Road side with traffic arriving from Mahai Sawan Intersection rather than the Ratchaphruek Road / Taksin side.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[36]` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=36`: `location_th` `แยกรัชดา-ราชพฤกษ์ (ด้านถนนราชพฤกษ์)` -> `แยกรัชดา-ราชพฤกษ์ (ด้านถนนรัชดาภิเษก)`; `location_en` `Ratchada-Ratchaphruek Intersection (Ratchaphruek Road)` -> `Ratchada-Ratchaphruek Intersection (Ratchadaphisek Road)`; `location_detail_th` `รถมาจากแยกตากสิน` -> `รถมาจากแยกมไหสวรรย์`; `location_detail_en` `From Taksin / Mahai Sawan Intersection` -> `From Mahai Sawan Intersection`; `direction` `Outbound` -> `None`.
-  - Images affected: `0` valid images (`metadata-only` update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+- **Scope:** `75, 88, 186, 188, 194, 196, 206, 599, 603, 604, 11, 82, 239, 432, 542, 619, 277` + Batch 1 `211` (`CHG-B3-01` – `CHG-B3-18`).
+- **Confirmed Healthy (`V1.0` Baseline Unchanged — 7 Cameras):** `186`, `188`, `196`, `211` (Batch 1), `239` (4 main southbound `Inbound` lanes), `542` (Sarasin–Lang Suan bidirectional `None`), `619` (Henri Dunant multi-directional `None`).
+- **Metadata Fixes Applied (11 Cameras):**
+  - `cam_id=11`: `location_detail_*` updated to `ช่วงอนุสาวรีย์ชัยสมรภูมิ – แยกสามเหลี่ยมดินแดง (ทั้งสองทิศทาง)` / `Between Victory Monument and Din Daeng Intersection (both directions)`; `direction`: `Outbound -> None`.
+  - `cam_id=75`: `location_detail_*`: `รถมาจากแยกด่วนสาธุประดิษฐ์ -> รถมาจากแยกนราธิวาส-พระราม 3` (`From Sathu Pradit Expressway Intersection -> From Naradhiwas-Rama 3 Intersection`).
+  - `cam_id=82`: `location_detail_*` clarified (4 northbound lanes + 1 southbound contraflow bus lane); `direction`: `Inbound -> None`.
+  - `cam_id=88`: Undivided two-way Chan Rd near Soi 18/6; `direction`: `Inbound -> None`.
+  - `cam_id=194`: `ถนนสาทรใต้ -> ถนนสาทรเหนือ` (`South -> North Sathon Road`); `จากแยกสาทร-นราธิวาส มุ่งหน้าวิทยุ -> จากแยกวิทยุ มุ่งหน้าสาทร-นราธิวาส`; `direction`: `Inbound -> Outbound`.
+  - `cam_id=206`: `ใกล้ซอย -> ตรงข้ามซอยนราธิวาสราชนครินทร์ 20` (`near -> opposite`); approach reversed (`Chan-Naradhiwas -> Ratchada-Naradhiwas`); `direction`: `Inbound -> Outbound`; `lat, lon`: `13.70545, 100.53835 -> 13.70555, 100.53865` (~34 m east carriageway).
+  - `cam_id=277`: `ทางแยก -> วงเวียนอนุสาวรีย์ชัยสมรภูมิ` (`Footbridge near Soi Rang Nam -> Victory Monument Roundabout`); detail updated for Phayathai Island multi-directional roundabout view; `direction`: `Inbound -> None`.
+  - `cam_id=432`: `location_detail_*` clarified (`รถมาจากสีลม มุ่งหน้าไปหัวลำโพง (บริเวณแยกสามย่าน ถนนพระรามที่ 4)`); `direction`: `None -> Inbound`.
+  - `cam_id=599`: Full Surasak junction box; `direction`: `Inbound -> None`.
+  - `cam_id=603`: `location_detail_*`: `รถมาจากแยกสุรศักดิ์ -> รถมาจากแยกสาทร-นราธิวาส` (main corridor ahead is Naradhiwas Rd Northbound).
+  - `cam_id=604`: `location_detail_*` updated (full 4-way Silom–Naradhiwas junction under BTS viaduct; removed off-axis `ศาลาแดง`); `direction`: `Inbound -> None`.
+- **Manual Frame Exclusions (`6` frames on `cam_id=206`):**
+  - `corrupt_artifact` (`5`): `206_20260825_183106.jpg`, `206_20260827_120106.jpg`, `206_20260828_130705.jpg`, `206_20260828_171605.jpg`, `206_20260831_104606.jpg`.
+  - `blocked_lens` (`1`, heavy condensation/water smear): `206_20260831_164105.jpg`.
 
-#### `CHG-006` -- Batch 4 Peer Audit: Soi Charoen Nakhon 46 Footbridge (`cam_id=158`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=158`)
-- **Problem Found:**
-  - `cam_id=158`: Visual inspection confirms the camera is centered over the 3-lane carriageway flowing Outbound (towards Bukkhalo Intersection), while the opposing 2 lanes across the median are oblique/secondary; `location_detail_th` also labeled the flow `ขาเข้า`.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[158]["direction"]` to `"Outbound"` and `location_detail_th` (`ขาเข้า` -> `ขาออก`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`, and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=158`: `direction` `Inbound` -> `Outbound`; `location_detail_th` `ถนนเจริญนคร ขาเข้า มุ่งหน้าแยกบุคคโล` -> `ถนนเจริญนคร ขาออก มุ่งหน้าแยกบุคคโล`.
-  - Images affected: `0` valid images from this metadata edit (note: `8` `corrupt_artifact` frames on `cam_id=158` are tracked in `MANUAL_EXCLUDED_IMAGES`).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+---
 
-#### `CHG-007` -- Batch 4 Peer Audit: Wat Ditsahongsaram Footbridge (`cam_id=251`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=251`)
-- **Problem Found:**
-  - `cam_id=251`: Google Maps lists the temple name as `Wat Ditsahongsaram (Wat Makkasan)` (rather than `Wat Dishongsaram`), and traffic moving from Phetchaburi Expressway Intersection towards Mit Samphan Intersection is heading `Outbound` (away from CBD).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[251]` (`location_en` and `direction`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=251`: `location_en` `Footbridge near Wat Dishongsaram on Phetchaburi Road` -> `Footbridge near Wat Ditsahongsaram (Wat Makkasan) on Phetchaburi Road`; `direction` `Inbound` -> `Outbound`.
-  - Images affected: `0` valid images (`metadata-only` update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+#### Batch 4 -- สอง (`@theme222`): Phetchaburi & Thon Buri Corridors (`17` Cameras, PR #4)
 
-#### `CHG-008` -- Batch 4 Peer Audit: Soi Phetchaburi 27 Footbridge (`cam_id=256`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=256`)
-- **Problem Found:**
-  - `cam_id=256`: Camera is centered over an undivided multi-lane tidal/contraflow stretch of Phetchaburi Road showing both opposing directions prominently (2 crowded lanes on the left vs. 4-5 free-flowing opposing lanes on the right), so labeling a single direction would misattribute congestion in whole-frame YOLO analytics. The expressway landmark is also more accurately `ใต้ทางด่วนเฉลิมมหานคร` (`Chalerm Maha Nakhon Expressway`).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[256]` (`direction` -> `"None"`, `location_detail_th`, `location_detail_en`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=256`: `direction` `Outbound` -> `None`; `location_detail_th` `หน้ารถมาจากแยกประตูน้ำ มุ่งหน้าแยกใต้ด่วนเพชรบุรี` -> `หน้ารถมาจากแยกประตูน้ำ มุ่งหน้าไปใต้ทางด่วนเฉลิมมหานคร`; `location_detail_en` `From Pratu Nam Intersection towards Phetchaburi Expressway Intersection` -> `From Pratu Nam Intersection towards Chalerm Maha Nakhon Expressway`.
-  - Images affected: `0` valid images (`metadata-only` update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+- **Scope:** `250, 251, 256, 500, 26, 1195, 32, 36, 1103, 1076, 158, 1078, 1132, 529, 572, 1188, 595` (`CHG-B4-01` – `CHG-B4-13`).
+- **Metadata Fixes Applied (12 Cameras):**
+  - `cam_id=26` & `1195`: `pair_id`: `PAIR_JX_BUKKHALO -> PAIR_ARM_BUKKHALO`; `pair_type`: `perpendicular_junction -> opposite_intersection_arm`. `1195` updated to `แยกบุคคโล (ด้านถนนเจริญนคร)` / `Charoen Nakhon Road (Outbound)`, `direction`: `Inbound -> Outbound`.
+  - `cam_id=32`: Bidirectional Thoet Thai Rd; `direction`: `Inbound -> None`.
+  - `cam_id=36`: `location_*` `ราชพฤกษ์ -> รัชดาภิเษก`, `location_detail_*` `ตากสิน -> มไหสวรรย์`; `direction`: `Outbound -> None`.
+  - `cam_id=158`: Dominant 3-lane foreground flows `Outbound` towards Bukkhalo; `location_detail_th`: `ขาเข้า -> ขาออก`; `direction`: `Inbound -> Outbound`.
+  - `cam_id=251`: `Wat Dishongsaram -> Wat Ditsahongsaram (Wat Makkasan)`; `direction`: `Inbound -> Outbound`.
+  - `cam_id=256`: Undivided multi-lane Phetchaburi Rd; `location_detail_*` updated to `ใต้ทางด่วนเฉลิมมหานคร` (`Chalerm Maha Nakhon Expressway`); `direction`: `Outbound -> None`.
+  - `cam_id=500`: Relabelled from Mit Samphan to **Pratu Nam Intersection (`แยกประตูน้ำ`)** per `(13.75001, 100.54103)`; `direction`: `Inbound -> None`.
+  - `cam_id=529`: Crossing interchange split ~50/50; removed `(Inbound)` / `(ฝั่งขาเข้า)` labels; `direction`: `Inbound -> None`.
+  - `cam_id=572`: Strictly ascending ramp traffic; `location_detail_en`: `ascending/descending -> ascending`; `direction`: `None -> Inbound`.
+  - `cam_id=595`: Added `ประชาธิปก` / `Prajadhipok Roads` to `location_detail_*`; `direction`: `Inbound -> None`.
+  - `cam_id=1188`: Corrected location from Borommaratchachonnani to **Kanchanaphisek Road (Chimphli Interchange)** towards Bang Chueak Nang Interchange (`direction="None"` kept).
+- **Manual Frame Exclusions (`22` frames):**
+  - `cam_id=32` (`2` `scanline_smear`): `32_20260828_100545.jpg`, `32_20260830_124541.jpg`.
+  - `cam_id=158` (`8` `corrupt_artifact`): `158_20260827_183605.jpg`, `158_20260827_191605.jpg`, `158_20260828_185607.jpg`, `158_20260829_114604.jpg`, `158_20260830_075603.jpg`, `158_20260830_110607.jpg`, `158_20260831_161604.jpg`, `158_20260831_201605.jpg`.
+  - `cam_id=529` (`9` `corrupt_artifact`): `529_20260825_081011.jpg`, `529_20260825_142011.jpg`, `529_20260827_123022.jpg`, `529_20260827_155011.jpg`, `529_20260827_161011.jpg`, `529_20260827_193511.jpg`, `529_20260828_145011.jpg`, `529_20260828_155011.jpg`, `529_20260828_200011.jpg`.
+  - `cam_id=595` (`1` `frozen_visual`): `595_20260826_154043.jpg`.
+  - `cam_id=1076` (`2` `blocked_lens` — rainwater): `1076_20260831_163105.jpg`, `1076_20260831_164105.jpg`.
+- **Open Proposal (`CHG-B4-02`):** Team/maintainer decision pending on whether to exclude `cam_id=500` (`>10%` artifacts) and `cam_id=1188` (tiny vehicles & severe nighttime glare) downstream (`run_pipeline.py` contract currently checks `100` rows in `cctv_info_cleaned`). *(Also added `**/workspace/` to `.gitignore`.)*
 
-#### `CHG-009` -- Batch 4 Peer Audit: Pratu Nam Intersection Correction (`cam_id=500`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=500`)
-- **Problem Found:**
-  - `cam_id=500`: Map verification at `(13.75001, 100.54103)` confirms `500` is actually at **Pratu Nam Intersection (`แยกประตูน้ำ`)** rather than Mit Samphan Intersection (`V1.0` corrected the shifted English label to match the erroneous Thai label `ทางแยกมิตรสัมพันธ์` instead of vice versa). Traffic along Phetchaburi Road flows from Ratchathewi Intersection towards `cam_id=256` (Soi Phetchaburi 27), and the wide intersection view captures heavy traffic in every direction (`None`).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[500]` (`location_th`, `location_detail_th`, `location_en`, `location_detail_en`, `direction` -> `"None"`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`. *(Note: the `CHG-003` recommendation to exclude `cam_id=500` downstream due to `>10%` unusable artifacts remains pending team/maintainer decision.)*
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=500`: `location_th` `ทางแยกมิตรสัมพันธ์` -> `แยกประตูน้ำ`; `location_en` `Mit Samphan Intersection` -> `Pratu Nam Intersection`; `location_detail_th` `รถมุ่งหน้าไปแยกราชประสงค์` -> `บริเวณแยกประตูน้ำ (รถมาจากแยกราชเทวี มุ่งหน้าซอยเพชรบุรี 27)`; `location_detail_en` `Towards Ratchaprasong Intersection` -> `Pratu Nam Intersection (from Ratchathewi Intersection towards Soi Phetchaburi 27)`; `direction` `Inbound` -> `None`.
-  - Images affected: `0` valid images (`metadata-only` update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+---
 
-#### `CHG-010` -- Batch 4 Peer Audit: Phutthamonthon Sai 2 - Borommaratchachonnani Interchange (`cam_id=529`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=529`)
-- **Problem Found:**
-  - `cam_id=529`: Crossing interchange roads are split ~50/50 in the frame and neither road leads directly into central Bangkok, so `"Inbound"` does not reflect the overall camera view.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[529]` (`direction` -> `"None"` and removed `(Inbound)` / `(ฝั่งขาเข้า)` / `Inbound` / `ขาเข้า` from `location_*` and `location_detail_*`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`, and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=529`: `location_th` `จุดตัดถนนพุทธมณฑลสาย 2 (ฝั่งขาเข้า)` -> `จุดตัดถนนพุทธมณฑลสาย 2`; `location_detail_th` `ถนนบรมราชชนนี-พุทธมณฑลสาย 2 ขาเข้า` -> `ถนนบรมราชชนนี-พุทธมณฑลสาย 2`; `location_en` `Phutthamonthon Sai 2 - Borommaratchachonnani Interchange (Inbound)` -> `Phutthamonthon Sai 2 - Borommaratchachonnani Interchange`; `location_detail_en` `Phutthamonthon Sai 2 / Borommaratchachonnani Inbound` -> `Phutthamonthon Sai 2 / Borommaratchachonnani`; `direction` `Inbound` -> `None`.
-  - Images affected: `0` valid images from this metadata edit (note: `9` `corrupt_artifact` frames on `cam_id=529` are tracked in `MANUAL_EXCLUDED_IMAGES`).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+#### Batch 5 -- นิว (`@Pranithi-New`): Dusit - Rama 5 - Samsen (`17` Cameras, PR #9)
 
-#### `CHG-011` -- Batch 4 Peer Audit: Borommaratchachonnani Elevated Highway Taling Chan Ramp (`cam_id=572`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=572`)
-- **Problem Found:**
-  - `cam_id=572`: Visual audit confirms traffic on the Taling Chan ramp is strictly ascending (matching Thai `ทางขึ้นตลิ่งชัน`) and heading `Inbound` towards central Bangkok, rather than bidirectional `ascending/descending` (`None`).
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[572]` (`location_detail_en` and `direction`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=572`: `location_detail_en` `Taling Chan ascending/descending ramp` -> `Taling Chan ascending ramp`; `direction` `None` -> `Inbound`.
-  - Images affected: `0` valid images (`metadata-only` update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+- **Scope:** `915, 18, 1028, 70, 1361, 150, 169, 230, 233, 1063, 301, 332, 363, 370, 371, 546, 1368` (`CHG-B5-01` – `CHG-B5-05`).
+- **Metadata Fixes Applied (15 Cameras):**
+  - **Two-Way / Multi-Directional (`direction -> "None"`, `12` cams):** `18, 150, 301, 1063, 1361` (`Outbound -> None`) and `70, 230, 233, 332, 363, 370, 371` (`Inbound -> None`), with `location_detail_th/en` updated for opposing/contraflow/cross-traffic framing (`301` road corrected to Nakhon Ratchasima Rd; `370` clarified along Krung Kasem Rd).
+  - **Street View & OSM Fixes:** `cam_id=915` pin moved ~95 m SE to SW Wongwian Yai roundabout quadrant (`lat=13.72572, lon=100.49268`, detail refined); `546` & `1368` details clarified.
+  - **V1.0 Open Edge Cases Verified Healthy (Keep All Frames):**
+    - `cam_id=370` & `371` (`contrast_std < 20`): steep downward framing on dark uniform asphalt confirmed optically healthy (`370_20260829_190537.jpg`, `370_20260830_070536.jpg`, `370_20260829_202540.jpg`, `371_20260830_060042.jpg`).
+    - `cam_id=546` & `1368` (`glare_ratio > 0.15`): wet asphalt reflections & headlight bloom preserved for Task 04 CV rain/wet-road detection.
+    - `1028` & `169` directions/coords verified (`0` camera angle shifts across Batch 5).
+- **Manual Frame Exclusions (`25` frames):**
+  - `cam_id=169` (`20` `corrupt_artifact`, >35%–72% gray-128 blocks occluding road ROI): `169_20260825_093619.jpg`, `124618`, `155620`, `160618`, `20260826_100622`, `130619`, `144618`, `20260827_154118`, `20260828_124622`, `162627`, `164617`, `20260829_195620`, `20260830_100117`, `121118`, `125119`, `130117`, `20260831_080119`, `100120`, `145119`, `174119` (`598 -> 578` valid).
+  - `cam_id=332` (`5` `scanline_smear`, vertical streak >50%–90% occluded): `332_20260825_163054.jpg`, `164054`, `165052`, `20260826_064052`, `20260828_112105` (`611 -> 606` valid).
 
-#### `CHG-012` -- Batch 4 Peer Audit: Ban Khaek Intersection (`cam_id=595`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=595`)
-- **Problem Found:**
-  - `cam_id=595`: Wide-angle fisheye view of Ban Khaek Intersection captures multi-leg crossing/queuing traffic across both Itsaraphap Road and Prajadhipok Road (`ถนนประชาธิปก`, with the left leg barriered off), so `"None"` keeps directional analytics cleaner than `"Inbound"`; `location_detail_*` also omitted Prajadhipok Road.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[595]` (`location_detail_th`, `location_detail_en`, `direction` -> `"None"`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py` and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`.
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=595`: `location_detail_th` `ถนนอิสรภาพ รถมาจากแยกโพธิ์สามต้น` -> `ถนนอิสรภาพ-ประชาธิปก (รถมาจากแยกโพธิ์สามต้น)`; `location_detail_en` `Itsaraphap Road, from Pho Sam Ton Intersection` -> `Itsaraphap & Prajadhipok Roads (from Pho Sam Ton Intersection)`; `direction` `Inbound` -> `None`.
-  - Images affected: `0` valid images from this metadata edit (note: `1` `frozen_visual` frame on `cam_id=595` is tracked in `MANUAL_EXCLUDED_IMAGES`).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+---
 
-#### `CHG-013` -- Batch 4 Peer Audit: Kanchanaphisek Road / Chimphli Interchange (`cam_id=1188`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`cam_id=1188`)
-- **Problem Found:**
-  - `cam_id=1188`: Street View and camera framing confirm the camera overlooks Kanchanaphisek Road (Motorway 9 / Bangkok Western Outer Ring Rd) facing towards Bang Chueak Nang Interchange (`ทางแยกต่างระดับบางเชือกหนัง`) with both incoming and outgoing lanes visible (`None`), rather than Borommaratchachonnani Rd / Phutthamonthon Sai 2.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION[1188]` (`location_th`, `location_detail_th`, `location_en`, `location_detail_en`) in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`, kept `direction="None"`, and checked off `[x]` in `00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`. *(Note: the `CHG-003` recommendation to exclude `cam_id=1188` downstream due to unusable nighttime glare/tiny vehicles remains pending team/maintainer decision.)*
-- **Quantitative Impact (Before -> After):**
-  - `cam_id=1188`: `location_th` `ต่างระดับฉิมพลี-พุทธมณฑลสาย 2 (ถนนบรมราชชนนี)` -> `ถนนกาญจนาภิเษก (ต่างระดับฉิมพลี)`; `location_detail_th` `จุดตัดถนนบรมราชชนนี-กาญจนาภิเษก ฝั่งพุทธมณฑลสาย 2` -> `ถนนกาญจนาภิเษก มุ่งหน้าทางแยกต่างระดับบางเชือกหนัง (เห็นทั้งขาเข้าและขาออก)`; `location_en` `Borommaratchachonnani - Kanchanaphisek Interchange (Phutthamonthon Sai 2 Side)` -> `Kanchanaphisek Road (Chimphli Interchange)`; `location_detail_en` `Borommaratchachonnani Road near Phutthamonthon Sai 2` -> `Overlooking Kanchanaphisek Road (Motorway 9) towards Bang Chueak Nang Interchange (both directions)`.
-  - Images affected: `0` valid images (`metadata-only` update).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+#### Batch 6 -- โม่ (`@moaqilo`): Historic Old Town - Phra Nakhon - Pom Prap (`16` Cameras, PR #8)
 
-#### `CHG-014` -- Batch 4 Peer Audit: Manual Frame Exclusions (`22` Frames Across `cam_id=32, 158, 529, 595, 1076`)
-- **Date:** `2026-11-15`
-- **Editor:** สอง (`@theme222`)
-- **Batch / Scope:** Batch 4 (`MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py`)
-- **Problem Found:**
-  - `cam_id=32` (`2` `scanline_smear`): `32_20260828_100545.jpg`, `32_20260830_124541.jpg`
-  - `cam_id=158` (`8` `corrupt_artifact`): `158_20260827_183605.jpg`, `158_20260827_191605.jpg`, `158_20260828_185607.jpg`, `158_20260829_114604.jpg`, `158_20260830_075603.jpg`, `158_20260830_110607.jpg`, `158_20260831_161604.jpg`, `158_20260831_201605.jpg`
-  - `cam_id=529` (`9` `corrupt_artifact`): `529_20260825_081011.jpg`, `529_20260825_142011.jpg`, `529_20260827_123022.jpg`, `529_20260827_155011.jpg`, `529_20260827_161011.jpg`, `529_20260827_193511.jpg`, `529_20260828_145011.jpg`, `529_20260828_155011.jpg`, `529_20260828_200011.jpg`
-  - `cam_id=595` (`1` `frozen_visual`): `595_20260826_154043.jpg`
-  - `cam_id=1076` (`2` `blocked_lens` — rainwater): `1076_20260831_163105.jpg`, `1076_20260831_164105.jpg`
-- **Fix / Decision Applied:**
-  - Added all `22` filenames to `MANUAL_EXCLUDED_IMAGES` in `00_data_cleaning_and_qa/src/clean_dataset_v1.py`. *(Note: `cam_id=500` frames are intentionally omitted here pending `CHG-003` whole-camera removal decision.)*
-- **Quantitative Impact (Before -> After):**
-  - Images queued for exclusion (`MANUAL_EXCLUDED_IMAGES`): `22` images (`2` `scanline_smear`, `17` `corrupt_artifact`, `1` `frozen_visual`, `2` `blocked_lens`).
-- **Verification:** Branch `chore/00-qa-song` `[Pending final maintainer clean_dataset_v1.py + run_pipeline.py --check-contract]`
+- **Scope:** `68, 228, 395, 411, 412, 413, 414, 556, 569, 576, 630, 913, 1039, 1060, 1362, 1589` (`CHG-B6-01`).
+- **Metadata Fixes Applied (8 Cameras):**
+  - `cam_id=68`: `direction`: `Inbound -> None`.
+  - `cam_id=414`: `location_detail_th`: `บริเวณใต้สะพานพระพุทธยอดฟ้า -> มุ่งเข้าสู่ย่านพระนครและสนามไชย`; `location_detail_en`: `Under Memorial Bridge -> Towards Phra Nakhon area and Sanam Chai`; `direction`: `None -> Inbound`.
+  - `cam_id=556`: `location_detail_th`: `รถมาจากสะพานกรุงธน -> รถมาจากวัดประสาทบุญญาวาส`; `location_detail_en`: `From Krung Thon Bridge -> From Wat Prasat Bunyawat`.
+  - `cam_id=576`: `location_detail_th`: `บริเวณแยกบางลำพู -> รถมุ่งหน้าไปถนนข้าวสาร / สนามหลวง`; `location_detail_en`: `Bang Lamphu Intersection -> Towards Khao San Road / Sanam Luang`; `direction`: `None -> Inbound`.
+  - `cam_id=630`: `location_detail_th`: `รถมุ่งหน้าแยกสะพานแดง -> รถมาจากแยกสะพานแดง`; `location_detail_en`: `Towards Saphan Daeng Intersection -> From Saphan Daeng Intersection`; `direction`: `Outbound -> Inbound`.
+  - `cam_id=1039`: `direction`: `Outbound -> None`.
+  - `cam_id=1060`: `location_detail_th`: `รถมุ่งหน้าไปถนนพระรามที่ 1 -> รถมาจากถนนพระรามที่ 1`; `location_detail_en`: `Towards Rama 1 Road -> From Rama 1 Road`.
+  - `cam_id=1362`: `location_th`: `แยกสามเสน -> ถนนสามเสน`; `location_en`: `Samsen Intersection -> Samsen Road`; `location_detail_th`: `บริเวณแยกสามเสน มุ่งหน้าแยกอภัยเจษฎุทิศ -> รถมุ่งหน้าท่าวาสุกรี`; `location_detail_en`: `Left side towards Uphai Chetsaduthit Intersection -> Towards Tha Wasukri Pier`; `lat=13.7746377`, `lon=100.5067094` (`Inbound` kept).
+- **Manual Frame Exclusions (`32` frames):**
+  - `cam_id=68` (`1` `blocked_by_crow`): `68_20260828_092625.jpg`.
+  - `cam_id=413` (`1` `blocked_by_pickup`): `413_20260827_111525.jpg`.
+  - `cam_id=630` (`25` total: `15` `corrupt_artifact`, `9` `stretched_frame`, `1` `blurry_frame`):
+    - `corrupt_artifact`: `630_20260825_072031.jpg`, `074031`, `085033`, `170031`, `174034`, `175032`, `201032`, `20260826_085032`, `100032`, `20260827_092031`, `194035`, `203032`, `20260828_080531`, `20260830_115531`, `120533`.
+    - `stretched_frame`: `630_20260825_202032.jpg`, `20260826_060531`, `061540`, `091031`, `20260827_162032`, `202032`, `20260829_083530`, `201532`, `20260831_170532`.
+    - `blurry_frame`: `630_20260830_150531.jpg`.
+  - `cam_id=1039` (`5` `overexposed_glare`): `1039_20260825_185509.jpg`, `20260826_195009.jpg`, `20260829_194509.jpg`, `20260830_185009.jpg`, `20260831_195511.jpg`.
+
+---
+
+#### Remaining Open Items Before Locking `V2.0`
+1. **Batch 1 `cam_id=225` visual sweep:** Metadata (`lat/lon`, `Outbound`) verified; complete the visual frame scan (`CAMERA_AUDIT_CHECKLIST.md` line `225`).
+2. **Batch 4 `CHG-B4-02` decision (`cam_id=500` & `1188`):** Confirm whether to exclude downstream in Task 03/04 or keep in `cctv_info_cleaned` (`expected_min_rows=100`).
+3. **Google Drive `V2.0` sync:** Remove `28` redundant byte-identical duplicate copies in Drive `136/` (`18`) and `176/` (`10`), and sync regenerated `Dataset_Clean_V1/` (`60,107` images + updated `.parquet`/`.csv`) after review.
+4. **Task 03 Median Backgrounds Refresh:** Locally cached `data/median_backgrounds/` generated prior to `V1.1` should be regenerated for cameras with newly excluded frames (especially `1815`, `630`, `1039`, `169`, `158`, `529`, `206`, `332`).
+
+---
+
+> **Instructions for Future Contributors:** When adding `V2.0+` updates, copy the template below, fill in exact details, and add a summary row to the **Modification Ledger** above.
 
 ```markdown
 #### Change Entry Template (Copy & Paste for Each Audit / Fix Session)
 - **Date:** YYYY-MM-DD
 - **Editor:** <Name> (<GitHub handle>)
-- **Batch / Scope:** <e.g., Batch 2 (16 cameras) / Extra Gate 4 check / partial_green_screen review>
+- **Batch / Scope:** <e.g., V2.0 Final Lock / extra exclusion check>
 - **Problem Found:**
   - `cam_id=XXX`: <describe exact issue in metadata or specific images>
 - **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION` / exclusion list / threshold in `clean_dataset_v1.py` (or requested update)
+  - Updated `CAMERA_CURATION` / exclusion list / threshold in `clean_dataset_v1.py`
 - **Quantitative Impact (Before -> After):**
   - Metadata fields changed: <list exact fields & old -> new values>
   - Images affected: `<N>` valid images (`<before>` -> `<after>`)
-- **Verification:** PR opened (`chore/00-qa-<name>` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run / PASS]`
+- **Verification:** `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[PASS]`
 ```
-
-#### Batch 2 Peer Audit (`CHG-003`)
-- **Date:** 2026-11-15
-- **Editor:** กร (@kkooAAA)
-- **Batch / Scope:** Batch 2 (16 cameras): `1815, 136, 137, 139, 141, 170, 176, 177, 178, 179, 1070, 1071, 1112, 938, 939, 1804` -- image sweep of all valid frames + metadata check.
-- **Problem Found:**
-  - `cam_id=938`: `district` was `Suan Luang`; coordinates `(13.74761, 100.60591)` fall in **Bang Kapi** district (verified on Google Maps).
-  - `cam_id=1815`: `district` was `Huai Khwang`; coordinates `(13.75599, 100.56481)` fall on Asok-Din Daeng Road, **Din Daeng** (verified on Google Maps). **-> Road clarified by `CHG-005`:** the camera views **Rama 9 Road** (final documented road); the district fix (`Din Daeng`) stands.
-  - `cam_id=1112`: `district` `Din Daeng` confirmed on Google Maps (intersection lies on the Phaya Thai / Din Daeng boundary) -- no change.
-  - Direction check: `direction` of all `16` cameras manually verified by comparing CCTV images with Google Maps -- all match existing values (e.g., `141`: `Outbound` verified; `170`: `Outbound` verified; `1815`: `Inbound` verified for the original view).
-  - Image sweep: all `9,535` valid frames inspected (contact sheets of every frame, day and night, plus full-size checks of suspicious frames). `0` unreadable, `0` pitch-black, `0` blocked, `0` corrupted frames found beyond what Gates 1-5 already removed.
-- **Fix / Decision Applied:**
-  - Updated `CAMERA_CURATION` in `clean_dataset_v1.py`: `938` and `1815` `district`.
-  - No entries added to `MANUAL_EXCLUDED_IMAGES`. Rainy, wet-road, and headlight-glare frames preserved (e.g., rain-smeared lens frame `938_20260829_151005.jpg` kept intentionally).
-  - All `direction` values verified and left unchanged.
-- **Quantitative Impact (Before -> After):**
-  - Metadata fields changed: `938` `district`: Suan Luang -> Bang Kapi; `1815` `district`: Huai Khwang -> Din Daeng.
-  - Images affected: `0` valid images (`9,535` -> `9,535`).
-- **Open Items for Maintainer (not changed in this PR):**
-  - `cam_id=1815` **view change:** camera view changed between `1815_20260831_180044.jpg` (last original view) and `1815_20260831_181044.jpg` (first new view) -- likely a ~180° pan at the same site (same noise-barrier style on the elevated road, which flips from left to right; the same grey dome fixture moves from the left to the right frame edge; same `352x288` resolution and `:x0:44` capture cadence). `18` valid frames (`2026-08-31 18:10:44` to `21:00:44`) show the reverse view; the other `597` frames (`593` valid) show the original view. `location_detail_th/en` and `direction` do not describe these `18` frames. Not excluded -- maintainer / Task 03 owner to decide (e.g., exclude, or handle as a separate view for median background / ROI). **-> Resolved by `CHG-004`** (excluded following the PM's instruction).
-  - `cam_id=1112` road name: frames suggest the camera faces east along **Sutthisan Winitchai Road** (sunrise straight ahead on 28 Aug 06:45), not Vibhavadi Rangsit. Possible fix: `location_en` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`, `location_th` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`. Not applied -- needs Street View confirmation. **-> Resolved by `CHG-005`** (confirmed and applied).
-  - `Inbound` / `Outbound` definition is not documented in `DATA_CONTRACT.md`; existing labels imply "towards / away from central Bangkok". Suggest documenting it.
-  - **Google Drive duplicates (informational only):** `28` duplicate files exist in `Dataset_Clean_V1/cctv_images/` on Drive -- `18` in `136/` (e.g., `136_20260825_111611.jpg`) and `10` in `176/` (e.g., `176_20260829_085616.jpg`); each filename appears twice with identical size, and downloaded copies are byte-for-byte identical. They do **not** affect the dataset (each image appears once in `image_quality_manifest.parquet`). They must **NOT** be added to `MANUAL_EXCLUDED_IMAGES` (that would exclude the valid original frame). Suggest removing the extra copies during the `V2.0` Drive sync.
-- **Verification:** PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
-
-#### Camera 1815 View-Change Exclusion (`CHG-004`)
-- **Date:** 2026-11-15
-- **Editor:** กร (@kkooAAA)
-- **Batch / Scope:** `cam_id=1815` only -- follow-up to the Batch 2 open item (`CHG-003`).
-- **Problem Found:**
-  - `cam_id=1815`: camera view changed (~180° reverse pan at the same site) between `1815_20260831_180044.jpg` (last original-view frame) and `1815_20260831_181044.jpg` (first changed-view frame). The changed view lasts until the camera's last capture, `1815_20260831_210044.jpg`. These frames do not match the camera's `location_detail_th/en` or `direction` (`Inbound`).
-- **Fix / Decision Applied:**
-  - **Following the PM's instruction**, added the `18` changed-view frames to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` with reason `camera_view_changed`:
-    - `1815_20260831_181044.jpg`, `1815_20260831_182046.jpg`, `1815_20260831_183044.jpg`, `1815_20260831_184044.jpg`, `1815_20260831_185044.jpg`, `1815_20260831_190044.jpg`,
-    - `1815_20260831_191044.jpg`, `1815_20260831_192044.jpg`, `1815_20260831_193044.jpg`, `1815_20260831_194046.jpg`, `1815_20260831_195044.jpg`, `1815_20260831_200044.jpg`,
-    - `1815_20260831_201046.jpg`, `1815_20260831_202044.jpg`, `1815_20260831_203044.jpg`, `1815_20260831_204044.jpg`, `1815_20260831_205044.jpg`, `1815_20260831_210044.jpg`.
-  - All original-view frames (up to and including `1815_20260831_180044.jpg`) are kept.
-  - Existing `CAMERA_CURATION` values (including the `CHG-003` `district` fix and the `direction` values) are unchanged.
-  - No CSV / Parquet files and no Google Drive files were modified in this PR.
-- **Quantitative Impact (Before -> After):**
-  - Metadata fields changed: none.
-  - Images affected: `18` valid images excluded -- `cam_id=1815`: `611 -> 593` valid (`615` raw); Batch 2: `9,535 -> 9,517`. No other camera affected.
-- **Verification:** All `18` filenames exist in `image_quality_manifest.parquet` as `is_valid=True`, `cam_id=1815`, timestamps `2026-08-31 18:10:44` to `21:00:44` (the camera's last frame); boundary frames checked visually. PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
-
-#### Batch 2 Location Metadata Audit (`CHG-005`)
-- **Date:** 2026-11-16
-- **Editor:** กร (@kkooAAA)
-- **Batch / Scope:** Batch 2 location check of road name, intersection, camera facing, and traffic direction -- `1112`, `939`, `170`, `1071`, `1804`, `1815`, `178`, `179` (manual check on Google Maps / Street View + CCTV frames, with an OpenStreetMap POI cross-check).
-- **Problem Found:**
-  - `cam_id=1112`: `location_en` / `location_th` named **Vibhavadi Rangsit Road**, but the camera faces east along **Sutthisan Winitchai Road** (OSD `TF-DD-S10-04`; two-way shophouse street, no Vibhavadi frontage road or Don Mueang Tollway in view). Traffic in view is westbound, coming from Ratchada-Sutthisan Intersection (`Inbound`).
-  - `cam_id=1815`: `CHG-003` recorded the camera as being on **Asok-Din Daeng Road**; the manually confirmed road is **Rama 9 Road**.
-- **Fix / Decision Applied:**
-  - `1112` **(superseded by `CHG-006`: road set back to Vibhavadi Rangsit Road)**: `location_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`; `location_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`. `location_detail_th/en` (`From Ratchada-Sutthisan Intersection`), `direction` (`Inbound`), and `district` (`Din Daeng`) already correct -- unchanged. The district is kept as `Din Daeng` even though the raw coordinate falls about `30 m` inside Phaya Thai on an OSM boundary lookup; it is not changed on coordinate-based boundary ambiguity alone.
-  - `939`: name kept as `Mahadthai Intersection` / `Mahadthai Intersection (Ramkhamhaeng Road)` to match the Dashboard, which is the source of truth for naming. The camera OSD spells it `Mahatthai`; that spelling is **not** adopted. No change.
-  - `1815` road clarification: the final documented road is **Rama 9 Road** (Rama 9 Intersection). This supersedes the `Asok-Din Daeng Road` wording in `CHG-003`, which is kept for history. No metadata value depends on it, so nothing in `CAMERA_CURATION` changed.
-  - Verified, no change needed:
-    - `170`: faces south, northbound traffic, `Outbound` (Nawutti Somdet Ya Hospital reference kept).
-    - `1071`: Kamphaeng Phet Intersection, faces south, southbound traffic, `Inbound`.
-    - `1804`: entrance to Soi On Nut 33, faces east, eastbound traffic, `Outbound`.
-    - `1815`: Rama 9 Road / Rama 9 Intersection, `Din Daeng`, faces east, westbound (into the city) = `Inbound`. The `18` `camera_view_changed` exclusions from `CHG-004` are kept.
-    - `1815` `location_detail`: manually confirmed that traffic travels from Phang Mueang Intersection toward Rama 9 Intersection. The existing `From Phang Mueang Intersection` / `หน้ารถมาจากแยกผังเมือง` is correct and retained -- no metadata change needed.
-  - `178` / `179`: extra location references (approx. `180 m` / `120 m` after turning right from Phyathai 2 Hospital, accepted as approximate references) recorded as code comments in `CAMERA_CURATION` -- there is no schema field for them, so no metadata value changed.
-  - No `MANUAL_EXCLUDED_IMAGES` changes. No CSV / Parquet or Google Drive files modified.
-- **Quantitative Impact (Before -> After):**
-  - Metadata fields changed: `1112` `location_en`, `location_th` (`2` fields, `1` camera).
-  - Images affected: `0` (Batch 2 valid images stay `9,517`).
-- **Open Items for Maintainer:**
-  - Regenerated outputs will also pick up the `CHG-003` district fixes for `938` / `1815`, which are not yet in the current CSV / Parquet.
-- **Verification:** `clean_dataset_v1.py` syntax check passed; `CAMERA_CURATION` still holds all `100` cameras and only the `2` fields above differ from the previous commit; `1815` exclusions = `18`. PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
-
-#### Batch 2 Location Detail & Direction Fix (`CHG-006`)
-- **Date:** 2026-11-17
-- **Editor:** กร (@kkooAAA)
-- **Batch / Scope:** `939`, `1112`, `1804` (metadata only).
-- **Fix / Decision Applied:**
-  - `939`: `location_detail_th`: `บริเวณแยกมหาดไทย (ถนนรามคำแหง)` -> `บริเวณแยกมหาดไทย (สะพานรามคำแหง)`; `location_detail_en`: `Mahadthai Intersection (Ramkhamhaeng Road)` -> `Mahadthai Intersection (Ramkhamhaeng Bridge)`. `direction` stays `None`.
-  - `1112`: `location_detail_th`: `รถมาจากแยกรัชดา-สุทธิสาร` -> `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)`; `location_detail_en`: `From Ratchada-Sutthisan Intersection` -> `Sutthisan Intersection (Vibhavadi Rangsit Road)`; `direction`: `Inbound` -> `None`; `location_th`: `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)` -> `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)`; `location_en`: `Sutthisan Intersection (Sutthisan Winitchai Road)` -> `Sutthisan Intersection (Vibhavadi Rangsit Road)`, so name and detail name the same road. This supersedes the `CHG-005` road change (kept for history).
-  - `1804`: `location_detail_th`: `ท้ายรถมุ่งหน้าแยกสวนหลวง` -> `ปากซอยอ่อนนุช 33 ถนนอ่อนนุช`; `location_detail_en`: `Towards Suan Luang Intersection` -> `Entrance to Soi On Nut 33 on On Nut Road`; `direction`: `Outbound` -> `None`.
-  - No `MANUAL_EXCLUDED_IMAGES` changes. No CSV / Parquet files modified (regenerate with `clean_dataset_v1.py`).
-- **Quantitative Impact (Before -> After):**
-  - Metadata fields changed: `10` fields across `3` cameras.
-  - `direction` totals: `Inbound 51 -> 50`, `Outbound 29 -> 28`, `None 20 -> 22`. Images affected: `0`.
-- **Open Items for Maintainer:**
-  - Direction totals `51 / 29 / 20` are still quoted in `DATA_CONTRACT.md`, `00_data_cleaning_and_qa/GOAL.md`, `04_ds_traffic_analytics/GOAL.md`, `06_bi_dashboard/GOAL.md`, `Dataset_Clean_V1/README.md`, `Info/Project Ideas.md`, and `BKK_Pulse_Team_Guide.html`.
-  - `cctv_info_cleaned.csv` / `.parquet` not yet regenerated -- rerun `clean_dataset_v1.py` with the raw `Dataset/` folder.
-
-#### Batch 2 Location Road Fix (`CHG-007`)
-- **Date:** 2026-11-17
-- **Editor:** กร (@kkooAAA)
-- **Batch / Scope:** `1112` (metadata only).
-- **Fix / Decision Applied:**
-  - `location_th` / `location_detail_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`.
-  - `location_en` / `location_detail_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`.
-  - Supersedes the `CHG-006` road revert for `1112` (kept for history). `direction` stays `None`. No `MANUAL_EXCLUDED_IMAGES` changes; no CSV / Parquet modified.
-- **Quantitative Impact (Before -> After):**
-  - Metadata fields changed: `4` fields, `1` camera. Images affected: `0`. Direction totals unchanged.

@@ -43,7 +43,7 @@ This module delivers the **4-Tab Streamlit Interactive BI Dashboard (`BKK-Pulse 
 - **Corridor Space-Time Heatmap:**
   - Interactive corridor selector (`Ratchadaphisek`, `Phahon Yothin - Lat Phrao`, `Sathon - Naradhiwas - Rama 3`, etc.) rendering a Plotly 2D Heatmap (`X`: Time `06:00-21:00`, `Y`: Ordered Cameras along Corridor, `Color`: `congestion_index`) to visualize congestion shockwave propagation.
 - **Macro & Micro Tidal Flow Analyzer (Reversible Lane Advisor + CSV Policy Export):**
-  - Macro comparison curve of **51 `Inbound`** vs. **29 `Outbound`** cameras across the week.
+  - Macro comparison curve of **32 `Inbound`** vs. **23 `Outbound`** directional cameras across the week *(post-V1.1 Peer QA)*.
   - Micro spotlight on the **6 Bidirectional Footbridge Pairs (`footbridge_bidirectional`)** (`136/137`, `178/179`, `126/127`, `224/225`, `176/177`, `1132/1078`), displaying the **Tidal Imbalance Index**, automated policy callouts indicating exact time windows (`abs(tidal_imbalance) > 0.40`) to deploy a **Reversible Lane**, and a downloadable **BMA Reversible Lane Schedule (`.csv`)**.
 - **Unsupervised Road Archetype Explorer (K-Means + PCA):**
   - Interactive 2D PCA scatter plot and cluster profile **Radar Chart** comparing the 4 behavioral archetypes against surrounding 500m OSM POI densities.
@@ -63,9 +63,10 @@ This module delivers the **4-Tab Streamlit Interactive BI Dashboard (`BKK-Pulse 
 
 ### Tab 4: BMA CCTV Network Health & Infrastructure Audit *(Build Immediately on Day 1!)*
 - **Network Quality Gate KPIs (`61,319` Total Inspected Frames):**
-  - Valid Operational Frames (`valid`): **`60,210` (`98.19%`)** *(plus `32` frames tagged with non-destructive `quality_warning`)*
+  - Valid Operational Frames (`valid`): **`60,107` (`98.02%`)** *(plus `7` frames on `cam_id=500` tagged with non-destructive `quality_warning`)*
   - Frozen Stream Buffers (`frozen`): **`553` (`0.90%`)**
   - Blank White Sensor Drops (`white_error`): **`504` (`0.82%`)**
+  - Peer QA Manual Exclusions (`manual_excluded`): **`103` (`0.17%`)**
   - RTSP Pipeline Crashes (`no_signal_error` Rainbow): **`33` (`0.05%`)**
   - Codec / YUV Corruptions (`corrupt_color` -- 11 Gray P-Frame, 8 Green Screen): **`19` (`0.03%`)**
 - **System-Wide Outage Timeline:**

@@ -76,8 +76,8 @@ Export `pcu_score`, `composite_density`, `congestion_index`, `low_visibility_fla
 1. **Corridor Space-Time Heatmaps:**
    - Order cameras geographically along major corridors defined in `cctv_info_cleaned.parquet` (e.g., `Ratchadaphisek` ordered South-to-North: Rama 9 `1815` -> Thiam Ruam Mit `112` -> Huai Khwang `215` -> Sutthisan `118/119` -> Lat Phrao `123/125` -> Criminal Court `224/225`).
    - Construct space-time matrices (`X`: 10-min intervals `06:00-21:00`; `Y`: ordered corridor cameras; `Value`: `congestion_index`) to reveal backward-propagating traffic shockwaves.
-2. **Macro Directional Flow (80 Directional Cameras):**
-   - Compare aggregate hourly profiles of all **51 `Inbound`** vs. **29 `Outbound`** cameras across weekdays vs. weekends.
+2. **Macro Directional Flow (55 Directional Cameras):**
+   - Compare aggregate hourly profiles of all **32 `Inbound`** vs. **23 `Outbound`** directional cameras across weekdays vs. weekends *(excluding the `45` multi-directional/`"None"` cameras)*.
 3. **Micro Spotlight on the 6 True Bidirectional Footbridge Pairs (`footbridge_bidirectional`):**
    - Analyze the 6 opposite-facing footbridge camera pairs:
      1. `FB_01_LatPhrao_BigC` (`137` Inbound vs. `136` Outbound -- Big C Extra Lat Phrao)

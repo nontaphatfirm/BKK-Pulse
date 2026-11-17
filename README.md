@@ -17,7 +17,7 @@
 
 Rather than treating vehicle detection as a naive bounding-box counting exercise, **BKK-Pulse** addresses real-world physical, optical, and sensor anomalies through four engineering pillars:
 
-1. **Automated Image Quality Gate & Network Health Auditing ([`00_data_cleaning_and_qa/`](00_data_cleaning_and_qa/GOAL.md)):** A 5-stage deterministic image quality filter that isolates blank sensor drops (`white_error`), RTSP pipeline crashes (`no_signal_error`), YUV/P-frame codec corruptions (`corrupt_color`), and frozen camera buffers (`frozen`), paired with spatial metadata enrichment and bilingual location reconciliation (`61,319` raw -> `60,210` valid images).
+1. **Automated Image Quality Gate & Network Health Auditing ([`00_data_cleaning_and_qa/`](00_data_cleaning_and_qa/GOAL.md)):** A 5-stage deterministic image quality filter that isolates blank sensor drops (`white_error`), RTSP pipeline crashes (`no_signal_error`), YUV/P-frame codec corruptions (`corrupt_color`), and frozen camera buffers (`frozen`), combined with Peer QA visual sweeps (`manual_excluded`) and spatial metadata / bilingual location reconciliation (`61,319` raw -> `60,107` valid images).
 2. **Multi-Source Urban Context Acquisition ([`01_scraping_apis/`](01_scraping_apis/GOAL.md) & [`02_scraping_traffy_playwright/`](02_scraping_traffy_playwright/GOAL.md)):** Programmatic ingestion of hourly meteorological records (Open-Meteo Archive), city-wide urban air quality context (`PM2.5`, `NO2`, `CO`), surrounding 500m land-use Points of Interest (OpenStreetMap Overpass API), and citizen-reported monsoon flood/traffic hotspots (BMA Traffy Fondue via Playwright browser automation + GeoJSON API).
 3. **Computer Vision & Spatio-Temporal Feature Engineering ([`03_cv_yolo_pipeline/`](03_cv_yolo_pipeline/GOAL.md)):** High-throughput single-pass batch vehicle detection supporting multi-class canonical NMS remapping (with locally cached `yolo26x`, `VisDrone`, and `UVH-26` checkpoints), augmented by pixel-level Median Background subtraction (`foreground_ratio`), Stationary Box Filtering (`IoU > 0.65`) to eliminate roadside advertisement boards and parked vehicles, and automated Road ROI masking (`>= 15%` frame floor).
 4. **Traffic Engineering Analytics, CCTV Weather Detection, ML Forecasting & BI Command Center ([`04_ds_traffic_analytics/`](04_ds_traffic_analytics/GOAL.md), [`05_ds_ml_forecasting/`](05_ds_ml_forecasting/GOAL.md), [`06_bi_dashboard/`](06_bi_dashboard/GOAL.md)):** Standardized Passenger Car Unit (`PCU`), low-light/glare-adaptive composite density, camera-level **CCTV image-processing rain & wet-road detection** (`visual_rain_flag`, `wet_road_flag`, `rain_severity_score`), per-camera `P95` Congestion Index modeling, corridor shockwave propagation, reversible-lane tidal flow analysis, rainfall recovery quantification, K-Means behavioral clustering, 30-minute ahead LightGBM traffic forecasting with interactive **What-If simulation** and SHAP explainability, and a 4-tab Streamlit decision-support command center.
@@ -28,7 +28,7 @@ Rather than treating vehicle detection as a naive bounding-box counting exercise
 
 ```mermaid
 flowchart LR
-    RAW["Raw BMA CCTV<br/>61,319 Images | 100 Cameras"] --> T00["00: Data Cleaning & QA<br/>60,210 Valid Frames + Metadata"]
+    RAW["Raw BMA CCTV<br/>61,319 Images | 100 Cameras"] --> T00["00: Data Cleaning & QA<br/>60,107 Valid Frames + Metadata"]
     T00 --> T03["03: CV & YOLO Pipeline<br/>Vehicle Counts + Median BG + ROI"]
     API["Open-Meteo & OSM APIs"] --> T01["01: API Scraping"]
     WEB["BMA Traffy Fondue"] --> T02["02: Playwright Scraping"]
@@ -66,7 +66,7 @@ This repository is organized into **seven self-contained task directories (`00_`
 
 | Module | Owner(s) | Core Scope & Deliverables | Specification | Code / Entrypoint | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`00_data_cleaning_and_qa/`** | All 6 *(Phase 0)* | 5-Stage Image Quality Gate (`61,319` -> `60,210` valid) & 100-camera metadata repair | [`GOAL.md`](00_data_cleaning_and_qa/GOAL.md) / [`Checklist`](00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md) | [`clean_dataset_v1.py`](00_data_cleaning_and_qa/src/clean_dataset_v1.py) | `V1 Complete (Peer QA)` |
+| **`00_data_cleaning_and_qa/`** | All 6 *(Phase 0)* | 5-Stage Image Quality Gate + Peer QA (`61,319` -> `60,107` valid) & 100-cam metadata | [`GOAL.md`](00_data_cleaning_and_qa/GOAL.md) / [`Checklist`](00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md) | [`clean_dataset_v1.py`](00_data_cleaning_and_qa/src/clean_dataset_v1.py) | `V1.1 Merged (99/100 QA)` |
 | **`01_scraping_apis/`** | **ปลื้ม**, **กร** *(+ นิว support)* | **3 Simple APIs:** Open-Meteo Weather, OSM Overpass POIs (500m), Open-Meteo Air Quality | [`GOAL.md`](01_scraping_apis/GOAL.md) | [`01_scraping_apis/src/`](01_scraping_apis/src/README.md) | `Spec Ready` |
 | **`02_scraping_traffy_playwright/`** | **ปลื้ม**, **กร** *(+ นิว support)* | **Interactive Playwright:** BMA Traffy Fondue flood/traffic monsoon hotspots & spatial matching | [`GOAL.md`](02_scraping_traffy_playwright/GOAL.md) | [`02_scraping_traffy_playwright/src/`](02_scraping_traffy_playwright/src/README.md) | `Spec Ready` |
 | **`03_cv_yolo_pipeline/`** | **เฟิร์ม** *(+ นิว support)* | Single-pass YOLO batch inference, Median BG, Stationary Filter (`IoU > 0.65`), Auto ROI | [`GOAL.md`](03_cv_yolo_pipeline/GOAL.md) | [`predict_yolo26x.py`](03_cv_yolo_pipeline/src/predict_yolo26x.py) | `Prototype Ready` |
@@ -128,7 +128,7 @@ Data_Science_Project/
     ├── cleaning_summary.json              # Machine-readable quality gate metrics
     ├── cctv_info_cleaned.parquet          # Cleaned & enriched metadata for 100 cameras
     ├── image_quality_manifest.parquet     # Frame-level quality & optical stats for 61,319 frames
-    └── cctv_images/                       # (Gitignored) 60,210 valid ASCII-renamed images
+    └── cctv_images/                       # (Gitignored) 60,107 valid ASCII-renamed images
 ```
 
 ---

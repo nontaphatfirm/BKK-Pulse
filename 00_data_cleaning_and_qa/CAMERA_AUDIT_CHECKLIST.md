@@ -1,9 +1,19 @@
 # 100-Camera Metadata Peer Audit Checklist (`CAMERA_AUDIT_CHECKLIST.md`)
 
 > **Instructions:** The 100 CCTV cameras in [`Dataset_Clean_V1/cctv_info_cleaned.csv`](../Dataset_Clean_V1/cctv_info_cleaned.csv) are partitioned into **6 corridor-aligned batches (16-17 cameras per team member)**. Camera pairs sharing a `pair_id` are grouped within the same member's batch for side-by-side verification.  
-> **How to Audit & Submit:**
-> 1. **Google Drive (`Dataset_Clean_V1/cctv_images/<cam_id>/`) is READ-ONLY:** Quickly scan through **all images** in each assigned camera folder (e.g., thumbnail/grid view) to catch any severely broken, heavily corrupted, or unusable frames that slipped past the automated gates, and inspect day/night frames + Google Maps `(lat, lon)` to confirm `location_en`, `location_th`, `district`, `corridor`, `pair_id`, and `direction`. Do **not** edit, delete, or re-upload anything in Google Drive.
-> 2. **GitHub Branch & PR Only (Never Edit `main` Directly):** Create your own branch (e.g., `chore/00-qa-<your-name>`), update [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py) and [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md) if fixes/bad-frame exclusions are needed, check off `[x]` each verified camera below, and open a **Pull Request into `main`**. The maintainer will run the final script and sync `V2.0` to Google Drive once all 6 PRs are merged.
+> **Consolidated Status (2026-11-17):** All 6 Peer QA PRs (`#2`, `#4`, `#6`, `#7`, `#8`, `#9`) have been merged into `main`. **`100/100` camera metadata** has been reviewed and updated (`56` cameras modified; **`Inbound: 32` | `Outbound: 23` | `None: 45`**), and **`103` additional frames** were queued in `MANUAL_EXCLUDED_IMAGES`. Only `cam_id=225` (Batch 1) awaits its frame-level visual sweep (`99/100` `[x]`).
+
+## Peer QA Progress Summary
+
+| Batch | Owner (GitHub) | Cameras | Visual Sweep `[x]` | Metadata Edited | Manual Frame Exclusions | Open / Special Notes |
+| :---: | :--- | :---: | :---: | :---: | :---: | :--- |
+| **1** | **ปลื้ม** (`@siravidthongsook`) | `17` | `16 / 17` | `5` cams (`119, 120, 127, 224, 225`) | `0` | `225` metadata verified; visual sweep pending |
+| **2** | **กร** (`@kkooAAA`) | `16` | `16 / 16` | `5` cams (`938, 939, 1112, 1804, 1815`) | `18` (`1815`) | `28` identical Drive duplicate files in `136`/`176` noted for V2.0 sync |
+| **3** | **เฟิร์ม** (`@nontaphatfirm`) | `17` | `17 / 17` | `11` cams (`11, 75, 82, 88, 194, 206, 277, 432, 599, 603, 604`) | `6` (`206`) | Also cross-checked Batch 1 `211` |
+| **4** | **สอง** (`@theme222`) | `17` | `17 / 17` | `12` cams (`26, 32, 36, 158, 251, 256, 500, 529, 572, 595, 1188, 1195`) | `22` (`32, 158, 529, 595, 1076`) | Open proposal (`CHG-B4-02`): review keeping vs. dropping `500` & `1188` |
+| **5** | **นิว** (`@Pranithi-New`) | `17` | `17 / 17` | `15` cams (`18, 70, 150, 230, 233, 301, 332, 363, 370, 371, 546, 915, 1063, 1361, 1368`) | `25` (`169`: 20, `332`: 5) | `370/371` low contrast & `546/1368` glare verified healthy |
+| **6** | **โม่** (`@moaqilo`) | `16` | `16 / 16` | `8` cams (`68, 414, 556, 576, 630, 1039, 1060, 1362`) | `32` (`68`: 1, `413`: 1, `630`: 25, `1039`: 5) | `1362` coords & road label updated |
+| **Total** | **All 6 Members** | **`100`** | **`99 / 100`** | **`56`** (`100 / 100` audited) | **`103`** | **`Inbound: 32` · `Outbound: 23` · `None: 45`** |
 
 ---
 
@@ -15,20 +25,20 @@
 | [x] | `112` | Thiam Ruam Mit Intersection (Thiam Ruam Mit Road) | Towards Huai Khwang / Ratchadaphisek Road | แยกเทียมร่วมมิตร (ถนนเทียมร่วมมิตร) | Huai Khwang | Ratchadaphisek | `PAIR_JX_THIAMRUAMMIT` | `Inbound` |
 | [x] | `1408` | Thiam Ruam Mit Intersection (Cyber World Tower) | From Huai Khwang Intersection towards Thiam Ruam Mit Intersection | แยกเทียมร่วมมิตร (หน้าอาคารไซเบอร์เวิลด์) | Huai Khwang | Ratchadaphisek | `PAIR_JX_THIAMRUAMMIT` | `Inbound` |
 | [x] | `118` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | From Sutthisan-Vibhavadi Rangsit Intersection | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `Outbound` |
-| [x] | `119` | Ratchada-Sutthisan Intersection (Ratchadaphisek Road) | From Huai Khwang Intersection | แยกรัชดา-สุทธิสาร (ด้านถนนรัชดาภิเษก) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `Outbound` |
-| [x] | `120` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | From Soi Lat Phrao 64 | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `None` |
+| [x] | `119` | Ratchada-Sutthisan Intersection (Ratchadaphisek Road) | From Huai Khwang Intersection *(coords updated)* | แยกรัชดา-สุทธิสาร (ด้านถนนรัชดาภิเษก) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `Outbound` |
+| [x] | `120` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | From Soi Lat Phrao 64 *(coords updated)* | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `None` |
 | [x] | `123` | Ratchada-Lat Phrao Intersection (Ratchadaphisek Road) | From Ratchada-Sutthisan Intersection | แยกรัชดา-ลาดพร้าว (ด้านถนนรัชดาภิเษก) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `Outbound` |
 | [x] | `124` | Ratchada-Lat Phrao Intersection (Lat Phrao Road) | From Chok Chai 4 Intersection | แยกรัชดา-ลาดพร้าว (ด้านถนนลาดพร้าว) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `Inbound` |
 | [x] | `125` | Ratchada-Lat Phrao Intersection (Ratchadaphisek Road) | From Ratchayothin Intersection towards Ratchada-Sutthisan | แยกรัชดา-ลาดพร้าว (ด้านถนนรัชดาภิเษก) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `Inbound` |
 | [x] | `126` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Inbound` |
-| [x] | `127` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Outbound` |
+| [x] | `127` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection *(coords updated)* | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Outbound` |
 | [x] | `135` | Footbridge in front of Toyota Sure on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยหน้าโตโยต้าชัวร์ ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `None` | `Inbound` |
 | [x] | `211` | Footbridge near Soi Ratchadaphisek 3 on Ratchadaphisek Road | From Rama 9 Intersection towards Thiam Ruam Mit Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 3 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
 | [x] | `212` | Footbridge near Big C Ratchadaphisek on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Rama 9 Intersection | สะพานลอยใกล้บิ๊กซีรัชดา ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Inbound` |
 | [x] | `215` | Footbridge near Soi Ratchadaphisek 7 on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 7 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
 | [x] | `219` | Footbridge near Soi Ratchadaphisek 14 on Ratchadaphisek Road | From Ratchada-Sutthisan Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 14 ถนนรัชดาภิเษก | Huai Khwang | Ratchadaphisek | `None` | `Inbound` |
-| [x] | `224` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Inbound` |
-| [ ] | `225` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Outbound` |
+| [x] | `224` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection *(coords updated)* | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Inbound` |
+| [ ] | `225` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection *(coords updated)* | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Outbound` |
 
 > **Batch 1 note:** `225` metadata (position + `Outbound` direction) was verified, but its image folder was **not** visually swept in this pass, so it stays unchecked until the frame-level scan is done.
 
@@ -39,7 +49,7 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [x] | `1815` | Rama 9 Intersection | From Phang Mueang Intersection | แยกพระราม 9 | Din Daeng | Ratchadaphisek | `None` | `Inbound` |
+| [x] | `1815` | Rama 9 Intersection | From Phang Mueang Intersection *(18 view-changed exclusions)* | แยกพระราม 9 | Din Daeng | Ratchadaphisek | `None` | `Inbound` |
 | [x] | `136` | Footbridge near Big C Extra (Soi Lat Phrao 7) on Lat Phrao Road | From Lat Phrao Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยใกล้บิ๊กซีเอ็กซ์ตร้า ลาดพร้าว | Chatuchak | Phahon Yothin - Lat Phrao | `FB_01_LatPhrao_BigC` | `Outbound` |
 | [x] | `137` | Footbridge near Big C Extra (Soi Lat Phrao 7) on Lat Phrao Road | From Ratchada-Lat Phrao Intersection towards Lat Phrao Intersection | สะพานลอยใกล้บิ๊กซีเอ็กซ์ตร้า ลาดพร้าว | Chatuchak | Phahon Yothin - Lat Phrao | `FB_01_LatPhrao_BigC` | `Inbound` |
 | [x] | `139` | Footbridge in front of Horwang School on Phahon Yothin Road | From Ratchayothin Intersection towards Lat Phrao Intersection | สะพานลอยหน้าโรงเรียนหอวัง ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
@@ -56,17 +66,10 @@
 | [x] | `939` | Mahadthai Intersection | Mahadthai Intersection (Ramkhamhaeng Bridge) *(95 frozen frames)* | แยกมหาดไทย | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
 | [x] | `1804` | Entrance to Soi On Nut 33 on On Nut Road | Entrance to Soi On Nut 33 on On Nut Road *(16 rainbow frames)* | ปากซอยอ่อนนุช 33 ถนนอ่อนนุช | Suan Luang | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
 
-**Batch 2 location audit (`CHG-005`, 2026-11-16):** road, intersection, camera facing, and traffic direction manually re-checked (Google Maps / Street View + CCTV frames).
-- [x] `1112` -- road corrected to Sutthisan Winitchai Road (camera faces east, westbound traffic, `Inbound`); district kept `Din Daeng`. **-> Superseded by `CHG-006`** (road back to Vibhavadi Rangsit Road, direction `None`).
-- [x] `939` -- name kept as `Mahadthai Intersection` to match the Dashboard (naming source of truth); no change.
-- [x] `170` -- faces south, northbound traffic, `Outbound` -- matches existing metadata.
-- [x] `1071` -- faces south, southbound traffic, `Inbound` -- matches existing metadata.
-- [x] `1804` -- faces east, eastbound traffic, `Outbound` -- matches existing metadata.
-- [x] `1815` -- Rama 9 Road (final; supersedes the Asok-Din Daeng Road note in `CHG-003`) / Rama 9 Intersection, `Din Daeng`, faces east, westbound (into the city) = `Inbound` -- matches existing metadata; `18` `camera_view_changed` exclusions kept.
-- [x] `1815` -- `location_detail` `From Phang Mueang Intersection` (`หน้ารถมาจากแยกผังเมือง`) confirmed: traffic travels from Phang Mueang Intersection toward Rama 9 Intersection; retained, no change.
-- [x] `939` / `1112` / `1804` (`CHG-006`, 2026-11-17) -- `location_detail_th/en` updated; `1112` `location_th/en` set back to Vibhavadi Rangsit Road (supersedes `CHG-005`); `1112` direction `Inbound` -> `None`, `1804` direction `Outbound` -> `None`. **-> `1112` road superseded by `CHG-007`.**
-- [x] `1112` (`CHG-007`, 2026-11-17) -- `location_th/en` and `location_detail_th/en` set to Sutthisan Winitchai Road (`แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`); direction stays `None`.
-- [x] `178` / `179` -- extra location reference recorded (approx. `180 m` / `120 m` after turning right from Phyathai 2 Hospital; accepted as approximate references); no metadata field changed.
+> **Batch 2 location audit notes (`CHG-B2-01`–`CHG-B2-05`):**
+> - `1112` final road set to Sutthisan Winitchai Road (`CHG-B2-05`); district `Din Daeng` confirmed; `direction` set to `None`.
+> - `939` clarified as Ramkhamhaeng Bridge; `1804` set to Soi On Nut 33 (`direction` -> `None`); `1815` confirmed on Rama 9 Road (`Din Daeng`, `Inbound`, `18` post-rotation frames excluded in `CHG-B2-02`).
+> - `178` / `179`: extra physical references (~180 m / ~120 m after turning right from Phyathai 2 Hospital) recorded as code comments in `CAMERA_CURATION`.
 
 ---
 
@@ -81,7 +84,7 @@
 | [x] | `188` | Footbridge near Rama 3 Soi 68 on Rama 3 Road | From Na Ranong Intersection towards Nang Linchi Intersection | สะพานลอยใกล้ซอยพระรามที่ 3 ซอย 68 ถนนพระรามที่ 3 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `194` | Footbridge near Soi Convent on North Sathon Road | From Witthayu Intersection towards Sathon-Naradhiwas Intersection | สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรเหนือ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `196` | Footbridge in front of Makro on Naradhiwas Ratchanakharin Road | From Sathon-Naradhiwas Intersection towards Chan-Naradhiwas Intersection | สะพานลอยหน้าแม็คโคร ถนนนราธิวาสราชนครินทร์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
-| [x] | `206` | Footbridge opposite Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road | From Chan-Naradhiwas Intersection towards Ratchada-Naradhiwas Intersection | สะพานลอยตรงข้ามซอยนราธิวาสราชนครินทร์ 20 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
+| [x] | `206` | Footbridge opposite Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road | From Chan-Naradhiwas Intersection towards Ratchada-Naradhiwas Intersection *(6 exclusions; coords updated)* | สะพานลอยตรงข้ามซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์ | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `599` | Surasak Intersection | Towards Sathon-Surasak Intersection | แยกสุรศักดิ์ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
 | [x] | `603` | Silom-Naradhiwas Intersection | From Sathon-Naradhiwas Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `Inbound` |
 | [x] | `604` | Silom-Naradhiwas Intersection | Silom-Naradhiwas Intersection (Naradhiwas Rd towards Sathon-Naradhiwas Intersection) | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `None` |
@@ -150,20 +153,20 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [x] | `68` | In front of Bangkok Bank Worachak Branch on Worachak Road | From Maen Si Intersection towards Worachak Intersection | หน้าธนาคารกรุงเทพ สาขาวรจักร | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `68` | In front of Bangkok Bank Worachak Branch on Worachak Road | From Maen Si Intersection towards Worachak Intersection *(1 blocked_by_crow exclusion)* | หน้าธนาคารกรุงเทพ สาขาวรจักร | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `228` | In front of Klang Hospital on Luang Road | From Klang Hospital Intersection towards Worachak Intersection | หน้าโรงพยาบาลกลาง ถนนหลวง | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `395` | Sao Chingcha Intersection | Sao Chingcha Intersection *(348x261 px, 72 frozen frames)* | แยกเสาชิงช้า | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `411` | Phra Athit Road (Camera 1) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
 | [x] | `412` | Phra Athit Road (Camera 2) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
-| [x] | `413` | Tanao Road | Tanao Road | แนวถนนตะนาว 1 | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `414` | Under Phra Phuttha Yodfa Bridge (Memorial Bridge) | Under Memorial Bridge | บริเวณใต้สะพานพุทธ | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `556` | Vajira Intersection | From Krung Thon Bridge | แยกวชิระ | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `413` | Tanao Road | Tanao Road *(1 blocked_by_pickup exclusion)* | แนวถนนตะนาว 1 | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `414` | Under Phra Phuttha Yodfa Bridge (Memorial Bridge) | Towards Phra Nakhon area and Sanam Chai | บริเวณใต้สะพานพุทธ | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `556` | Vajira Intersection | From Wat Prasat Bunyawat | แยกวชิระ | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `569` | Jor Por Ror Intersection | Jor Por Ror Intersection | แยก จ.ป.ร. | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `576` | Bang Lamphu Intersection | Bang Lamphu Intersection | แยกบางลำพู | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `630` | Kesakomon Intersection (Amnuay Songkhram Road) | Towards Saphan Daeng Intersection | แยกเกษะโกมล (ด้านถนนอำนวยสงคราม) | Dusit | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
+| [x] | `576` | Bang Lamphu Intersection | Towards Khao San Road / Sanam Luang | แยกบางลำพู | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `630` | Kesakomon Intersection (Amnuay Songkhram Road) | From Saphan Daeng Intersection *(25 corrupt/stretched/blurry exclusions)* | แยกเกษะโกมล (ด้านถนนอำนวยสงคราม) | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `913` | S.A.B. Intersection | S.A.B. Intersection (Charoen Krung - Worachak Road) | แยกเอส.เอ.บี. | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | Towards Lan Luang Intersection | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
-| [x] | `1060` | In front of Sai Panya School on Krung Kasem Road | Towards Rama 1 Road | หน้าโรงเรียนสายปัญญา ถนนกรุงเกษม | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [x] | `1362` | Samsen Intersection | Left side towards Uphai Chetsaduthit Intersection | แยกสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | Towards Lan Luang Intersection *(5 overexposed_glare exclusions)* | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `1060` | In front of Sai Panya School on Krung Kasem Road | From Rama 1 Road | หน้าโรงเรียนสายปัญญา ถนนกรุงเกษม | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `1362` | Samsen Road | Towards Tha Wasukri Pier *(coords updated)* | ถนนสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `1589` | Maen Si Intersection | Maen Si Intersection | แยกแม้นศรี | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 

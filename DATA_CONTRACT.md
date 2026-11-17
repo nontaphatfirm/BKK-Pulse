@@ -46,7 +46,7 @@
 | `corridor` | `string` | Major arterial corridor grouping (7 corridors) | `"Phahon Yothin - Lat Phrao"` |
 | `pair_id` | `string` | Paired camera group identifier (`"None"` if unpaired) | `"FB_01_LatPhrao_BigC"` |
 | `pair_type` | `string` | Pair relationship (`"footbridge_bidirectional"`, `"opposite_intersection_arm"`, `"perpendicular_junction"`, `"two_way_no_median"`, `"overlapping_junction"`, `"None"`) | `"footbridge_bidirectional"` |
-| `direction` | `string` | Traffic flow orientation (`"Inbound"`: 51, `"Outbound"`: 29, `"None"`: 20) | `"Outbound"` |
+| `direction` | `string` | Traffic flow orientation (`"Inbound"`: 32, `"Outbound"`: 23, `"None"`: 45) | `"Outbound"` |
 | `ip_address` | `string` | Camera RTSP/HTTP stream IP address | `"10.130.129.125"` |
 | `ip_subnet` | `string` | Class B `/16` subnet group (`10.xxx.x.x`) for network reliability auditing | `"10.130.x.x"` |
 | `raw_info_image_count` | `int64` | Original image count reported in raw `cctv_info.csv` | `614` |
@@ -97,7 +97,7 @@
 ### Table 3: `data/vehicle_counts.parquet` (and Pilot `data/vehicle_counts_sample.parquet`)
 - **Status:** `In Progress` -- Produced by Task `03_cv_yolo_pipeline` (**เฟิร์ม** `[@nontaphatfirm]`, with support from **นิว** `[@Pranithi-New]`)
   - **Pilot Fast-Track (`data/vehicle_counts_sample.parquet`):** 5 representative cameras (~3,000 rows) generated first for immediate use by Tasks 04, 05, and 06.
-  - **Full Production (`data/vehicle_counts.parquet`):** All `60,210` valid frames across 100 cameras.
+  - **Full Production (`data/vehicle_counts.parquet`):** All `60,107` valid frames across 100 cameras.
 - **Primary Key:** `(cam_id, timestamp)`
 
 | Column Name | Data Type | Description | Example Value |
