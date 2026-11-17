@@ -150,20 +150,20 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [ ] | `68` | In front of Bangkok Bank Worachak Branch on Worachak Road | From Maen Si Intersection towards Worachak Intersection | หน้าธนาคารกรุงเทพ สาขาวรจักร | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `228` | In front of Klang Hospital on Luang Road | From Klang Hospital Intersection towards Worachak Intersection | หน้าโรงพยาบาลกลาง ถนนหลวง | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `395` | Sao Chingcha Intersection | Sao Chingcha Intersection *(348x261 px, 72 frozen frames)* | แยกเสาชิงช้า | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [ ] | `411` | Phra Athit Road (Camera 1) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
-| [ ] | `412` | Phra Athit Road (Camera 2) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
-| [ ] | `413` | Tanao Road | Tanao Road | แนวถนนตะนาว 1 | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [ ] | `414` | Under Phra Phuttha Yodfa Bridge (Memorial Bridge) | Under Memorial Bridge | บริเวณใต้สะพานพุทธ | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [ ] | `556` | Vajira Intersection | From Krung Thon Bridge | แยกวชิระ | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `569` | Jor Por Ror Intersection | Jor Por Ror Intersection | แยก จ.ป.ร. | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [ ] | `576` | Bang Lamphu Intersection | Bang Lamphu Intersection | แยกบางลำพู | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [ ] | `630` | Kesakomon Intersection (Amnuay Songkhram Road) | Towards Saphan Daeng Intersection | แยกเกษะโกมล (ด้านถนนอำนวยสงคราม) | Dusit | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
-| [ ] | `913` | S.A.B. Intersection | S.A.B. Intersection (Charoen Krung - Worachak Road) | แยกเอส.เอ.บี. | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [ ] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | Towards Lan Luang Intersection | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
-| [ ] | `1060` | In front of Sai Panya School on Krung Kasem Road | Towards Rama 1 Road | หน้าโรงเรียนสายปัญญา ถนนกรุงเกษม | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `1362` | Samsen Intersection | Left side towards Uphai Chetsaduthit Intersection | แยกสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [ ] | `1589` | Maen Si Intersection | Maen Si Intersection | แยกแม้นศรี | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `68` | In front of Bangkok Bank Worachak Branch on Worachak Road | From Maen Si Intersection towards Worachak Intersection | หน้าธนาคารกรุงเทพ สาขาวรจักร | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `228` | In front of Klang Hospital on Luang Road | From Klang Hospital Intersection towards Worachak Intersection | หน้าโรงพยาบาลกลาง ถนนหลวง | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `395` | Sao Chingcha Intersection | Sao Chingcha Intersection *(348x261 px, 72 frozen frames)* | แยกเสาชิงช้า | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `411` | Phra Athit Road (Camera 1) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
+| [x] | `412` | Phra Athit Road (Camera 2) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
+| [x] | `413` | Tanao Road | Tanao Road | แนวถนนตะนาว 1 | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `414` | Under Phra Phuttha Yodfa Bridge (Memorial Bridge) | Under Memorial Bridge | บริเวณใต้สะพานพุทธ | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `556` | Vajira Intersection | From Krung Thon Bridge | แยกวชิระ | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `569` | Jor Por Ror Intersection | Jor Por Ror Intersection | แยก จ.ป.ร. | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `576` | Bang Lamphu Intersection | Bang Lamphu Intersection | แยกบางลำพู | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `630` | Kesakomon Intersection (Amnuay Songkhram Road) | Towards Saphan Daeng Intersection | แยกเกษะโกมล (ด้านถนนอำนวยสงคราม) | Dusit | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
+| [x] | `913` | S.A.B. Intersection | S.A.B. Intersection (Charoen Krung - Worachak Road) | แยกเอส.เอ.บี. | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | Towards Lan Luang Intersection | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Outbound` |
+| [x] | `1060` | In front of Sai Panya School on Krung Kasem Road | Towards Rama 1 Road | หน้าโรงเรียนสายปัญญา ถนนกรุงเกษม | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `1362` | Samsen Intersection | Left side towards Uphai Chetsaduthit Intersection | แยกสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `1589` | Maen Si Intersection | Maen Si Intersection | แยกแม้นศรี | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 
