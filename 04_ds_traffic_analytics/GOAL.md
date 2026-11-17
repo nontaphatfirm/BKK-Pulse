@@ -151,7 +151,7 @@ Regardless of the specific algorithm chosen, the CCTV image-processing rain pipe
 
 ## 3. Definition of Done Checklist
 
-- [ ] Complete Batch 4 camera verification (17 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
+- [x] Complete Batch 4 camera verification (17 cameras) and resolve `CHG-B4-02` (`cam_id=500`, `cam_id=1188`) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
 - [ ] Implement Module 2.1 (`pcu_score`, adaptive `composite_density`, `P95` `congestion_index`, `low_visibility_flag`) and Module 2.3 CCTV image-processing rain & wet-road detection (`visual_rain_flag`, `wet_road_flag`, `rain_severity_score`), exporting `data/analytics_traffic_metrics.parquet`.
 - [ ] Implement Module 2.2 (Corridor Space-Time matrices + macro/6-footbridge tidal flow analysis) and export `data/footbridge_tidal_flow.parquet`.
 - [ ] Quantify rain/wet-road congestion surge (`delta_congestion_rain`) and recovery time (`tau_recovery_min`), exporting `data/rain_resilience_ranking.parquet`.

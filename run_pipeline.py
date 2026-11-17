@@ -143,7 +143,7 @@ CONTRACT_TABLES: tuple[ContractSpec, ...] = (
             "foreground_ratio",
             "filtered_static_boxes",
         ),
-        expected_min_rows=60107,
+        expected_min_rows=60029,
     ),
     ContractSpec(
         name="Table 4: External Weather, Air Quality, POI & Traffy Context",

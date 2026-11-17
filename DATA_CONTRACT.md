@@ -97,7 +97,7 @@
 ### Table 3: `data/vehicle_counts.parquet` (and Pilot `data/vehicle_counts_sample.parquet`)
 - **Status:** `In Progress` -- Produced by Task `03_cv_yolo_pipeline` (**เฟิร์ม** `[@nontaphatfirm]`, with support from **นิว** `[@Pranithi-New]`)
   - **Pilot Fast-Track (`data/vehicle_counts_sample.parquet`):** 5 representative cameras (~3,000 rows) generated first for immediate use by Tasks 04, 05, and 06.
-  - **Full Production (`data/vehicle_counts.parquet`):** All `60,107` valid frames across 100 cameras.
+  - **Full Production (`data/vehicle_counts.parquet`):** All `60,029` valid frames across 100 cameras (`V2.0`).
 - **Primary Key:** `(cam_id, timestamp)`
 
 | Column Name | Data Type | Description | Example Value |

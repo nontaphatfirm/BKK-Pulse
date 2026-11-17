@@ -11,7 +11,7 @@
 
 Before running object detection or spatio-temporal traffic modeling, raw CCTV streams must be sanitized to prevent corrupted frames and misaligned metadata from biasing downstream models. This module implements:
 
-1. **A 5-Stage Automated Image Quality Gate + Peer QA Exclusions** inspecting all **61,319 raw images** across 100 cameras and isolating **1,212 filtered frames (1.98%)** (`1,109` automated + `103` `manual_excluded`), leaving **60,107 valid frames (98.02%)**.
+1. **A 5-Stage Automated Image Quality Gate + Peer QA Exclusions** inspecting all **61,319 raw images** across 100 cameras and isolating **1,290 filtered frames (2.10%)** (`1,109` automated + `181` `manual_excluded`), leaving **60,029 valid frames (97.90%)** (`V2.0`).
 2. **ASCII Filename Standardization** (`<cam_id>_<YYYYMMDD_HHMMSS>.jpg`) to eliminate Windows OpenCV (`cv2.imread`) Unicode path failures caused by Thai characters in raw filenames.
 3. **Metadata Cleansing & Spatial Enrichment** repairing misaligned `location_en` rows, stripping system noise (`connect BMAcctv`, `17/5000`, `(See Yellow)`), restoring 28-character truncated Thai location strings, and adding `district`, `corridor`, `pair_id`, `pair_type`, and `direction`.
 
@@ -25,10 +25,10 @@ Executed via [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py) and logged in 
 | :---: | :--- | :--- | :---: |
 | **Gate 1** | `white_error` | `file_size < 2,000 bytes` OR `brightness_mean >= 254.5` (blank white HTTP placeholder images during stream timeouts) | **504** |
 | **Gate 2** | `no_signal_error` | `file_size == 8,782 bytes` OR (`8,700 <= file_size <= 8,900` with `127.5 <= brightness_mean <= 128.5` and `contrast_std >= 111.0`), capturing `gst-launch-0.10` rainbow test bars on Cameras `432` (17 frames) and `1804` (16 frames) | **33** |
-| **Gate 3** | `corrupt_color` | **Gray P-Frame:** `127.0 <= brightness_mean <= 132.0` and `contrast_std < 16.0` (11 frames); **Green Screen (YUV Drop):** `g_mean - r_mean > 40.0` and `g_mean - b_mean > 40.0` (8 frames). *(7 valid frames on `cam_id=500` remain tagged in `quality_warning` after V1.1 excluded 25 warnings)* | **19** |
+| **Gate 3** | `corrupt_color` | **Gray P-Frame:** `127.0 <= brightness_mean <= 132.0` and `contrast_std < 16.0` (11 frames); **Green Screen (YUV Drop):** `g_mean - r_mean > 40.0` and `g_mean - b_mean > 40.0` (8 frames). *(All 32 original `quality_warning` frames excluded cleanly by `V2.0`; `0` warnings remain)* | **19** |
 | **Gate 4** | `frozen` | Pixel-wise Mean Absolute Difference `mad_from_prev == 0.0` against the preceding valid frame of the same camera (e.g., Cam `150`: 124 frozen frames; Cam `938`: 98; Cam `939`: 95; Cam `206`: 95; Cam `395`: 72) | **553** |
-| **Peer QA** | `manual_excluded` | Explicit filename exclusions in `MANUAL_EXCLUDED_IMAGES` (`V1.1` visual sweep across Batches 2–6) | **103** |
-| **Gate 5** | `valid` | Strict timestamp extraction from filename (`_YYYYMMDD_HHMMSS.jpg`), bypassing on-screen display (OSD) text due to `1970-01-01` CMOS battery resets | **60,107** *(Valid)* |
+| **Peer QA** | `manual_excluded` | Explicit filename exclusions in `MANUAL_EXCLUDED_IMAGES` (`V1.1` + `V2.0` surgical `cam_id=500` sweep across Batches 2–6) | **181** |
+| **Gate 5** | `valid` | Strict timestamp extraction from filename (`_YYYYMMDD_HHMMSS.jpg`), bypassing on-screen display (OSD) text due to `1970-01-01` CMOS battery resets | **60,029** *(Valid)* |
 
 ---
 
@@ -85,4 +85,4 @@ To ensure 100% metadata and image accuracy before locking the final `V2.0` table
 - [x] Execute 5-stage Automated Image Quality Gate across all 61,319 images (`Dataset_Clean_V1/`).
 - [x] Generate `cctv_info_cleaned.parquet` and `image_quality_manifest.parquet`.
 - [x] Document `V1.0` cleaning rules, team audit guide, and version changelog in [`Dataset_Clean_V1/README.md`](../Dataset_Clean_V1/README.md) and [`Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).
-- [x] Batches 1–6 peer audit PRs (`#2, #4, #6, #7, #8, #9`) merged into `main`, `100/100` metadata audited (`99/100` visual sweeps; `cam_id=225` image sweep pending), and `Dataset_Clean_V1/` rebuilt (`60,107` valid images).
+- [x] Batches 1–6 peer audit PRs (`#2, #4, #6, #7, #8, #9`), `cam_id=225` visual sweep (`100/100` `[x]`), and `CHG-B4-02` resolution (`500`: `-78` corrupt frames, `1188`: `607` kept) consolidated into `main`, locking **`V2.0` (`60,029` valid images, `0` warnings)**.

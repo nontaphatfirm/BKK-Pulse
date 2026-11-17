@@ -1,30 +1,31 @@
 {
-  "generated_at": "2026-11-17T21:53:24",
-  "elapsed_seconds": 295.76,
+  "generated_at": "2026-11-17T23:41:25",
+  "elapsed_seconds": 188.57,
   "total_cameras": 100,
   "total_raw_images": 61319,
-  "total_valid_images": 60107,
-  "total_filtered_images": 1212,
-  "valid_rate_pct": 98.0235,
+  "total_valid_images": 60029,
+  "total_filtered_images": 1290,
+  "valid_rate_pct": 97.8962,
   "status_counts": {
-    "valid": 60107,
+    "valid": 60029,
     "frozen": 553,
     "white_error": 504,
-    "manual_excluded": 103,
+    "manual_excluded": 181,
     "no_signal_error": 33,
     "corrupt_color": 19
   },
   "error_subtype_counts": {
-    "none": 60107,
+    "none": 60029,
     "frozen": 553,
     "white_error": 504,
-    "corrupt_artifact": 57,
+    "corrupt_artifact": 127,
     "no_signal_rainbow": 33,
     "camera_view_changed": 18,
     "gray_pframe": 11,
     "stretched_frame": 9,
     "green_screen": 8,
-    "scanline_smear": 7,
+    "scanline_smear": 8,
+    "partial_green_screen": 7,
     "overexposed_glare": 5,
     "blocked_lens": 3,
     "blocked_by_crow": 1,
@@ -33,14 +34,13 @@
     "blurry_frame": 1
   },
   "quality_warning_counts_among_valid": {
-    "none": 60100,
-    "partial_green_screen": 7
+    "none": 60029
   },
   "daily_breakdown": [
     {
       "date": "2026-08-25",
       "total": 8937,
-      "valid": 8808,
+      "valid": 8788,
       "white_error": 15,
       "no_signal_error": 0,
       "corrupt_color": 1,
@@ -49,7 +49,7 @@
     {
       "date": "2026-08-26",
       "total": 8953,
-      "valid": 8709,
+      "valid": 8696,
       "white_error": 111,
       "no_signal_error": 0,
       "corrupt_color": 2,
@@ -58,7 +58,7 @@
     {
       "date": "2026-08-27",
       "total": 7438,
-      "valid": 7215,
+      "valid": 7206,
       "white_error": 71,
       "no_signal_error": 33,
       "corrupt_color": 6,
@@ -67,7 +67,7 @@
     {
       "date": "2026-08-28",
       "total": 9015,
-      "valid": 8793,
+      "valid": 8786,
       "white_error": 108,
       "no_signal_error": 0,
       "corrupt_color": 2,
@@ -76,7 +76,7 @@
     {
       "date": "2026-08-29",
       "total": 8964,
-      "valid": 8826,
+      "valid": 8814,
       "white_error": 64,
       "no_signal_error": 0,
       "corrupt_color": 2,
@@ -85,7 +85,7 @@
     {
       "date": "2026-08-30",
       "total": 9002,
-      "valid": 8873,
+      "valid": 8869,
       "white_error": 73,
       "no_signal_error": 0,
       "corrupt_color": 1,
@@ -94,7 +94,7 @@
     {
       "date": "2026-08-31",
       "total": 9010,
-      "valid": 8883,
+      "valid": 8870,
       "white_error": 62,
       "no_signal_error": 0,
       "corrupt_color": 5,
@@ -153,6 +153,19 @@
       "corrupt_color_count": 0,
       "frozen_image_count": 95,
       "valid_rate_pct": 82.87
+    },
+    {
+      "cam_id": 500,
+      "location_th": "แยกประตูน้ำ",
+      "ip_subnet": "10.137.x.x",
+      "actual_raw_image_count": 613,
+      "valid_image_count": 522,
+      "error_image_count": 91,
+      "white_error_count": 7,
+      "no_signal_error_count": 0,
+      "corrupt_color_count": 6,
+      "frozen_image_count": 0,
+      "valid_rate_pct": 85.15
     },
     {
       "cam_id": 395,
@@ -218,19 +231,6 @@
       "corrupt_color_count": 0,
       "frozen_image_count": 0,
       "valid_rate_pct": 96.33
-    },
-    {
-      "cam_id": 1815,
-      "location_th": "แยกพระราม 9",
-      "ip_subnet": "10.156.x.x",
-      "actual_raw_image_count": 615,
-      "valid_image_count": 593,
-      "error_image_count": 22,
-      "white_error_count": 4,
-      "no_signal_error_count": 0,
-      "corrupt_color_count": 0,
-      "frozen_image_count": 0,
-      "valid_rate_pct": 96.42
     }
   ],
   "rules_applied": {
@@ -240,6 +240,6 @@
     "gate_3_green_screen": "(g_mean - r_mean > 40.0) and (g_mean - b_mean > 40.0)",
     "gate_4_frozen": "MAD == 0.0 compared against previous non-error frame of same cam_id",
     "gate_5_timestamp": "Parsed strictly from filename _YYYYMMDD_HHMMSS.jpg (never OSD)",
-    "manual_excluded": "103 filename(s) in MANUAL_EXCLUDED_IMAGES"
+    "manual_excluded": "181 filename(s) in MANUAL_EXCLUDED_IMAGES"
   }
 }

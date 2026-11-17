@@ -1,19 +1,19 @@
 # 100-Camera Metadata Peer Audit Checklist (`CAMERA_AUDIT_CHECKLIST.md`)
 
 > **Instructions:** The 100 CCTV cameras in [`Dataset_Clean_V1/cctv_info_cleaned.csv`](../Dataset_Clean_V1/cctv_info_cleaned.csv) are partitioned into **6 corridor-aligned batches (16-17 cameras per team member)**. Camera pairs sharing a `pair_id` are grouped within the same member's batch for side-by-side verification.  
-> **Consolidated Status (2026-11-17):** All 6 Peer QA PRs (`#2`, `#4`, `#6`, `#7`, `#8`, `#9`) have been merged into `main`. **`100/100` camera metadata** has been reviewed and updated (`56` cameras modified; **`Inbound: 32` | `Outbound: 23` | `None: 45`**), and **`103` additional frames** were queued in `MANUAL_EXCLUDED_IMAGES`. Only `cam_id=225` (Batch 1) awaits its frame-level visual sweep (`99/100` `[x]`).
+> **Consolidated Status (`V2.0` Final Lock, 2026-11-17):** All 6 Peer QA PRs (`#2`, `#4`, `#6`, `#7`, `#8`, `#9`), `cam_id=225` visual sweep (**`100 / 100` `[x]`**), and Batch 4 `CHG-B4-02` resolution (`cam_id=500`: `78` severe corruptions excluded -> `522` clean frames; `cam_id=1188`: all `607` frames retained) are consolidated into `main`. **`100 / 100` cameras** audited (`56` metadata updates; **`Inbound: 32` | `Outbound: 23` | `None: 45`**) with **`181` `manual_excluded` frames** queued in `MANUAL_EXCLUDED_IMAGES`.
 
 ## Peer QA Progress Summary
 
-| Batch | Owner (GitHub) | Cameras | Visual Sweep `[x]` | Metadata Edited | Manual Frame Exclusions | Open / Special Notes |
+| Batch | Owner (GitHub) | Cameras | Visual Sweep `[x]` | Metadata Edited | Manual Frame Exclusions | Status / Notes |
 | :---: | :--- | :---: | :---: | :---: | :---: | :--- |
-| **1** | **ปลื้ม** (`@siravidthongsook`) | `17` | `16 / 17` | `5` cams (`119, 120, 127, 224, 225`) | `0` | `225` metadata verified; visual sweep pending |
-| **2** | **กร** (`@kkooAAA`) | `16` | `16 / 16` | `5` cams (`938, 939, 1112, 1804, 1815`) | `18` (`1815`) | `28` identical Drive duplicate files in `136`/`176` noted for V2.0 sync |
+| **1** | **ปลื้ม** (`@siravidthongsook`) | `17` | `17 / 17` | `5` cams (`119, 120, 127, 224, 225`) | `0` | Complete (`225` visual sweep verified clean `607/607`) |
+| **2** | **กร** (`@kkooAAA`) | `16` | `16 / 16` | `5` cams (`938, 939, 1112, 1804, 1815`) | `18` (`1815`) | `28` identical Drive duplicate files in `136`/`176` noted for Drive `V2.0` sync |
 | **3** | **เฟิร์ม** (`@nontaphatfirm`) | `17` | `17 / 17` | `11` cams (`11, 75, 82, 88, 194, 206, 277, 432, 599, 603, 604`) | `6` (`206`) | Also cross-checked Batch 1 `211` |
-| **4** | **สอง** (`@theme222`) | `17` | `17 / 17` | `12` cams (`26, 32, 36, 158, 251, 256, 500, 529, 572, 595, 1188, 1195`) | `22` (`32, 158, 529, 595, 1076`) | Open proposal (`CHG-B4-02`): review keeping vs. dropping `500` & `1188` |
+| **4** | **สอง** (`@theme222`) | `17` | `17 / 17` | `12` cams (`26, 32, 36, 158, 251, 256, 500, 529, 572, 595, 1188, 1195`) | `100` (`32, 158, 500, 529, 595, 1076`) | Resolved `CHG-B4-02` (`V2.0`): kept `500` (`-78` corrupt -> `522` clean) & `1188` (`607/607`) |
 | **5** | **นิว** (`@Pranithi-New`) | `17` | `17 / 17` | `15` cams (`18, 70, 150, 230, 233, 301, 332, 363, 370, 371, 546, 915, 1063, 1361, 1368`) | `25` (`169`: 20, `332`: 5) | `370/371` low contrast & `546/1368` glare verified healthy |
 | **6** | **โม่** (`@moaqilo`) | `16` | `16 / 16` | `8` cams (`68, 414, 556, 576, 630, 1039, 1060, 1362`) | `32` (`68`: 1, `413`: 1, `630`: 25, `1039`: 5) | `1362` coords & road label updated |
-| **Total** | **All 6 Members** | **`100`** | **`99 / 100`** | **`56`** (`100 / 100` audited) | **`103`** | **`Inbound: 32` · `Outbound: 23` · `None: 45`** |
+| **Total** | **All 6 Members** | **`100`** | **`100 / 100`** | **`56`** (`100 / 100` audited) | **`181`** | **`Inbound: 32` · `Outbound: 23` · `None: 45` (`V2.0` Final Lock)** |
 
 ---
 
@@ -38,9 +38,9 @@
 | [x] | `215` | Footbridge near Soi Ratchadaphisek 7 on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 7 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
 | [x] | `219` | Footbridge near Soi Ratchadaphisek 14 on Ratchadaphisek Road | From Ratchada-Sutthisan Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 14 ถนนรัชดาภิเษก | Huai Khwang | Ratchadaphisek | `None` | `Inbound` |
 | [x] | `224` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection *(coords updated)* | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Inbound` |
-| [ ] | `225` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection *(coords updated)* | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Outbound` |
+| [x] | `225` | Footbridge near The Criminal Court on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection *(coords updated)* | สะพานลอยใกล้ศาลอาญา ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_04_CriminalCourt` | `Outbound` |
 
-> **Batch 1 note:** `225` metadata (position + `Outbound` direction) was verified, but its image folder was **not** visually swept in this pass, so it stays unchecked until the frame-level scan is done.
+> **Batch 1 note:** `225` metadata (position + `Outbound` direction) and full `607`-frame visual/optical folder sweep (`0` corrupted frames; rain/lens droplets on `29_1511`, `29_1521`, `30_1641` retained for Task 04) verified clean (`17 / 17`).
 
 ---
 
@@ -106,7 +106,7 @@
 | [x] | `250` | Footbridge near Soi Phetchaburi 38 on Phetchaburi Road | From Phrom Phong Intersection towards Asok-Phetchaburi Intersection | สะพานลอยใกล้ซอยเพชรบุรี 38 ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
 | [x] | `251` | Footbridge near Wat Ditsahongsaram (Wat Makkasan) on Phetchaburi Road | From Phetchaburi Expressway Intersection towards Mit Samphan Intersection | สะพานลอยใกล้วัดดิสหงษาราม ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Outbound` |
 | [x] | `256` | Footbridge near Soi Phetchaburi 27 on Phetchaburi Road | From Pratu Nam Intersection towards Chalerm Maha Nakhon Expressway | สะพานลอยใกล้ซอยเพชรบุรี 27 ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
-| [x] | `500` | Pratu Nam Intersection | Pratu Nam Intersection (from Ratchathewi Intersection towards Soi Phetchaburi 27) | แยกประตูน้ำ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `500` | Pratu Nam Intersection | Pratu Nam Intersection (from Ratchathewi Intersection towards Soi Phetchaburi 27) *(78 corrupt/green exclusions)* | แยกประตูน้ำ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
 | [x] | `26` | Bukkhalo Intersection (Charoen Nakhon Road) | From Charoen Nakhon / Rat Burana Road | แยกบุคคโล (ด้านถนนเจริญนคร) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `PAIR_ARM_BUKKHALO` | `Inbound` |
 | [x] | `1195` | Bukkhalo Intersection (Charoen Nakhon Road) | Charoen Nakhon Road (Outbound) | แยกบุคคโล (ด้านถนนเจริญนคร) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `PAIR_ARM_BUKKHALO` | `Outbound` |
 | [x] | `32` | Bang Yi Ruea Intersection (Thoet Thai Road) | From Talat Phlu Intersection | แยกบางยี่เรือ (ด้านถนนเทอดไท) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
