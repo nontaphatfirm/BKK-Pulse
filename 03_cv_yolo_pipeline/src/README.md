@@ -40,7 +40,7 @@ python 03_cv_yolo_pipeline/src/evaluate_edge_cases.py
 
 ## Proposed Fine-Tuning / Knowledge Distillation (If Faster Batch Throughput Is Needed)
 
-The pretrained 5-expert `ensemble` requires no training and runs at `1,562.6 ms/frame` mean inference time (`~26.1 hours` estimated if extrapolated across all `60,210` frames, which works well for overnight/split batch execution). If faster single-pass batch inference is required without losing edge-case accuracy:
+The pretrained 5-expert `ensemble` requires no training and runs at `1,562.6 ms/frame` mean inference time (`~26.1 hours` estimated if extrapolated across all `60,029` valid frames in `V2.0`, which works well for overnight/split batch execution). If faster single-pass batch inference is required without losing edge-case accuracy:
 1. Generate pseudo-labels using `RobustTrafficDetector` across `4,000–6,000` stratified diverse frames (day/night/rain/glare/blur/all 100 cameras) + curate `~300–500` hand-corrected extreme-bloom night frames and hard-negative static traps (zebra crossings, billboards, shopfronts).
 2. Train a single unified student model (e.g., `yolo11m` or `yolo26m`/`yolo26l` initialized from `VisDrone` or COCO) using strong mosaic/HSV/motion-blur/rain-glare augmentations + hard-negative tiles, keeping Stage 1/Stage 6 background/edge-NCC post-filtering enabled at inference time.
 
