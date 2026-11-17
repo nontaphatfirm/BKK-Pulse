@@ -2,6 +2,7 @@
 Dataset/
 Dataset_Clean_V1/cctv_images/
 Dataset_Clean_V1/image_quality_manifest.csv
+*.zip
 
 # Model Checkpoints & Inference Outputs
 models/
