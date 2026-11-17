@@ -63,6 +63,26 @@ PARTIAL_GREEN_WARN_RATIO = 0.08
 # Value: short reason tag (e.g. "corrupt_artifact", "blocked_lens", "pitch_black", "frozen_visual").
 MANUAL_EXCLUDED_IMAGES: dict[str, str] = {
     # "169_20260827_081012.jpg": "corrupt_artifact",
+    # CHG-004 (PM instruction): cam 1815 view changed (~180 deg reverse pan) from
+    # 2026-08-31 18:10:44 to end of capture; original view ends at 1815_20260831_180044.jpg
+    "1815_20260831_181044.jpg": "camera_view_changed",
+    "1815_20260831_182046.jpg": "camera_view_changed",
+    "1815_20260831_183044.jpg": "camera_view_changed",
+    "1815_20260831_184044.jpg": "camera_view_changed",
+    "1815_20260831_185044.jpg": "camera_view_changed",
+    "1815_20260831_190044.jpg": "camera_view_changed",
+    "1815_20260831_191044.jpg": "camera_view_changed",
+    "1815_20260831_192044.jpg": "camera_view_changed",
+    "1815_20260831_193044.jpg": "camera_view_changed",
+    "1815_20260831_194046.jpg": "camera_view_changed",
+    "1815_20260831_195044.jpg": "camera_view_changed",
+    "1815_20260831_200044.jpg": "camera_view_changed",
+    "1815_20260831_201046.jpg": "camera_view_changed",
+    "1815_20260831_202044.jpg": "camera_view_changed",
+    "1815_20260831_203044.jpg": "camera_view_changed",
+    "1815_20260831_204044.jpg": "camera_view_changed",
+    "1815_20260831_205044.jpg": "camera_view_changed",
+    "1815_20260831_210044.jpg": "camera_view_changed",
 }
 
 
@@ -412,6 +432,8 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_type": "footbridge_bidirectional",
         "direction": "Outbound",
     },
+    # CHG-005 location reference (manual check, no schema field): approx. 180 m after
+    # turning right from Phyathai 2 Hospital. Metadata values unchanged.
     178: {
         "location_th": "สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน",
         "location_detail_th": "รถมาจากแยกสะพานควาย มุ่งหน้าอนุสาวรีย์ชัยสมรภูมิ",
@@ -423,6 +445,8 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "pair_type": "footbridge_bidirectional",
         "direction": "Inbound",
     },
+    # CHG-005 location reference (manual check, no schema field): approx. 120 m after
+    # turning right from Phyathai 2 Hospital. Metadata values unchanged.
     179: {
         "location_th": "สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน",
         "location_detail_th": "รถมาจากอนุสาวรีย์ชัยสมรภูมิ มุ่งหน้าแยกสะพานควาย",
@@ -951,7 +975,7 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "location_detail_th": "บริเวณแยกรามคำแหง-พระราม 9",
         "location_en": "Ramkhamhaeng - Rama 9 Intersection",
         "location_detail_en": "Ramkhamhaeng - Rama 9 Intersection",
-        "district": "Suan Luang",
+        "district": "Bang Kapi",
         "corridor": "East Bangkok (Ramkhamhaeng - On Nut)",
         "pair_id": None,
         "pair_type": None,
@@ -959,9 +983,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     939: {
         "location_th": "แยกมหาดไทย",
-        "location_detail_th": "บริเวณแยกมหาดไทย (ถนนรามคำแหง)",
+        "location_detail_th": "บริเวณแยกมหาดไทย (สะพานรามคำแหง)",
         "location_en": "Mahadthai Intersection",
-        "location_detail_en": "Mahadthai Intersection (Ramkhamhaeng Road)",
+        "location_detail_en": "Mahadthai Intersection (Ramkhamhaeng Bridge)",
         "district": "Bang Kapi",
         "corridor": "East Bangkok (Ramkhamhaeng - On Nut)",
         "pair_id": None,
@@ -1068,15 +1092,15 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
         "direction": "Inbound",
     },
     1112: {
-        "location_th": "แยกสุทธิสาร (ถนนวิภาวดีรังสิต)",
-        "location_detail_th": "รถมาจากแยกรัชดา-สุทธิสาร",
-        "location_en": "Sutthisan Intersection (Vibhavadi Rangsit Road)",
-        "location_detail_en": "From Ratchada-Sutthisan Intersection",
+        "location_th": "แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)",
+        "location_detail_th": "แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)",
+        "location_en": "Sutthisan Intersection (Sutthisan Winitchai Road)",
+        "location_detail_en": "Sutthisan Intersection (Sutthisan Winitchai Road)",
         "district": "Din Daeng",
         "corridor": "Phahon Yothin - Lat Phrao",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Inbound",
+        "direction": "None",
     },
     1132: {
         "location_th": "สะพานลอยหน้าวัดสุวรรณ ถนนเจริญนคร",
@@ -1168,21 +1192,21 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     1804: {
         "location_th": "ปากซอยอ่อนนุช 33 ถนนอ่อนนุช",
-        "location_detail_th": "ท้ายรถมุ่งหน้าแยกสวนหลวง",
+        "location_detail_th": "ปากซอยอ่อนนุช 33 ถนนอ่อนนุช",
         "location_en": "Entrance to Soi On Nut 33 on On Nut Road",
-        "location_detail_en": "Towards Suan Luang Intersection",
+        "location_detail_en": "Entrance to Soi On Nut 33 on On Nut Road",
         "district": "Suan Luang",
         "corridor": "East Bangkok (Ramkhamhaeng - On Nut)",
         "pair_id": None,
         "pair_type": None,
-        "direction": "Outbound",
+        "direction": "None",
     },
     1815: {
         "location_th": "แยกพระราม 9",
         "location_detail_th": "หน้ารถมาจากแยกผังเมือง",
         "location_en": "Rama 9 Intersection",
         "location_detail_en": "From Phang Mueang Intersection",
-        "district": "Huai Khwang",
+        "district": "Din Daeng",
         "corridor": "Ratchadaphisek",
         "pair_id": None,
         "pair_type": None,

@@ -35,6 +35,11 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | `CHG-001` | `2026-11-11` | `V1.0` | Automated Baseline | All `100` cams / `61,319` imgs | Blank white, rainbow, gray P-frame, green screen, frozen streams, Thai Unicode paths, `1970` OSD dates, corrupted `cctv_info.csv` | Executed 5-Gate pipeline + `CAMERA_CURATION` in `clean_dataset_v1.py` | `61,319 -> 60,210` valid images (`1,109` filtered); `100/100` metadata repaired | Yes (`clean_dataset_v1.py`) |
 | `CHG-002` | *YYYY-MM-DD* | `V1.1` | *Example: ปลื้ม (@siravidthongsook)* | *e.g., `cam_id=126` or `quality_warning`* | *Describe issue observed in Drive image or CSV* | *Describe exact fix / rule / label update* | *e.g., `direction`: Inbound -> Outbound* | *No / Pending / Yes* |
 | `CHG-003` | `2026-11-15` | `V1.1` | ปลื้ม (@siravidthongsook) | Batch 1 (`17` cameras, Ratchadaphisek) | Pair cameras `119/120` and `224/225` reported each other's `(lat, lon)`; `127` pin sat on the road median instead of the outbound footbridge span; `120` labelled `Inbound` although both directions pass the side-arm view; `0` broken frames found in the visual sweep | Added optional `lat`/`lon` override support to `CAMERA_CURATION` (`clean_dataset_v1.py`) and applied `5` camera corrections + `1` `direction` fix; no image exclusions needed | `119/120`, `224/225` swapped longitudes restored to the correct side; `127` re-pinned `~25 m` onto the outbound span; `120`: `Inbound` -> `None`; valid images unchanged at `60,210` | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-01` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | Batch 2 (16 cams): `1815, 136, 137, 139, 141, 170, 176, 177, 178, 179, 1070, 1071, 1112, 938, 939, 1804` | District mismatch on `938`, `1815`; no defective frames missed by automated gates | Updated `district` in `CAMERA_CURATION`; no `MANUAL_EXCLUDED_IMAGES` added; open items logged for maintainer (see V1.1 Batch 2 entry) | `938` district: Suan Luang -> Bang Kapi; `1815` district: Huai Khwang -> Din Daeng; images `9,535 -> 9,535` (0 excluded) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-02` | `2026-11-15` | `V1.1` | กร (@kkooAAA) | `cam_id=1815` / `18` images | Camera view changed (~180° reverse pan) from `2026-08-31 18:10:44` to end of capture; frames no longer match `location_detail` / `direction` | **Following the PM's instruction**, added the `18` changed-view filenames to `MANUAL_EXCLUDED_IMAGES` (reason `camera_view_changed`); original-view frames kept | `1815` valid images: `611 -> 593`; Batch 2: `9,535 -> 9,517`; no other camera affected | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-03` | `2026-11-16` | `V1.1` | กร (@kkooAAA) | Batch 2 location audit: `1112` (changed); `939`, `170`, `1071`, `1804`, `1815`, `178`, `179` (verified) | `1112` labelled with the wrong road (Vibhavadi Rangsit) although it views Sutthisan Winitchai Road; `1815` road recorded as Asok-Din Daeng in `CHG-003` | Updated `location_en` / `location_th` (`1112`) in `CAMERA_CURATION`; `1815` road clarified as Rama 9 Road (documentation only); other cameras verified unchanged | `1112` road: Vibhavadi Rangsit -> Sutthisan Winitchai; images unchanged (`9,517`) | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-04` | `2026-11-17` | `V1.1` | กร (@kkooAAA) | `939`, `1112`, `1804` | `939` detail named Ramkhamhaeng Road instead of Ramkhamhaeng Bridge; `1112` / `1804` detail and `direction` did not match the camera view | Updated `location_detail_th/en` (`939`, `1112`, `1804`), `location_th/en` (`1112`, back to Vibhavadi Rangsit Road, supersedes `CHG-005`) and `direction` (`1112`, `1804`) in `CAMERA_CURATION` | `1112` direction: Inbound -> None; `1804` direction: Outbound -> None; direction totals `51/29/20 -> 50/28/22` (Inbound/Outbound/None); images unchanged | Yes (`clean_dataset_v1.py`) |
+| `CHG-B2-05` | `2026-11-17` | `V1.1` | กร (@kkooAAA) | `cam_id=1112` | Road name: camera views Sutthisan Winitchai Road, not Vibhavadi Rangsit Road | Updated `location_th/en` and `location_detail_th/en` in `CAMERA_CURATION` to Sutthisan Winitchai Road (supersedes the `CHG-006` road revert); `direction` unchanged (`None`) | `location_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`; `location_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)` (same for `location_detail_th/en`) | Yes (`clean_dataset_v1.py`) |
 
 ---
 
@@ -132,3 +137,98 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 - **Verification:** PR opened (`chore/00-qa-<name>` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run / PASS]`
 ```
 
+#### Batch 2 Peer Audit (`CHG-003`)
+- **Date:** 2026-11-15
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** Batch 2 (16 cameras): `1815, 136, 137, 139, 141, 170, 176, 177, 178, 179, 1070, 1071, 1112, 938, 939, 1804` -- image sweep of all valid frames + metadata check.
+- **Problem Found:**
+  - `cam_id=938`: `district` was `Suan Luang`; coordinates `(13.74761, 100.60591)` fall in **Bang Kapi** district (verified on Google Maps).
+  - `cam_id=1815`: `district` was `Huai Khwang`; coordinates `(13.75599, 100.56481)` fall on Asok-Din Daeng Road, **Din Daeng** (verified on Google Maps). **-> Road clarified by `CHG-005`:** the camera views **Rama 9 Road** (final documented road); the district fix (`Din Daeng`) stands.
+  - `cam_id=1112`: `district` `Din Daeng` confirmed on Google Maps (intersection lies on the Phaya Thai / Din Daeng boundary) -- no change.
+  - Direction check: `direction` of all `16` cameras manually verified by comparing CCTV images with Google Maps -- all match existing values (e.g., `141`: `Outbound` verified; `170`: `Outbound` verified; `1815`: `Inbound` verified for the original view).
+  - Image sweep: all `9,535` valid frames inspected (contact sheets of every frame, day and night, plus full-size checks of suspicious frames). `0` unreadable, `0` pitch-black, `0` blocked, `0` corrupted frames found beyond what Gates 1-5 already removed.
+- **Fix / Decision Applied:**
+  - Updated `CAMERA_CURATION` in `clean_dataset_v1.py`: `938` and `1815` `district`.
+  - No entries added to `MANUAL_EXCLUDED_IMAGES`. Rainy, wet-road, and headlight-glare frames preserved (e.g., rain-smeared lens frame `938_20260829_151005.jpg` kept intentionally).
+  - All `direction` values verified and left unchanged.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: `938` `district`: Suan Luang -> Bang Kapi; `1815` `district`: Huai Khwang -> Din Daeng.
+  - Images affected: `0` valid images (`9,535` -> `9,535`).
+- **Open Items for Maintainer (not changed in this PR):**
+  - `cam_id=1815` **view change:** camera view changed between `1815_20260831_180044.jpg` (last original view) and `1815_20260831_181044.jpg` (first new view) -- likely a ~180° pan at the same site (same noise-barrier style on the elevated road, which flips from left to right; the same grey dome fixture moves from the left to the right frame edge; same `352x288` resolution and `:x0:44` capture cadence). `18` valid frames (`2026-08-31 18:10:44` to `21:00:44`) show the reverse view; the other `597` frames (`593` valid) show the original view. `location_detail_th/en` and `direction` do not describe these `18` frames. Not excluded -- maintainer / Task 03 owner to decide (e.g., exclude, or handle as a separate view for median background / ROI). **-> Resolved by `CHG-004`** (excluded following the PM's instruction).
+  - `cam_id=1112` road name: frames suggest the camera faces east along **Sutthisan Winitchai Road** (sunrise straight ahead on 28 Aug 06:45), not Vibhavadi Rangsit. Possible fix: `location_en` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`, `location_th` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`. Not applied -- needs Street View confirmation. **-> Resolved by `CHG-005`** (confirmed and applied).
+  - `Inbound` / `Outbound` definition is not documented in `DATA_CONTRACT.md`; existing labels imply "towards / away from central Bangkok". Suggest documenting it.
+  - **Google Drive duplicates (informational only):** `28` duplicate files exist in `Dataset_Clean_V1/cctv_images/` on Drive -- `18` in `136/` (e.g., `136_20260825_111611.jpg`) and `10` in `176/` (e.g., `176_20260829_085616.jpg`); each filename appears twice with identical size, and downloaded copies are byte-for-byte identical. They do **not** affect the dataset (each image appears once in `image_quality_manifest.parquet`). They must **NOT** be added to `MANUAL_EXCLUDED_IMAGES` (that would exclude the valid original frame). Suggest removing the extra copies during the `V2.0` Drive sync.
+- **Verification:** PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
+
+#### Camera 1815 View-Change Exclusion (`CHG-004`)
+- **Date:** 2026-11-15
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** `cam_id=1815` only -- follow-up to the Batch 2 open item (`CHG-003`).
+- **Problem Found:**
+  - `cam_id=1815`: camera view changed (~180° reverse pan at the same site) between `1815_20260831_180044.jpg` (last original-view frame) and `1815_20260831_181044.jpg` (first changed-view frame). The changed view lasts until the camera's last capture, `1815_20260831_210044.jpg`. These frames do not match the camera's `location_detail_th/en` or `direction` (`Inbound`).
+- **Fix / Decision Applied:**
+  - **Following the PM's instruction**, added the `18` changed-view frames to `MANUAL_EXCLUDED_IMAGES` in `clean_dataset_v1.py` with reason `camera_view_changed`:
+    - `1815_20260831_181044.jpg`, `1815_20260831_182046.jpg`, `1815_20260831_183044.jpg`, `1815_20260831_184044.jpg`, `1815_20260831_185044.jpg`, `1815_20260831_190044.jpg`,
+    - `1815_20260831_191044.jpg`, `1815_20260831_192044.jpg`, `1815_20260831_193044.jpg`, `1815_20260831_194046.jpg`, `1815_20260831_195044.jpg`, `1815_20260831_200044.jpg`,
+    - `1815_20260831_201046.jpg`, `1815_20260831_202044.jpg`, `1815_20260831_203044.jpg`, `1815_20260831_204044.jpg`, `1815_20260831_205044.jpg`, `1815_20260831_210044.jpg`.
+  - All original-view frames (up to and including `1815_20260831_180044.jpg`) are kept.
+  - Existing `CAMERA_CURATION` values (including the `CHG-003` `district` fix and the `direction` values) are unchanged.
+  - No CSV / Parquet files and no Google Drive files were modified in this PR.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: none.
+  - Images affected: `18` valid images excluded -- `cam_id=1815`: `611 -> 593` valid (`615` raw); Batch 2: `9,535 -> 9,517`. No other camera affected.
+- **Verification:** All `18` filenames exist in `image_quality_manifest.parquet` as `is_valid=True`, `cam_id=1815`, timestamps `2026-08-31 18:10:44` to `21:00:44` (the camera's last frame); boundary frames checked visually. PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
+
+#### Batch 2 Location Metadata Audit (`CHG-005`)
+- **Date:** 2026-11-16
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** Batch 2 location check of road name, intersection, camera facing, and traffic direction -- `1112`, `939`, `170`, `1071`, `1804`, `1815`, `178`, `179` (manual check on Google Maps / Street View + CCTV frames, with an OpenStreetMap POI cross-check).
+- **Problem Found:**
+  - `cam_id=1112`: `location_en` / `location_th` named **Vibhavadi Rangsit Road**, but the camera faces east along **Sutthisan Winitchai Road** (OSD `TF-DD-S10-04`; two-way shophouse street, no Vibhavadi frontage road or Don Mueang Tollway in view). Traffic in view is westbound, coming from Ratchada-Sutthisan Intersection (`Inbound`).
+  - `cam_id=1815`: `CHG-003` recorded the camera as being on **Asok-Din Daeng Road**; the manually confirmed road is **Rama 9 Road**.
+- **Fix / Decision Applied:**
+  - `1112` **(superseded by `CHG-006`: road set back to Vibhavadi Rangsit Road)**: `location_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`; `location_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`. `location_detail_th/en` (`From Ratchada-Sutthisan Intersection`), `direction` (`Inbound`), and `district` (`Din Daeng`) already correct -- unchanged. The district is kept as `Din Daeng` even though the raw coordinate falls about `30 m` inside Phaya Thai on an OSM boundary lookup; it is not changed on coordinate-based boundary ambiguity alone.
+  - `939`: name kept as `Mahadthai Intersection` / `Mahadthai Intersection (Ramkhamhaeng Road)` to match the Dashboard, which is the source of truth for naming. The camera OSD spells it `Mahatthai`; that spelling is **not** adopted. No change.
+  - `1815` road clarification: the final documented road is **Rama 9 Road** (Rama 9 Intersection). This supersedes the `Asok-Din Daeng Road` wording in `CHG-003`, which is kept for history. No metadata value depends on it, so nothing in `CAMERA_CURATION` changed.
+  - Verified, no change needed:
+    - `170`: faces south, northbound traffic, `Outbound` (Nawutti Somdet Ya Hospital reference kept).
+    - `1071`: Kamphaeng Phet Intersection, faces south, southbound traffic, `Inbound`.
+    - `1804`: entrance to Soi On Nut 33, faces east, eastbound traffic, `Outbound`.
+    - `1815`: Rama 9 Road / Rama 9 Intersection, `Din Daeng`, faces east, westbound (into the city) = `Inbound`. The `18` `camera_view_changed` exclusions from `CHG-004` are kept.
+    - `1815` `location_detail`: manually confirmed that traffic travels from Phang Mueang Intersection toward Rama 9 Intersection. The existing `From Phang Mueang Intersection` / `หน้ารถมาจากแยกผังเมือง` is correct and retained -- no metadata change needed.
+  - `178` / `179`: extra location references (approx. `180 m` / `120 m` after turning right from Phyathai 2 Hospital, accepted as approximate references) recorded as code comments in `CAMERA_CURATION` -- there is no schema field for them, so no metadata value changed.
+  - No `MANUAL_EXCLUDED_IMAGES` changes. No CSV / Parquet or Google Drive files modified.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: `1112` `location_en`, `location_th` (`2` fields, `1` camera).
+  - Images affected: `0` (Batch 2 valid images stay `9,517`).
+- **Open Items for Maintainer:**
+  - Regenerated outputs will also pick up the `CHG-003` district fixes for `938` / `1815`, which are not yet in the current CSV / Parquet.
+- **Verification:** `clean_dataset_v1.py` syntax check passed; `CAMERA_CURATION` still holds all `100` cameras and only the `2` fields above differ from the previous commit; `1815` exclusions = `18`. PR (`chore/00-qa-kkooAAA` -> `main`) -> Final `clean_dataset_v1.py` + `run_pipeline.py --check-contract` `[Pending Maintainer Run]`
+
+#### Batch 2 Location Detail & Direction Fix (`CHG-006`)
+- **Date:** 2026-11-17
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** `939`, `1112`, `1804` (metadata only).
+- **Fix / Decision Applied:**
+  - `939`: `location_detail_th`: `บริเวณแยกมหาดไทย (ถนนรามคำแหง)` -> `บริเวณแยกมหาดไทย (สะพานรามคำแหง)`; `location_detail_en`: `Mahadthai Intersection (Ramkhamhaeng Road)` -> `Mahadthai Intersection (Ramkhamhaeng Bridge)`. `direction` stays `None`.
+  - `1112`: `location_detail_th`: `รถมาจากแยกรัชดา-สุทธิสาร` -> `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)`; `location_detail_en`: `From Ratchada-Sutthisan Intersection` -> `Sutthisan Intersection (Vibhavadi Rangsit Road)`; `direction`: `Inbound` -> `None`; `location_th`: `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)` -> `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)`; `location_en`: `Sutthisan Intersection (Sutthisan Winitchai Road)` -> `Sutthisan Intersection (Vibhavadi Rangsit Road)`, so name and detail name the same road. This supersedes the `CHG-005` road change (kept for history).
+  - `1804`: `location_detail_th`: `ท้ายรถมุ่งหน้าแยกสวนหลวง` -> `ปากซอยอ่อนนุช 33 ถนนอ่อนนุช`; `location_detail_en`: `Towards Suan Luang Intersection` -> `Entrance to Soi On Nut 33 on On Nut Road`; `direction`: `Outbound` -> `None`.
+  - No `MANUAL_EXCLUDED_IMAGES` changes. No CSV / Parquet files modified (regenerate with `clean_dataset_v1.py`).
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: `10` fields across `3` cameras.
+  - `direction` totals: `Inbound 51 -> 50`, `Outbound 29 -> 28`, `None 20 -> 22`. Images affected: `0`.
+- **Open Items for Maintainer:**
+  - Direction totals `51 / 29 / 20` are still quoted in `DATA_CONTRACT.md`, `00_data_cleaning_and_qa/GOAL.md`, `04_ds_traffic_analytics/GOAL.md`, `06_bi_dashboard/GOAL.md`, `Dataset_Clean_V1/README.md`, `Info/Project Ideas.md`, and `BKK_Pulse_Team_Guide.html`.
+  - `cctv_info_cleaned.csv` / `.parquet` not yet regenerated -- rerun `clean_dataset_v1.py` with the raw `Dataset/` folder.
+
+#### Batch 2 Location Road Fix (`CHG-007`)
+- **Date:** 2026-11-17
+- **Editor:** กร (@kkooAAA)
+- **Batch / Scope:** `1112` (metadata only).
+- **Fix / Decision Applied:**
+  - `location_th` / `location_detail_th`: `แยกสุทธิสาร (ถนนวิภาวดีรังสิต)` -> `แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย)`.
+  - `location_en` / `location_detail_en`: `Sutthisan Intersection (Vibhavadi Rangsit Road)` -> `Sutthisan Intersection (Sutthisan Winitchai Road)`.
+  - Supersedes the `CHG-006` road revert for `1112` (kept for history). `direction` stays `None`. No `MANUAL_EXCLUDED_IMAGES` changes; no CSV / Parquet modified.
+- **Quantitative Impact (Before -> After):**
+  - Metadata fields changed: `4` fields, `1` camera. Images affected: `0`. Direction totals unchanged.
