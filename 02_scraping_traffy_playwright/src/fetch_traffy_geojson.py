@@ -23,6 +23,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -35,6 +36,7 @@ CACHE_DIR = PROJECT_ROOT / "data" / "raw_traffy_cache" / "pages"
 INCIDENT_PATH = PROJECT_ROOT / "data" / "traffy_complaints_near_cctv.parquet"
 COUNTS_PATH = PROJECT_ROOT / "data" / "traffy_camera_counts.parquet"
 SUMMARY_PATH = PROJECT_ROOT / "data" / "scraping_summary_02.json"
+CATEGORY_MAP_PATH = Path(__file__).with_name("category_map.json")
 
 API_URL = "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed"
 USER_AGENT = "bkk-pulse-course-project/1.0 (Chulalongkorn DSDE)"
@@ -47,10 +49,11 @@ DEFAULT_END = "2026-10-31"
 WEEK_START = "2026-08-25"
 WEEK_END = "2026-08-31 23:59:59"
 
-FLOOD_KEYS = ("น้ำท่วม", "น้ำท่วมขัง", "ท่อระบายน้ำ", "อุทกภัย")
-TRAFFIC_KEYS = ("จราจร", "ถนน", "กีดขวาง", "อุบัติเหตุ")
+_TYPE_MAP = json.loads(CATEGORY_MAP_PATH.read_text(encoding="utf-8"))
+_TAG_BUCKETS: dict[str, str] = _TYPE_MAP["tags"]
+_DEFAULT_BUCKET: str = _TYPE_MAP["default"]
 
-PAGE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})_\d+\.json\.gz$")
+PAGE_RE = re.compile(r"^(\d{4}-\d{2}-\d{2})_(\d{4}-\d{2}-\d{2})_(\d+)\.json\.gz$")
 
 # Largest legitimate gap in the 2026-05..10 feed is 3.05 h (a quiet night); the
 # 2026-09-25 truncation was 13.6 h. Anything longer means a fetch stopped early.
@@ -73,13 +76,24 @@ class Complaint:
     status: str
 
 
+def _tags(raw_type: str) -> list[str]:
+    return [part.strip() for part in str(raw_type).split(",") if part.strip()]
+
+
 def classify(raw_type: str) -> str:
     """Map a Traffy problem type onto flood / traffic / other."""
-    if any(key in raw_type for key in FLOOD_KEYS):
+    buckets = {_TAG_BUCKETS.get(tag, _DEFAULT_BUCKET) for tag in _tags(raw_type)}
+    if "flood" in buckets:
         return "flood"
-    if any(key in raw_type for key in TRAFFIC_KEYS):
+    if "traffic" in buckets:
         return "traffic"
-    return "other"
+    return _DEFAULT_BUCKET
+
+
+def unmatched_tags(raw_series: pd.Series) -> dict[str, int]:
+    """Return the comma-split tags the map does not know, with their counts."""
+    counts = Counter(tag for raw in raw_series for tag in _tags(raw))
+    return {tag: count for tag, count in counts.items() if tag not in _TAG_BUCKETS}
 
 
 def _page_path(start: str, end: str, offset: int) -> Path:
@@ -393,6 +407,7 @@ def build_outputs(
         "complaints_within_1000m": int(len(matched)),
         "category_counts_all": {k: int(v) for k, v in complaints["problem_type"].value_counts().items()},
         "category_counts_matched": {k: int(v) for k, v in matched["problem_type"].value_counts().items()},
+        "unmatched_type_tags": unmatched_tags(raw["type_raw"]),
         "cameras_with_any_complaint": int((counts["traffy_complaint_count"] > 0).sum()),
         "cameras_with_flood_complaint": int((counts["traffy_flood_count"] > 0).sum()),
         "week_complaints_within_1000m": int(len(week)),
