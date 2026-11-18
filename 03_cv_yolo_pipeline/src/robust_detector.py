@@ -35,6 +35,7 @@ import pandas as pd
 import torch
 import torchvision
 from ultralytics import YOLO
+from ultralytics.cfg import DEFAULT_CFG_DICT
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -853,6 +854,11 @@ class RobustTrafficDetector:
         self.imgsz = imgsz
         self.raw_conf = raw_conf
         self.use_half = torch.cuda.is_available() if use_half is None else bool(use_half)
+        self._precision_kwargs: dict[str, object] = (
+            ({"quantize": 16} if self.use_half else {})
+            if "quantize" in DEFAULT_CFG_DICT
+            else {"half": self.use_half}
+        )
         self.models: dict[str, YOLO] = {}
         self._load_experts()
 
@@ -879,8 +885,8 @@ class RobustTrafficDetector:
             conf=eff_conf,
             iou=0.75,
             max_det=500,
-            half=self.use_half,
             verbose=False,
+            **self._precision_kwargs,
         )
         return self._parse_model_results(model_key, crop_items, results, img_w, img_h)
 
@@ -2426,8 +2432,8 @@ class RobustTrafficDetector:
                     conf=eff_conf,
                     iou=0.75,
                     max_det=500,
-                    half=self.use_half,
                     verbose=False,
+                    **self._precision_kwargs,
                 )
                 offset = 0
                 for frame_idx, f_crops in items_chunk:
