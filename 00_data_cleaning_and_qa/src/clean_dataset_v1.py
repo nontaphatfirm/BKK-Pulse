@@ -1141,9 +1141,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     915: {
         "location_th": "วงเวียนใหญ่",
-        "location_detail_th": "บริเวณวงเวียนใหญ่",
+        "location_detail_th": "วงเวียนใหญ่ (มุมโค้งตะวันตกเฉียงใต้ มุ่งหน้าแยกอินทรพิทักษ์ – ประชาธิปก)",
         "location_en": "Wongwian Yai Roundabout",
-        "location_detail_en": "At Wongwian Yai Roundabout",
+        "location_detail_en": "Wongwian Yai Roundabout (SW quadrant looking NNE towards Intharaphithak & Prajadhipok)",
         "lat": 13.72572,
         "lon": 100.49268,
         "district": "Thon Buri",

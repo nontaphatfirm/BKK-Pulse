@@ -128,7 +128,7 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [x] | `915` | Wongwian Yai Roundabout | At Wongwian Yai Roundabout | วงเวียนใหญ่ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
+| [x] | `915` | Wongwian Yai Roundabout | Wongwian Yai Roundabout (SW quadrant looking NNE towards Intharaphithak & Prajadhipok) | วงเวียนใหญ่ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
 | [x] | `18` | Saphan Daeng Intersection (Thahan Road) | Saphan Daeng Bridge towards Kiakkai Intersection (both directions visible) | แยกสะพานแดง (ด้านถนนทหาร) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
 | [x] | `1028` | Saphan Daeng Intersection | Saphan Daeng Intersection | แยกสะพานแดง | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
 | [x] | `70` | In front of Bank of Thailand on Sam Sen Road | From Thewet Intersection towards Bang Khun Phrom Intersection (with contraflow lane) | หน้าธนาคารแห่งประเทศไทย ถนนสามเสน | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_2W_BOT_SAMSEN` | `None` |
