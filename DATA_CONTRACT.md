@@ -139,9 +139,11 @@
 | `nearby_mall_count` | `int64` | Count of malls, department stores & markets within 500m radius (OSM Overpass) | Task 01 |
 | `nearby_hospital_count` | `int64` | Count of hospitals & clinics within 500m radius (OSM Overpass) | Task 01 |
 | `poi_total_count` | `int64` | Total POI count across all 4 categories within 500m radius | Task 01 |
-| `traffy_complaint_count` | `int64` | Nearby BMA Traffy Fondue complaint hotspot count within 500m-1km | Task 02 |
-| `traffy_flood_count` | `int64` | Nearby flooding / drainage complaint hotspot count within 500m-1km | Task 02 |
-| `traffy_traffic_count` | `int64` | Nearby traffic congestion / signal failure / road obstruction hotspot count within 500m-1km | Task 02 |
+| `traffy_complaint_count` | `int64` | BMA Traffy Fondue complaints within 500m-1km in the trailing 7 days ending at `timestamp` (as-of, never later) | Task 02 |
+| `traffy_flood_count` | `int64` | Flooding / drainage complaints over the same trailing 7 days | Task 02 |
+| `traffy_traffic_count` | `int64` | Traffic congestion / signal failure / road obstruction complaints over the same trailing 7 days | Task 02 |
+
+- **Traffy time semantics:** the three Traffy counts are as-of totals. Each row counts complaints with `timestamp > row.timestamp - 7 days` and `<= row.timestamp`, so no row can see a complaint from its own future and the columns are safe as features. Six-month lifetime totals stay in `data/traffy_camera_counts.parquet` for consumers that want a time-free structural indicator.
 
 ---
 
