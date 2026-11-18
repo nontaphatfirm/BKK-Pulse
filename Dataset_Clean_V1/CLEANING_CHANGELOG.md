@@ -22,7 +22,8 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | :--- | :---: | :---: | :---: | :--- |
 | [`V1.0`](#v10----2026-11-11-initial-automated-quality-gate--metadata-cleansing) | `2026-11-11` | Baseline | `61,319 -> 60,210` (`98.19%`) | 5-Gate Image Filter, ASCII filenames, full 100-camera `CAMERA_CURATION` repair |
 | [`V1.1`](#v11----2026-11-17-consolidated-team-peer-qa--batches-1-6) | `2026-11-17` | Superseded | `61,319 -> 60,107` (`98.02%`) | All 6 PRs (`#2, #4, #6, #7, #8, #9`) merged & rebuilt: `56` camera metadata updates, `8` `(lat, lon)` fixes, `103` `manual_excluded` frames; `99/100` visual sweeps complete |
-| [`V2.0`](#v20----2026-11-17-final-data-lock--100100-peer-qa-verified--chg-b4-02-resolved) | `2026-11-17` | **Locked Final Data** | `61,319 -> 60,029` (`97.90%`) | `cam_id=225` visual sweep (`100/100` `[x]`); resolved `CHG-B4-02` (`1188` kept `607/607`; `500` `-78` severe corrupt/green frames -> `522`); `0` remaining `quality_warning`s; `DATA_CONTRACT` passed |
+| [`V2.0`](#v20----2026-11-17-final-data-lock--100100-peer-qa-verified--chg-b4-02-resolved) | `2026-11-17` | Superseded | `61,319 -> 60,029` (`97.90%`) | `cam_id=225` visual sweep (`100/100` `[x]`); resolved `CHG-B4-02` (`1188` kept `607/607`; `500` `-78` severe corrupt/green frames -> `522`); `0` remaining `quality_warning`s; `DATA_CONTRACT` passed |
+| [`V2.1`](#v21----2026-11-19-metadata-refinement--rebuild-pr-12--chg-b6-02) | `2026-11-19` | **Locked Final Data** | `61,319 -> 60,029` (`97.90%`) | `PR #12` (`CHG-B6-02`): refined `30` camera metadata entries (`26` details, `13` directions -> `"None"`, `2` approach-road names `119/630`, `4` coords `411–414`), rebuilt & `DATA_CONTRACT` passed (`0` images changed) |
 
 ---
 
@@ -76,7 +77,7 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 | `CHG-B5-04` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `915, 301, 370, 546, 1368` (Batch 5 — PR #9) | `915` raw pin sat ~95 m NW on Intharaphithak Rd; `301` looks along Nakhon Ratchasima Rd; `370` looks SE along Krung Kasem Rd | Added `"lat": 13.72572, "lon": 100.49268` for `915` + refined `location_detail_th/en` (`915, 301, 370, 546, 1368`) | `cam_id=915` re-pinned ~95 m SE; road details aligned to Street View & OSM | Yes (`clean_dataset_v1.py`) |
 | `CHG-B5-05` | `2026-11-17` | `V1.1` | นิว (`@Pranithi-New`) | `cam_id=332` (Batch 5 — PR #9) | Full pixel scan across `10,217` Batch 5 frames uncovered `5` severe vertical `scanline_smear` / stretched frames (>50–90% occluded) | Added all `5` filenames to `MANUAL_EXCLUDED_IMAGES` (`"scanline_smear"`) | `cam_id=332`: `611 -> 606` valid images (`-5`) | Yes (`clean_dataset_v1.py`) |
 | `CHG-B6-01` | `2026-11-16` | `V1.1` | โม่ (`@moaqilo`) | Batch 6 Old Town (`16` cams — PR #8) | Wrong/missing `direction` & `location_detail` (`68, 414, 556, 576, 630, 1039, 1060, 1362`); `1362` coords offset; `32` unusable frames (`68`: 1, `413`: 1, `630`: 25, `1039`: 5) | Updated `8` cameras in `CAMERA_CURATION` (incl. `1362` `lat=13.7746377, lon=100.5067094`) + added `32` filenames to `MANUAL_EXCLUDED_IMAGES` | `8` cams metadata updated; `-32` images queued; `16/16` ticked | Yes (`clean_dataset_v1.py`) |
-| `CHG-B6-02` | `2026-11-19` | `V2.1` *(pending rebuild)* | โม่ / ชวิน ศิลมั่น (`@moaqilo`) | `30` cams (`32, 36, 68, 88, 118, 119, 120, 124, 135, 158, 250, 251, 256, 301, 411, 412, 413, 414, 500, 546, 595, 599, 603, 604, 630, 1039, 1071, 1195, 1362, 1408`) | `location_detail` described a single flow on cams that see a whole junction / both carriageways; wrong `direction` on two-way views; `119` & `630` labelled with the wrong approach road; `411–414` coords offset | `CAMERA_CURATION`: rewrote `location_detail_th/en` on `26` cams; `direction` -> `None` on `118, 119, 124, 135, 158, 250, 251, 603, 630, 1071, 1195, 1362, 1408`; `119` location -> แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย); `630` location -> แยกเกษะโกมล (ด้านถนนพระราม 5); `(lat, lon)`: `411/412` -> `13.7619642, 100.4934256`, `413` -> `13.754495, 100.4985768`, `414` -> `13.7402672, 100.4977062` | `30` cams metadata updated (`13` direction, `2` location name, `4` coords); `0` images changed | Yes (`clean_dataset_v1.py`) |
+| `CHG-B6-02` | `2026-11-19` | `V2.1` | โม่ / ชวิน ศิลมั่น (`@moaqilo`) | `30` cams (`32, 36, 68, 88, 118, 119, 120, 124, 135, 158, 250, 251, 256, 301, 411, 412, 413, 414, 500, 546, 595, 599, 603, 604, 630, 1039, 1071, 1195, 1362, 1408`) | `location_detail` described a single flow on cams that see a whole junction / both carriageways; wrong `direction` on two-way views; `119` & `630` labelled with the wrong approach road; `411–414` coords offset | `CAMERA_CURATION`: rewrote `location_detail_th/en` on `26` cams; `direction` -> `None` on `118, 119, 124, 135, 158, 250, 251, 603, 630, 1071, 1195, 1362, 1408`; `119` location -> แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย); `630` location -> แยกเกษะโกมล (ด้านถนนพระราม 5); `(lat, lon)`: `411/412` -> `13.7619642, 100.4934256`, `413` -> `13.754495, 100.4985768`, `414` -> `13.7402672, 100.4977062` | `30` cams metadata updated (`13` direction, `2` location name, `4` coords); `0` images changed | Yes (`clean_dataset_v1.py`) |
 | `CHG-V2-01` | `2026-11-17` | `V2.0` | Maintainer (`Batch 1 Finalize`) | `cam_id=225` (`607` valid frames) | `cam_id=225` metadata verified in `CHG-B1-01`, visual frame sweep left unchecked (`99/100`) | Ran full pixel & visual extremity scan across all `607` valid frames (`0` corruptions; rain/mist on `29_1511`, `29_1521`, `30_1641` kept for Task 04) + ticked `[x]` | Checklist completed: `99/100 -> 100/100` (`[x]`); `0` frames dropped | Yes (`CAMERA_AUDIT_CHECKLIST.md`) |
 | `CHG-V2-02` | `2026-11-17` | `V2.0` | Maintainer (`CHG-B4-02 Resolution`) | `cam_id=500`, `cam_id=1188` | `1188` night glare (`128` night frames) vs. `500` H.264 macroblock/YUV corruptions (`>10%`, incl. remaining `7` warnings); whole-camera drops would break `100`-cam contract | Validated `RobustTrafficDetector` on `1188` (`8` cars night, `5` cars wet storm) -> kept `607/607`; audited all `600` frames of `500` & excluded `78` (`13.0%`) severe corruptions in `MANUAL_EXCLUDED_IMAGES` | `cam_id=1188`: `607` kept; `cam_id=500`: `600 -> 522` valid (`-78`); total valid `60,107 -> 60,029`; `quality_warning`: `7 -> 0` | Yes (`clean_dataset_v1.py`) |
 
@@ -305,7 +306,28 @@ Whenever you verify a batch, flag broken/corrupted frames to exclude, or edit an
 
 ---
 
-> **Instructions for Future Contributors:** When adding `V2.0+` updates, copy the template below, fill in exact details, and add a summary row to the **Modification Ledger** above.
+### `V2.1` -- `2026-11-19` *(Metadata Refinement & Rebuild -- `PR #12` / `CHG-B6-02`)*
+
+#### 1. `30`-Camera Metadata & Coordinate Refinement (`CHG-B6-02`)
+- **Scope (`30` cameras):** `32, 36, 68, 88, 118, 119, 120, 124, 135, 158, 250, 251, 256, 301, 411, 412, 413, 414, 500, 546, 595, 599, 603, 604, 630, 1039, 1071, 1195, 1362, 1408`.
+- **`location_detail_th` / `location_detail_en` (`26` cameras):** Reworded labels to accurately describe whole-junction / two-way / both-carriageway framing instead of single-direction flow.
+- **`direction` Alignment (`13` cameras -> `"None"`):** Updated `118, 119, 124, 135, 158, 250, 251, 603, 630, 1071, 1195, 1362, 1408` to `"None"`. Dataset `direction` totals in `cctv_info_cleaned` shifted from `V2.0` (`Inbound: 32, Outbound: 23, "None": 45`) to **`Inbound: 24, Outbound: 18, "None": 58`**.
+- **Approach-Road Corrections (`2` cameras):**
+  - `cam_id=119`: `แยกรัชดา-สุทธิสาร (ด้านถนนรัชดาภิเษก)` -> **`แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย)`**.
+  - `cam_id=630`: `แยกเกษะโกมล (ด้านถนนอำนวยสงคราม)` -> **`แยกเกษะโกมล (ด้านถนนพระราม 5)`**.
+- **Coordinate Overrides (`4` cameras in Old Town):**
+  - `cam_id=411`, `cam_id=412`: `lat=13.7619642, lon=100.4934256`.
+  - `cam_id=413`: `lat=13.754495, lon=100.4985768`.
+  - `cam_id=414`: `lat=13.7402672, lon=100.4977062`.
+
+#### 2. `V2.1` Metadata Rebuild & Contract Verification (`clean_dataset_v1.py --skip-copy`, `2026-11-19`, `185.76s`)
+- **Images Unchanged (`0` frames added/removed):** `total_raw_images = 61,319`, `total_valid_images = 60,029` (`97.90%` / `97.8962%`), `quality_warning = none` across all `60,029` valid frames.
+- **Rebuilt Outputs:** `cctv_info_cleaned.parquet`, `cctv_info_cleaned.csv`, `cleaning_summary.json`, `image_quality_manifest.parquet`.
+- **Verification:** `python run_pipeline.py --check-contract` -> `[PASS]` on Tables `1` (`100` rows, `25` cols), `2` (`61,319` rows, `36` cols), and `4` (`16,800` rows, `17` cols).
+
+---
+
+> **Instructions for Future Contributors:** When adding `V2.1+` updates, copy the template below, fill in exact details, and add a summary row to the **Modification Ledger** above.
 
 ```markdown
 #### Change Entry Template (Copy & Paste for Each Audit / Fix Session)

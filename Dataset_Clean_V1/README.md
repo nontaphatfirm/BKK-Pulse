@@ -1,6 +1,6 @@
 # Dataset_Clean_V1 -- Bangkok CCTV Cleaned Dataset (BKK-Pulse)
 
-> **Current Version:** `V2.0` *(Locked Final Data — Rebuilt `2026-11-17` by `00_data_cleaning_and_qa/src/clean_dataset_v1.py` after `100/100` Peer QA & `CHG-B4-02` resolution)*  
+> **Current Version:** `V2.1` *(Locked Final Data — Metadata refined via `PR #12` / `CHG-B6-02` & rebuilt `2026-11-19` by `00_data_cleaning_and_qa/src/clean_dataset_v1.py`)*  
 > **Raw Coverage:** `2026-08-25 06:00:00` to `2026-08-31 21:01:19` (`100` Bangkok BMA CCTV Cameras, ~10-minute intervals)  
 > **Version History & Edit Log:** See [`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md) *(in this folder -- **every editor must log changes here for the final report**)*
 
@@ -27,7 +27,7 @@ This folder (`Dataset_Clean_V1`) is shared as a **READ-ONLY** mirror on Google D
 
 ---
 
-## 1. What Has Already Been Cleaned (`V1.0` -> `V1.1` -> `V2.0` Final Lock)
+## 1. What Has Already Been Cleaned (`V1.0` -> `V1.1` -> `V2.0` -> `V2.1` Final Lock)
 
 ### 1.1 Image-Level Cleaning (5-Stage Automated Gate + Team Peer QA Exclusions)
 
@@ -69,7 +69,7 @@ Additional image-level processing:
 | `939` | แยกมหาดไทย | `10.156.x.x` | `508 / 613` (`82.87%`) | `10` | `0` | `0` | `95` |
 | `500` | แยกประตูน้ำ | `10.137.x.x` | `522 / 613` (`85.15%`) | `7` | `0` | `6` | `0` |
 | `395` | แยกเสาชิงช้า | `10.101.x.x` | `536 / 614` (`87.3%`) | `6` | `0` | `0` | `72` |
-| `630` | แยกเกษะโกมล (ด้านถนนอำนวยสงคราม) | `10.102.x.x` | `580 / 612` (`94.77%`) | `7` | `0` | `0` | `0` |
+| `630` | แยกเกษะโกมล (ด้านถนนพระราม 5) | `10.102.x.x` | `580 / 612` (`94.77%`) | `7` | `0` | `0` | `0` |
 | `169` | สะพานลอยหน้าวัดเสาหิน ใกล้ซอยวงศ์สว่าง 3 ถนนวงศ์สว่าง | `10.125.x.x` | `578 / 609` (`94.91%`) | `4` | `0` | `7` | `0` |
 | `1804` | ปากซอยอ่อนนุช 33 ถนนอ่อนนุช | `10.134.x.x` | `604 / 629` (`96.03%`) | `5` | `16` | `0` | `4` |
 | `432` | ทางแยกสามย่าน | `10.107.x.x` | `604 / 627` (`96.33%`) | `6` | `17` | `0` | `0` |
@@ -77,11 +77,11 @@ Additional image-level processing:
 ### 1.2 Metadata Cleaning & Enrichment (`cctv_info.csv` -> `cctv_info_cleaned`)
 
 1. **Removed Placeholders & Translate UI Noise:** Replaced `NULL` (`1589`, `572`), `'0'` (`576`, `1368`, `546`), `'connect BMAcctv'` (`913`, `915`, `938`, `939`), Google Translate counter `'17/5000'` (`1103`), and note artifact `'(See Yellow)'` (`556`).
-2. **Repaired Shifted/Misaligned English Names & Coords:** Cross-checked `(lat, lon)` against Street View / Google Maps across all 6 Peer QA batches (incl. `8` explicit coordinate overrides on `119, 120, 127, 206, 224, 225, 915, 1362` and `56` updated camera entries).
+2. **Repaired Shifted/Misaligned English Names & Coords:** Cross-checked `(lat, lon)` against Street View / Google Maps across all 6 Peer QA batches (incl. `12` explicit coordinate overrides on `119, 120, 127, 206, 224, 225, 411, 412, 413, 414, 915, 1362` and updated `30`-camera details in `V2.1`).
 3. **Restored Truncated Thai Text:** Repaired ~28-character field truncations affecting `53` cameras in `location_th` / `location_detail_th`.
 4. **Spatial, Pair & Network Enrichment:**
    - Added `district` and grouped all 100 cameras into `7` urban `corridor` zones.
-   - Classified `direction` after Peer QA: **`Inbound`: `32`, `Outbound`: `23`, `"None"`: `45`** *(shifted from `V1.0`'s `51 / 29 / 20` after moving undivided/multi-directional cameras to `"None"`)*.
+   - Classified `direction` after Peer QA & `V2.1`: **`Inbound`: `24`, `Outbound`: `18`, `"None"`: `58`** *(shifted from `V1.0`'s `51 / 29 / 20` and `V2.0`'s `32 / 23 / 45` after moving undivided/multi-directional junction cameras to `"None"`)*.
    - Verified `21` camera pairs within `<= 100m`, isolating **`6` `footbridge_bidirectional` pairs** (`126/127`, `136/137`, `176/177`, `178/179`, `1078/1132`, `224/225`) plus `opposite_intersection_arm` (incl. Bukkhalo `26/1195`), `perpendicular_junction`, `two_way_no_median`, and `overlapping_junction`.
    - Derived `ip_subnet`, validated `img_width`/`img_height`, and joined per-camera image QA statistics.
 
@@ -124,7 +124,8 @@ Every data-cleaning edit after `V1.0` **must be documented** so teammates know w
 ### 3.1 Versioning Convention
 - **`V1.0` (Initial Baseline):** Initial automated 5-Gate image cleaning + curated metadata repair (`61,319 -> 60,210` valid images).
 - **`V1.1` (Peer QA Merged):** Consolidated Batch 1–6 fixes (`56` camera updates, `8` coord overrides, `103` `manual_excluded` frames -> `60,107` valid images; `99/100` visual sweeps done).
-- **`V2.0` (Current — Final Data Lock):** Locked `100/100` QA-verified dataset (`60,029` valid images, `0` warnings) after verifying `cam_id=225` and resolving `CHG-B4-02` (`1188` retained `607/607`; `500` surgically cleaned `-78` frames).
+- **`V2.0` (Image Audit Lock):** Locked `100/100` QA-verified image set (`60,029` valid images, `0` warnings) after verifying `cam_id=225` and resolving `CHG-B4-02` (`1188` retained `607/607`; `500` surgically cleaned `-78` frames).
+- **`V2.1` (Current — Metadata Refinement & Rebuild):** Refined `30` camera metadata entries (`PR #12` / `CHG-B6-02`: `26` whole-junction/two-way `location_detail` rewrites, `13` `direction -> "None"`, `2` approach-road fixes `119/630`, `4` coords `411–414`; `60,029` valid images unchanged).
 
 ### 3.2 Mandatory Rules for Anyone Cleaning or Modifying Data
 
@@ -151,6 +152,7 @@ Every data-cleaning edit after `V1.0` **must be documented** so teammates know w
 | :--- | :---: | :---: | :--- | :--- |
 | **`V1.0`** | `2026-11-11` | Baseline | 5-Stage Image Quality Gate (`61,319 -> 60,210` valid, `1,109` filtered), ASCII rename, filename timestamp extraction, metadata placeholder/row-shift/truncation repair, 7 corridors, 6 bidirectional footbridge pairs | Initial Pipeline (`clean_dataset_v1.py`) |
 | **`V1.1`** | `2026-11-17` | Superseded | Merged Batches 1–6 (`#2, #4, #6, #7, #8, #9`): `56` camera metadata updates, `8` `(lat, lon)` fixes, `103` `manual_excluded` frames (`60,210 -> 60,107` valid), direction split `32 / 23 / 45` (`370/371` & `546/1368` verified healthy) | All 6 Members |
-| **`V2.0`** | `2026-11-17` | **Locked (Final Data)** | `cam_id=225` `607`-frame visual sweep complete (`100/100` `[x]`); resolved `CHG-B4-02` (`1188` kept `607/607`; `500` `-78` severe corruptions -> `522` clean); **`60,029`** valid images (`0` warnings) | Maintainer & All 6 Members |
+| **`V2.0`** | `2026-11-17` | Superseded | `cam_id=225` `607`-frame visual sweep complete (`100/100` `[x]`); resolved `CHG-B4-02` (`1188` kept `607/607`; `500` `-78` severe corruptions -> `522` clean); **`60,029`** valid images (`0` warnings) | Maintainer & All 6 Members |
+| **`V2.1`** | `2026-11-19` | **Locked (Current)** | Refined `30` camera metadata entries (`PR #12` / `CHG-B6-02`: `26` details, `13` `direction -> "None"` -> `24 / 18 / 58`, `2` road names `119/630`, `4` coords `411–414`); rebuilt `--skip-copy`, `0` image changes (`60,029` valid) | โม่ (`@moaqilo`) & Maintainer |
 
 > For full technical rules, Before -> After numbers, and the template to record your cleaning changes, open **[`CLEANING_CHANGELOG.md`](CLEANING_CHANGELOG.md)**.
