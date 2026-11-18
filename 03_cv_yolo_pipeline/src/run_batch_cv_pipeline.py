@@ -15,7 +15,9 @@ from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 from pathlib import Path
+import shutil
 import sys
+import tempfile
 import time
 import zipfile
 
@@ -168,6 +170,12 @@ def parse_args() -> argparse.Namespace:
         help="Output folder for annotated JPEGs (<images_dir>/<cam_id>/<filename>).",
     )
     parser.add_argument(
+        "--images-zip-dir",
+        type=Path,
+        default=None,
+        help="Optional persistent directory for per-camera image zip checkpoints (<images_zip_dir>/cam_<id>.zip).",
+    )
+    parser.add_argument(
         "--save-scale",
         type=float,
         default=1.5,
@@ -263,8 +271,9 @@ def is_valid_camera_checkpoint(
     expected_cam_df: pd.DataFrame,
     save_images: bool = False,
     images_dir: Path | None = None,
+    images_zip_dir: Path | None = None,
 ) -> bool:
-    """Return True iff `ckpt_path` matches expected timestamps (and all annotated JPEGs exist when saving images)."""
+    """Return True iff `ckpt_path` matches expected timestamps (and images/zip exist when `--save-images` is on)."""
     if not ckpt_path.is_file():
         return False
     try:
@@ -279,15 +288,55 @@ def is_valid_camera_checkpoint(
     exp_ts = pd.to_datetime(expected_cam_df["timestamp"]).dt.tz_localize(None).astype("datetime64[us]")
     if set(saved_ts.tolist()) != set(exp_ts.tolist()):
         return False
-    if save_images and images_dir is not None:
+    if save_images:
         cam_id = int(expected_cam_df["cam_id"].iloc[0])
-        cam_img_dir = images_dir / str(cam_id)
-        if not cam_img_dir.is_dir():
-            return False
         expected_names = expected_cam_df["clean_filename"].astype(str).tolist()
-        if not all((cam_img_dir / fn).is_file() for fn in expected_names):
-            return False
+        if images_zip_dir is not None:
+            cam_zip = images_zip_dir / f"cam_{cam_id}.zip"
+            if not cam_zip.is_file():
+                return False
+            try:
+                with zipfile.ZipFile(cam_zip, "r") as zf:
+                    archived = set(zf.namelist())
+            except Exception:
+                return False
+            expected_arcs = {f"{cam_id}/{fn}" for fn in expected_names}
+            if not expected_arcs.issubset(archived):
+                return False
+        elif images_dir is not None:
+            cam_img_dir = images_dir / str(cam_id)
+            if not cam_img_dir.is_dir():
+                return False
+            if not all((cam_img_dir / fn).is_file() for fn in expected_names):
+                return False
     return True
+
+
+def write_camera_images_zip_atomic(
+    cam_id: int,
+    cam_img_dir: Path,
+    expected_names: list[str],
+    target_zip: Path,
+) -> Path:
+    """Pack one camera's annotated JPEGs into a per-camera ZIP_STORED archive and commit atomically."""
+    target_zip.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(prefix=f"cam_{cam_id}_", suffix=".zip.tmp", delete=False) as tf:
+        local_tmp = Path(tf.name)
+    remote_tmp = target_zip.with_suffix(".zip.tmp")
+    try:
+        with zipfile.ZipFile(local_tmp, mode="w", compression=zipfile.ZIP_STORED, allowZip64=True) as zf:
+            for fn in expected_names:
+                fpath = cam_img_dir / fn
+                if not fpath.is_file():
+                    raise FileNotFoundError(f"Missing annotated image for cam_{cam_id}: {fpath}")
+                zf.write(fpath, arcname=f"{cam_id}/{fn}")
+        shutil.copy2(local_tmp, remote_tmp)
+        os.replace(remote_tmp, target_zip)
+    finally:
+        local_tmp.unlink(missing_ok=True)
+        if remote_tmp.exists() and target_zip.exists():
+            remote_tmp.unlink(missing_ok=True)
+    return target_zip
 
 
 def result_to_contract_row(cam_id: int, timestamp: pd.Timestamp, res: DetectionResult) -> dict:
@@ -345,7 +394,7 @@ def package_images_zip(images_dir: Path, zip_path: Path) -> Path:
     img_files = sorted(p for p in images_dir.rglob("*.jpg") if p.is_file())
     with zipfile.ZipFile(tmp_zip, mode="w", compression=zipfile.ZIP_STORED, allowZip64=True) as zf:
         for fpath in img_files:
-            zf.write(fpath, arcname=str(fpath.relative_to(images_dir)))
+            zf.write(fpath, arcname=fpath.relative_to(images_dir).as_posix())
     os.replace(tmp_zip, zip_path)
     return zip_path
 
@@ -473,6 +522,8 @@ def main() -> int:
     print(f"Checkpoints    : {args.checkpoint_dir} (resume={'OFF' if args.no_resume else 'ON'})")
     print(f"Batch settings : batch_frames={batch_frames}, yolo_batch={yolo_batch}, workers={args.workers}, conf={args.conf}")
     print(f"Annotated JPGs : {'ON -> ' + str(args.images_dir) + f' (scale={args.save_scale})' if args.save_images else 'OFF'}")
+    if args.save_images and args.images_zip_dir is not None:
+        print(f"Per-cam zip ckpt: {args.images_zip_dir}")
 
     detector = RobustTrafficDetector(
         clean_dir=args.clean_dir,
@@ -500,6 +551,7 @@ def main() -> int:
                 cam_df,
                 save_images=args.save_images,
                 images_dir=args.images_dir,
+                images_zip_dir=args.images_zip_dir,
             )
         ):
             cached_df = enforce_contract_dtypes(pd.read_parquet(ckpt_path))
@@ -529,6 +581,14 @@ def main() -> int:
         )
         cam_dt = max(time.perf_counter() - cam_t0, 1e-6)
         if is_complete_cam:
+            if args.save_images and args.images_zip_dir is not None:
+                expected_names = cam_df["clean_filename"].astype(str).tolist()
+                write_camera_images_zip_atomic(
+                    cam_id=cam_id,
+                    cam_img_dir=args.images_dir / str(cam_id),
+                    expected_names=expected_names,
+                    target_zip=args.images_zip_dir / f"cam_{cam_id}.zip",
+                )
             write_parquet_atomic(cam_res_df, ckpt_path)
 
         cam_dfs.append(cam_res_df)
