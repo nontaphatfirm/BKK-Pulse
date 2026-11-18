@@ -412,6 +412,14 @@ def covered_interval(segment: CacheSegment) -> tuple[pd.Timestamp, pd.Timestamp]
     return (pd.Timestamp(segment.first_ts) if segment.first_ts else end), end
 
 
+def _segment_report(segment: CacheSegment) -> dict:
+    report = asdict(segment)
+    report.pop("sha256")
+    left, right = covered_interval(segment)
+    report["covered"] = [left.isoformat(), right.isoformat()]
+    return report
+
+
 def coverage_gaps(
     segments: list[CacheSegment], start: str, end: str
 ) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
@@ -633,7 +641,7 @@ def build_outputs(
         "fetch": fetch,
         "coverage": coverage,
         "dropped": dropped,
-        "cache_segments": [asdict(segment) for segment in segments],
+        "cache_segments": [_segment_report(segment) for segment in segments],
         "coverage_gaps": [
             [left.isoformat(), right.isoformat()] for left, right in gaps
         ],
@@ -705,7 +713,7 @@ def main() -> None:
             "fetch": report,
             "coverage": coverage,
             "dropped": dropped,
-            "cache_segments": [asdict(segment) for segment in segments],
+            "cache_segments": [_segment_report(segment) for segment in segments],
             "coverage_gaps": [
                 [left.isoformat(), right.isoformat()] for left, right in gaps
             ],
@@ -732,10 +740,7 @@ def main() -> None:
         combine_cache=args.combine_cache,
         allow_partial=args.allow_partial,
     )
-    covered = []
-    for segment in summary["cache_segments"]:
-        left, right = covered_interval(CacheSegment(**segment))
-        covered.append([left.isoformat(), right.isoformat()])
+    covered = [segment["covered"] for segment in summary["cache_segments"]]
     provenance = {
         "window": {"start": args.start, "end": args.end},
         "generated_at": _now_iso(),
