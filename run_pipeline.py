@@ -17,6 +17,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import json
 from dataclasses import dataclass
 from pathlib import Path
 import subprocess
@@ -237,6 +238,28 @@ PIPELINE_STAGES: tuple[PipelineStage, ...] = (
 )
 
 
+def check_traffy_provenance() -> bool:
+    path = PROJECT_ROOT / "data" / "traffy_provenance.json"
+    if not path.exists():
+        print("[WARN] Traffy provenance -> data/traffy_provenance.json not found")
+        return True
+    provenance = json.loads(path.read_text(encoding="utf-8"))
+    if not provenance.get("complete"):
+        reason = (
+            provenance.get("allow_partial_reason")
+            or provenance.get("termination")
+            or "unknown"
+        )
+        print(f"[FAIL] Traffy provenance -> incomplete build ({reason})")
+        return False
+    window = provenance.get("window", {})
+    print(
+        f"[PASS] Traffy provenance -> complete, {provenance.get('pages')} pages, "
+        f"window {window.get('start')}..{window.get('end')}"
+    )
+    return True
+
+
 def validate_contract(strict_all: bool = False) -> bool:
     """Validate canonical Parquet tables against DATA_CONTRACT.md."""
     print("=" * 76)
@@ -297,6 +320,9 @@ def validate_contract(strict_all: bool = False) -> bool:
         print(
             f"[PASS] {spec.name} ({spec.rel_path}) -> {len(df):,} rows, {len(df.columns)} cols, PK {spec.primary_keys} valid"
         )
+
+    if not check_traffy_provenance():
+        all_passed = False
 
     print("=" * 76)
     return all_passed

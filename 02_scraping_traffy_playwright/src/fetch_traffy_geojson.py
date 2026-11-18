@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -31,6 +32,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CAMERA_PATH = PROJECT_ROOT / "Dataset_Clean_V1" / "cctv_info_cleaned.parquet"
@@ -39,6 +42,7 @@ WINDOWS_PATH = PROJECT_ROOT / "data" / "raw_traffy_cache" / "windows.json"
 INCIDENT_PATH = PROJECT_ROOT / "data" / "traffy_complaints_near_cctv.parquet"
 COUNTS_PATH = PROJECT_ROOT / "data" / "traffy_camera_counts.parquet"
 SUMMARY_PATH = PROJECT_ROOT / "data" / "scraping_summary_02.json"
+PROVENANCE_PATH = PROJECT_ROOT / "data" / "traffy_provenance.json"
 CATEGORY_MAP_PATH = Path(__file__).with_name("category_map.json")
 
 API_URL = "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed"
@@ -298,6 +302,29 @@ def _sha256(path: Path) -> str:
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _git_commit() -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=PROJECT_ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return result.stdout.strip() or None
+
+
+def _write_parquet(frame: pd.DataFrame, path: Path, provenance: dict) -> None:
+    table = pa.Table.from_pandas(frame, preserve_index=False)
+    metadata = dict(table.schema.metadata or {})
+    metadata[b"bkk_pulse_provenance"] = json.dumps(
+        provenance, separators=(",", ":"), ensure_ascii=False
+    ).encode("utf-8")
+    pq.write_table(table.replace_schema_metadata(metadata), path)
 
 
 def _read_page(path: Path) -> list[dict]:
@@ -696,10 +723,38 @@ def main() -> None:
         combine_cache=args.combine_cache,
         allow_partial=args.allow_partial,
     )
-    incidents.to_parquet(INCIDENT_PATH, index=False)
-    counts.to_parquet(COUNTS_PATH, index=False)
+    covered = []
+    for segment in summary["cache_segments"]:
+        left, right = covered_interval(CacheSegment(**segment))
+        covered.append([left.isoformat(), right.isoformat()])
+    provenance = {
+        "window": {"start": args.start, "end": args.end},
+        "generated_at": _now_iso(),
+        "git_commit": _git_commit(),
+        "complete": summary["complete"],
+        "termination": summary["fetch"]["termination"],
+        "pages": sum(segment["pages"] for segment in summary["cache_segments"]),
+        "segments": {"count": len(covered), "covered": covered},
+        "coverage": summary["coverage"],
+        "rows": int(len(incidents)),
+        "dropped": summary["dropped"],
+        "allow_partial_reason": None,
+    }
+    _write_parquet(incidents, INCIDENT_PATH, provenance)
+    pq.write_table(pa.Table.from_pandas(counts, preserve_index=False), COUNTS_PATH)
+    provenance["outputs"] = {
+        INCIDENT_PATH.name: {
+            "rows": int(len(incidents)),
+            "sha256": _sha256(INCIDENT_PATH),
+        },
+        COUNTS_PATH.name: {"rows": int(len(counts)), "sha256": _sha256(COUNTS_PATH)},
+    }
+    PROVENANCE_PATH.write_text(
+        json.dumps(provenance, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
     SUMMARY_PATH.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
+    print(f"[provenance] {PROVENANCE_PATH.relative_to(PROJECT_ROOT)}")
     print(f"[write] {INCIDENT_PATH.relative_to(PROJECT_ROOT)} ({len(incidents):,} rows)")
     print(f"[write] {COUNTS_PATH.relative_to(PROJECT_ROOT)} ({len(counts):,} rows)")
 

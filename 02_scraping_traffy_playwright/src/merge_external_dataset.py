@@ -12,10 +12,13 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 WEATHER_PATH = PROJECT_ROOT / "data" / "weather_air_poi.parquet"
 INCIDENTS_PATH = PROJECT_ROOT / "data" / "traffy_complaints_near_cctv.parquet"
+PROVENANCE_PATH = PROJECT_ROOT / "data" / "traffy_provenance.json"
 OUTPUT_PATH = PROJECT_ROOT / "data" / "external_weather_poi.parquet"
 
 CONTRACT_COLUMNS = [
@@ -76,6 +79,29 @@ def trailing_counts(
     return counts
 
 
+def _read_provenance() -> dict | None:
+    if INCIDENTS_PATH.exists():
+        stamp = (pq.read_schema(INCIDENTS_PATH).metadata or {}).get(b"bkk_pulse_provenance")
+        if stamp is not None:
+            return json.loads(stamp)
+    if PROVENANCE_PATH.exists():
+        block = json.loads(PROVENANCE_PATH.read_text(encoding="utf-8"))
+        block.pop("outputs", None)
+        return block
+    return None
+
+
+def _write_parquet(frame: pd.DataFrame, provenance: dict | None) -> None:
+    table = pa.Table.from_pandas(frame, preserve_index=False)
+    if provenance is not None:
+        metadata = dict(table.schema.metadata or {})
+        metadata[b"bkk_pulse_provenance"] = json.dumps(
+            provenance, separators=(",", ":"), ensure_ascii=False
+        ).encode("utf-8")
+        table = table.replace_schema_metadata(metadata)
+    pq.write_table(table, OUTPUT_PATH)
+
+
 def main() -> None:
     weather = pd.read_parquet(WEATHER_PATH)
     weather["cam_id"] = weather["cam_id"].astype("int64")
@@ -102,7 +128,7 @@ def main() -> None:
     if frame.isna().any().any():
         raise RuntimeError(f"Null values remain: {frame.isna().sum()[frame.isna().sum() > 0].to_dict()}")
 
-    frame.to_parquet(OUTPUT_PATH, index=False)
+    _write_parquet(frame, _read_provenance())
 
     summary = {
         "output": str(OUTPUT_PATH.relative_to(PROJECT_ROOT)),
