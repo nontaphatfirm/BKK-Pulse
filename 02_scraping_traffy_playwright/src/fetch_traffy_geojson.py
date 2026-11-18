@@ -528,7 +528,7 @@ def build_outputs(
         gap_text = ", ".join(f"{left} .. {right}" for left, right in gaps)
         raise IncompleteWindow(
             f"{start}..{end} is incomplete: {detail}; gaps=[{gap_text}]. "
-            "Rerun with --allow-partial to build anyway."
+            'Rerun with --allow-partial --reason "<text>" to build anyway.'
         )
     WINDOWS_PATH.write_text(
         json.dumps(
@@ -670,9 +670,18 @@ def main() -> None:
     parser.add_argument(
         "--allow-partial",
         action="store_true",
-        help="Build even when the window did not end on an empty page or has days with no records",
+        help="Build even when the cache does not cover the whole window",
+    )
+    parser.add_argument(
+        "--reason",
+        default=None,
+        help="Why the partial build is acceptable (required with --allow-partial)",
     )
     args = parser.parse_args()
+    if args.allow_partial and not args.reason:
+        parser.error('--allow-partial requires --reason "<text>"')
+    if args.allow_partial:
+        print(f"[partial] Build allowed by --reason: {args.reason}")
 
     if args.fetch_only:
         frame, report, dropped = fetch_complaints(
@@ -706,7 +715,7 @@ def main() -> None:
             gap_text = ", ".join(f"{left} .. {right}" for left, right in gaps)
             raise IncompleteWindow(
                 f"{args.start}..{args.end} is incomplete: {detail}; gaps=[{gap_text}]. "
-                "Rerun with --allow-partial to keep the prefix."
+                'Rerun with --allow-partial --reason "<text>" to keep the prefix.'
             )
         (PROJECT_ROOT / "data" / "traffy_fetch_progress.json").write_text(
             json.dumps(progress, indent=2), encoding="utf-8"
@@ -738,7 +747,7 @@ def main() -> None:
         "coverage": summary["coverage"],
         "rows": int(len(incidents)),
         "dropped": summary["dropped"],
-        "allow_partial_reason": None,
+        "allow_partial_reason": args.reason if args.allow_partial else None,
     }
     _write_parquet(incidents, INCIDENT_PATH, provenance)
     pq.write_table(pa.Table.from_pandas(counts, preserve_index=False), COUNTS_PATH)
