@@ -143,9 +143,9 @@ CANONICAL_CLASS_MAP: dict[str, str] = {
     "tempo-traveller": "bus",
     "truck": "truck",
     "lcv": "truck",
-    "tricycle": "three-wheeler",
-    "awning-tricycle": "three-wheeler",
-    "three-wheeler": "three-wheeler",
+    "tricycle": "car",
+    "awning-tricycle": "car",
+    "three-wheeler": "car",
 }
 
 CANONICAL_ID_TO_NAME: dict[int, str] = {
@@ -153,7 +153,6 @@ CANONICAL_ID_TO_NAME: dict[int, str] = {
     1: "motorcycle",
     2: "bus",
     3: "truck",
-    4: "three-wheeler",
 }
 CANONICAL_NAME_TO_ID: dict[str, int] = {name: cid for cid, name in CANONICAL_ID_TO_NAME.items()}
 MAX_BOX_OFFSET = 7680.0
@@ -505,11 +504,10 @@ def apply_nms_and_remap(
                 remapped_ids.append(extra_name_to_id[key])
 
         mapped_cls = torch.tensor(remapped_ids, dtype=torch.float32)
-        # Share one NMS group across 4+-wheelers {car(0), bus(2), truck(3)} so they never stack
-        # on the same vehicle, and one group across 2/3-wheelers {motorcycle(1), three-wheeler(4)},
-        # while keeping 4-wheelers and 2/3-wheelers independent.
+        # Share one NMS group across 4-wheelers {car(0), bus(2), truck(3)} (including remapped 3-wheelers)
+        # so they never stack on the same vehicle, while keeping motorcycles (1) independent.
         nms_groups = torch.tensor(
-            [0 if cid in (0, 2, 3) else (1 if cid in (1, 4) else cid) for cid in remapped_ids],
+            [0 if cid in (0, 2, 3) else (1 if cid == 1 else cid) for cid in remapped_ids],
             dtype=torch.float32,
         )
         offsets = nms_groups.unsqueeze(1) * MAX_BOX_OFFSET
@@ -631,6 +629,7 @@ def main() -> None:
         print(f"Optical profile: {ens_res.optical_profile}")
         print(f"Image: {image_path}")
         print(f"Suppressed static/parked boxes: {ens_res.suppressed_static_count}")
+        print(f"Suppressed off-ROI boxes: {ens_res.suppressed_roi_count} | Road occupancy: {ens_res.road_occupancy_ratio:.4f}")
         print(f"Detections ({len(ens_res.scores)}): {ens_res.counts}")
         for box, score, cid, sup in zip(
             ens_res.boxes_xyxy, ens_res.scores, ens_res.class_ids, ens_res.support_counts

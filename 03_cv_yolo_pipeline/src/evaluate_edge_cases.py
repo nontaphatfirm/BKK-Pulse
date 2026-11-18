@@ -425,6 +425,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate Robust Ensemble Detector across 100-camera edge cases")
     parser.add_argument("--quick", action="store_true", help="Run fast ~30-image showcase subset instead of all 100 cameras")
     parser.add_argument("--conf", type=float, default=0.25, help="Final confidence threshold (default: 0.25)")
+    parser.add_argument("--no-roi", action="store_true", help="Disable per-camera Road ROI filtering")
     args = parser.parse_args()
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -440,7 +441,8 @@ def main() -> None:
     print(f"Sampled {len(sample_df)} edge-case frames across {sample_df['cam_id'].nunique()} unique cameras.")
     print("Category breakdown:", sample_df["category"].value_counts().to_dict())
 
-    detector = RobustTrafficDetector()
+    detector = RobustTrafficDetector(use_roi=not args.no_roi)
+    print(f"Road ROI filtering: {'ENABLED (' + str(detector.roi_provider.roi_path) + ')' if detector.use_roi else 'DISABLED'}")
 
     records: list[dict] = []
     showcase_panels: list[tuple[pd.Series, np.ndarray]] = []
@@ -470,7 +472,7 @@ def main() -> None:
         total_v = int(len(res.scores))
         pcu = (
             1.0 * cnt.get("car", 0)
-            + 0.33 * (cnt.get("motorcycle", 0) + cnt.get("three-wheeler", 0))
+            + 0.33 * cnt.get("motorcycle", 0)
             + 2.5 * cnt.get("bus", 0)
             + 2.5 * cnt.get("truck", 0)
         )
@@ -497,7 +499,12 @@ def main() -> None:
                 "three_wheeler_count": cnt.get("three-wheeler", 0),
                 "total_vehicles": total_v,
                 "pcu_score": round(pcu, 2),
+                "bbox_total_area": float(res.bbox_total_area),
+                "road_roi_area": float(res.road_roi_area),
+                "road_occupancy_ratio": float(res.road_occupancy_ratio),
+                "foreground_ratio": float(res.foreground_ratio),
                 "suppressed_static_boxes": int(res.suppressed_static_count),
+                "suppressed_roi_boxes": int(res.suppressed_roi_count),
                 "multi_model_agreement_rate": round(multi_model_rate, 3),
                 "inference_ms": round(dt_ms, 1),
                 "output_image": str((img_out_dir / out_name).relative_to(PROJECT_ROOT)),
@@ -505,7 +512,10 @@ def main() -> None:
         )
 
         if (len(records) % 20 == 0) or (len(records) == len(sample_df)):
-            print(f"  Processed {len(records)}/{len(sample_df)} frames (last: Cam {cid}, {total_v} vehicles, {dt_ms:.0f} ms)")
+            print(
+                f"  Processed {len(records)}/{len(sample_df)} frames "
+                f"(last: Cam {cid}, {total_v} vehicles, roi_sup={res.suppressed_roi_count}, {dt_ms:.0f} ms)"
+            )
 
     total_sec = time.perf_counter() - t_start
     res_df = pd.DataFrame(records)
@@ -550,6 +560,8 @@ def main() -> None:
                 "uvh26_counts": c_uvh,
                 "ensemble_total": int(ens_row["total_vehicles"]),
                 "ensemble_suppressed_static": int(ens_row["suppressed_static_boxes"]),
+                "ensemble_suppressed_roi": int(ens_row["suppressed_roi_boxes"]),
+                "ensemble_road_occupancy_ratio": float(ens_row["road_occupancy_ratio"]),
                 "ensemble_counts": {
                     "car": int(ens_row["car_count"]),
                     "motorcycle": int(ens_row["motorcycle_count"]),
@@ -561,12 +573,16 @@ def main() -> None:
         )
 
     summary_payload = {
+        "roi_enabled": bool(detector.use_roi),
         "total_frames_evaluated": int(len(res_df)),
         "unique_cameras_covered": int(res_df["cam_id"].nunique()),
         "total_elapsed_sec": round(total_sec, 2),
         "mean_inference_ms": round(float(res_df["inference_ms"].mean()), 1),
         "total_vehicles_detected": int(res_df["total_vehicles"].sum()),
         "total_static_boxes_suppressed": int(res_df["suppressed_static_boxes"].sum()),
+        "total_roi_boxes_suppressed": int(res_df["suppressed_roi_boxes"].sum()),
+        "mean_road_occupancy_ratio": round(float(res_df["road_occupancy_ratio"].mean()), 4),
+        "mean_foreground_ratio": round(float(res_df["foreground_ratio"].mean()), 4),
         "mean_multi_model_agreement": round(float(res_df["multi_model_agreement_rate"].mean()), 3),
         "by_category": res_df.groupby("category")
         .agg(
@@ -576,9 +592,11 @@ def main() -> None:
             mean_motorcycles=("motorcycle_count", "mean"),
             mean_total=("total_vehicles", "mean"),
             total_suppressed=("suppressed_static_boxes", "sum"),
+            total_roi_suppressed=("suppressed_roi_boxes", "sum"),
+            mean_occupancy=("road_occupancy_ratio", "mean"),
             mean_agreement=("multi_model_agreement_rate", "mean"),
         )
-        .round(2)
+        .round(3)
         .to_dict(orient="index"),
         "showcase_comparisons": cmp_records,
     }
@@ -587,8 +605,15 @@ def main() -> None:
 
     print("\n=== Edge-Case Evaluation Summary ===")
     print(f"Frames: {len(res_df)} | Unique Cameras: {res_df['cam_id'].nunique()} / 100 | Elapsed: {total_sec:.1f}s")
-    print(f"Total Vehicles: {res_df['total_vehicles'].sum()} | Suppressed Static Boxes: {res_df['suppressed_static_boxes'].sum()}")
-    print(f"Mean Multi-Model Agreement: {res_df['multi_model_agreement_rate'].mean():.3f}")
+    print(
+        f"Total Vehicles: {res_df['total_vehicles'].sum()} | Suppressed Static: {res_df['suppressed_static_boxes'].sum()} "
+        f"| Suppressed Off-ROI: {res_df['suppressed_roi_boxes'].sum()}"
+    )
+    print(
+        f"Mean Road Occupancy: {res_df['road_occupancy_ratio'].mean():.4f} | "
+        f"Mean Foreground Ratio: {res_df['foreground_ratio'].mean():.4f} | "
+        f"Mean Agreement: {res_df['multi_model_agreement_rate'].mean():.3f}"
+    )
     print(f"Results saved to: {OUT_DIR}")
 
 
