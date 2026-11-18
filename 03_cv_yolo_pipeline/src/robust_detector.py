@@ -19,11 +19,14 @@ Augmented with physics-informed computer vision & scene gates:
 
 from __future__ import annotations
 
-from collections import Counter, defaultdict
+from bisect import bisect_left, bisect_right
+from collections import Counter, OrderedDict, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 import json
 from pathlib import Path
 import re
+import threading
 import urllib.request
 
 import cv2
@@ -317,33 +320,64 @@ class CameraSceneProvider:
     ) -> None:
         self.clean_dir = clean_dir
         self.bg_dir = bg_dir
+        self._lock = threading.Lock()
         self._manifest_loaded = False
         self._manifest_by_cam: dict[int, pd.DataFrame] = {}
+        self._cam_index: dict[int, tuple[np.ndarray, np.ndarray, list[str]]] = {}
         self._bg_cache: dict[tuple[int, str], np.ndarray | None] = {}
+        self._frame_cache: OrderedDict[str, np.ndarray] = OrderedDict()
+        self._frame_cache_max = 96
+
+    def _read_bgr_cached(self, path: Path) -> np.ndarray | None:
+        """Read an image with a bounded thread-safe LRU cache to avoid redundant adjacent JPEG decodes."""
+        key = str(path)
+        with self._lock:
+            cached = self._frame_cache.get(key)
+            if cached is not None:
+                self._frame_cache.move_to_end(key)
+                return cached
+        img = cv2.imread(key)
+        if img is None:
+            return None
+        with self._lock:
+            self._frame_cache[key] = img
+            self._frame_cache.move_to_end(key)
+            while len(self._frame_cache) > self._frame_cache_max:
+                self._frame_cache.popitem(last=False)
+        return img
 
     def _ensure_manifest(self) -> None:
         if self._manifest_loaded:
             return
-        self._manifest_loaded = True
-        manifest_path = self.clean_dir / "image_quality_manifest.parquet"
-        if not manifest_path.is_file():
-            return
-        cols = ["cam_id", "timestamp", "date", "hour", "clean_filename", "clean_rel_path", "is_valid", "quality_warning", "brightness_mean"]
-        df = pd.read_parquet(manifest_path, columns=cols)
-        df = df[df["is_valid"] & (df["quality_warning"] == "none")].copy()
-        df["timestamp"] = pd.to_datetime(df["timestamp"])
-        df.sort_values(["cam_id", "timestamp"], inplace=True)
-        for cid, grp in df.groupby("cam_id", sort=False):
-            self._manifest_by_cam[int(cid)] = grp.reset_index(drop=True)
+        with self._lock:
+            if self._manifest_loaded:
+                return
+            manifest_path = self.clean_dir / "image_quality_manifest.parquet"
+            if manifest_path.is_file():
+                cols = ["cam_id", "timestamp", "date", "hour", "clean_filename", "clean_rel_path", "is_valid", "quality_warning", "brightness_mean"]
+                df = pd.read_parquet(manifest_path, columns=cols)
+                df = df[df["is_valid"] & (df["quality_warning"] == "none")].copy()
+                df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.tz_localize(None)
+                df.sort_values(["cam_id", "timestamp"], inplace=True)
+                for cid, grp in df.groupby("cam_id", sort=False):
+                    grp_reset = grp.reset_index(drop=True)
+                    cid_int = int(cid)
+                    self._manifest_by_cam[cid_int] = grp_reset
+                    ts_float = grp_reset["timestamp"].to_numpy(dtype="datetime64[us]").astype(np.int64) / 1e6
+                    dates = grp_reset["timestamp"].to_numpy(dtype="datetime64[D]")
+                    rel_paths = [str(p) for p in grp_reset["clean_rel_path"].tolist()]
+                    self._cam_index[cid_int] = (ts_float, dates, rel_paths)
+            self._manifest_loaded = True
 
     def _load_or_build_bg(self, cam_id: int, regime: str, target_shape: tuple[int, int]) -> np.ndarray | None:
         """Load cached `<cam_id>_bg[_night].jpg` or compute median background from manifest frames."""
         cache_key = (cam_id, regime)
-        if cache_key in self._bg_cache:
-            cached = self._bg_cache[cache_key]
-            if cached is not None and cached.shape[:2] != target_shape:
-                return cv2.resize(cached, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_AREA)
-            return cached
+        with self._lock:
+            if cache_key in self._bg_cache:
+                cached = self._bg_cache[cache_key]
+                if cached is not None and cached.shape[:2] != target_shape:
+                    return cv2.resize(cached, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_AREA)
+                return cached
 
         self.bg_dir.mkdir(parents=True, exist_ok=True)
         bg_filename = f"{cam_id}_bg.jpg" if regime == "day" else f"{cam_id}_bg_night.jpg"
@@ -351,7 +385,8 @@ class CameraSceneProvider:
         if bg_path.is_file():
             loaded = cv2.imread(str(bg_path))
             if loaded is not None:
-                self._bg_cache[cache_key] = loaded
+                with self._lock:
+                    self._bg_cache[cache_key] = loaded
                 if loaded.shape[:2] != target_shape:
                     return cv2.resize(loaded, (target_shape[1], target_shape[0]), interpolation=cv2.INTER_AREA)
                 return loaded
@@ -359,7 +394,8 @@ class CameraSceneProvider:
         self._ensure_manifest()
         cam_df = self._manifest_by_cam.get(cam_id)
         if cam_df is None or cam_df.empty:
-            self._bg_cache[cache_key] = None
+            with self._lock:
+                self._bg_cache[cache_key] = None
             return None
 
         if regime == "day":
@@ -393,12 +429,14 @@ class CameraSceneProvider:
             frames.append(frame)
 
         if len(frames) < 3:
-            self._bg_cache[cache_key] = None
+            with self._lock:
+                self._bg_cache[cache_key] = None
             return None
 
         bg = np.median(np.stack(frames, axis=0), axis=0).astype(np.uint8)
         cv2.imwrite(str(bg_path), bg)
-        self._bg_cache[cache_key] = bg
+        with self._lock:
+            self._bg_cache[cache_key] = bg
         return bg
 
     def get_context(
@@ -437,23 +475,26 @@ class CameraSceneProvider:
 
         if parsed_ts is not None:
             self._ensure_manifest()
-            cam_df = self._manifest_by_cam.get(cam_id)
-            if cam_df is not None and not cam_df.empty:
-                same_day = cam_df[cam_df["timestamp"].dt.date == parsed_ts.date()]
-                dt_sec = (same_day["timestamp"] - parsed_ts).dt.total_seconds()
-                prev_cands = same_day[(dt_sec < -60.0) & (dt_sec >= -1800.0)]
-                next_cands = same_day[(dt_sec > 60.0) & (dt_sec <= 1800.0)]
+            cam_idx = self._cam_index.get(cam_id)
+            if cam_idx is not None:
+                ts_arr, dates_arr, rel_paths = cam_idx
+                ts_naive = parsed_ts.tz_localize(None) if parsed_ts.tzinfo is not None else parsed_ts
+                t0 = float(np.datetime64(ts_naive, "us").astype(np.int64)) / 1e6
+                d0 = np.datetime64(ts_naive, "D")
 
                 gray_cur = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-                if not prev_cands.empty:
-                    p_path = self.clean_dir / str(prev_cands.iloc[-1]["clean_rel_path"])
-                    p_img = cv2.imread(str(p_path))
+                i_prev = int(bisect_left(ts_arr, t0 - 60.0)) - 1
+                if i_prev >= 0 and dates_arr[i_prev] == d0 and (t0 - float(ts_arr[i_prev])) <= 1800.0:
+                    p_path = self.clean_dir / rel_paths[i_prev]
+                    p_img = self._read_bgr_cached(p_path)
                     if p_img is not None and p_img.shape[:2] == img_shape:
                         prev_img = p_img
                         prev_mad = float(cv2.absdiff(gray_cur, cv2.cvtColor(p_img, cv2.COLOR_BGR2GRAY)).mean())
-                if not next_cands.empty:
-                    n_path = self.clean_dir / str(next_cands.iloc[0]["clean_rel_path"])
-                    n_img = cv2.imread(str(n_path))
+
+                i_next = int(bisect_right(ts_arr, t0 + 60.0))
+                if i_next < len(ts_arr) and dates_arr[i_next] == d0 and (float(ts_arr[i_next]) - t0) <= 1800.0:
+                    n_path = self.clean_dir / rel_paths[i_next]
+                    n_img = self._read_bgr_cached(n_path)
                     if n_img is not None and n_img.shape[:2] == img_shape:
                         next_img = n_img
                         next_mad = float(cv2.absdiff(gray_cur, cv2.cvtColor(n_img, cv2.COLOR_BGR2GRAY)).mean())
@@ -476,6 +517,7 @@ class RoadRoiProvider:
 
     def __init__(self, roi_path: Path | None = DEFAULT_ROIS_PATH) -> None:
         self.roi_path = roi_path
+        self._lock = threading.Lock()
         self._cameras: dict[str, dict] = {}
         self._mask_cache: dict[tuple[int, int, int], tuple[np.ndarray, list[list[list[int]]], float]] = {}
         if roi_path is not None and roi_path.is_file():
@@ -497,8 +539,9 @@ class RoadRoiProvider:
             return None, [], fallback_area
 
         key = (int(cam_id), img_h, img_w)
-        if key in self._mask_cache:
-            return self._mask_cache[key]
+        with self._lock:
+            if key in self._mask_cache:
+                return self._mask_cache[key]
 
         cam_info = self._cameras.get(str(int(cam_id)))
         if not cam_info:
@@ -525,7 +568,8 @@ class RoadRoiProvider:
             cv2.fillPoly(mask, [np.array(poly, dtype=np.int32)], 255)
         area_px = max(float((mask > 0).sum()), fallback_area)
         result = (mask, polys_px, area_px)
-        self._mask_cache[key] = result
+        with self._lock:
+            self._mask_cache[key] = result
         return result
 
     @staticmethod
@@ -838,7 +882,17 @@ class RobustTrafficDetector:
             half=self.use_half,
             verbose=False,
         )
+        return self._parse_model_results(model_key, crop_items, results, img_w, img_h)
 
+    @staticmethod
+    def _parse_model_results(
+        model_key: str,
+        crop_items: list[tuple[str, str, tuple[int, int, int, int], np.ndarray]],
+        results: list,
+        img_w: int,
+        img_h: int,
+    ) -> tuple[list[RawDetection], list[RawDetection]]:
+        """Project Ultralytics crop predictions back to full-frame coordinates with crop-border filtering."""
         vehicle_dets: list[RawDetection] = []
         rider_dets: list[RawDetection] = []
 
@@ -1866,22 +1920,70 @@ class RobustTrafficDetector:
 
         return True
 
-    def predict(
+    @staticmethod
+    def _route_crops_for_frame(
+        orig_crops: list[tuple[str, str, tuple[int, int, int, int], np.ndarray]],
+        enh_crops: list[tuple[str, str, tuple[int, int, int, int], np.ndarray]],
+        deglare_crops: list[tuple[str, str, tuple[int, int, int, int], np.ndarray]],
+        is_night_or_glare: bool,
+    ) -> list[tuple[str, float | None, list[tuple[str, str, tuple[int, int, int, int], np.ndarray]]]]:
+        """Select active day/night experts, per-model raw confidence threshold, and routed crops."""
+        enh_primary_tags = {"full", "full_osd", "far_mid", "lower_left", "lower_right"}
+        enh_coco_tags = (
+            {"full", "full_osd", "far_mid", "lower_road", "lower_left", "lower_right"}
+            if is_night_or_glare
+            else {"full", "full_osd", "far_mid", "lower_road"}
+        )
+        active_models = (
+            ("uvh26", "visdrone", "bdd100k", "yolo26x", "yolo11x")
+            if is_night_or_glare
+            else ("uvh26", "visdrone", "visdrone26l", "yolo26x", "yolo11x")
+        )
+        routed: list[tuple[str, float | None, list[tuple[str, str, tuple[int, int, int, int], np.ndarray]]]] = []
+        for model_key in active_models:
+            if is_night_or_glare:
+                eff_raw_conf: float | None = 0.16 if model_key == "visdrone" else 0.12
+                if model_key == "visdrone":
+                    # Restrict aerial VisDrone at night to upper/full crops to suppress wet-road stripe hallucinations.
+                    model_crops = [c for c in orig_crops if c[1] in ("full", "full_osd", "far_mid")] + [
+                        c for c in enh_crops if c[1] in ("full", "far_mid")
+                    ]
+                else:
+                    model_crops = list(orig_crops)
+                    if enh_crops:
+                        allowed_enh = enh_coco_tags if model_key in (COCO_KEYS | BDD_KEYS) else enh_primary_tags
+                        model_crops.extend(c for c in enh_crops if c[1] in allowed_enh)
+                    if deglare_crops:
+                        dg_tags = {"full"}
+                        if model_key in (COCO_KEYS | BDD_KEYS):
+                            dg_tags.update({"far_mid", "lower_road"})
+                        elif model_key in UVH_KEYS:
+                            dg_tags.add("lower_road")
+                        model_crops.extend(c for c in deglare_crops if c[1] in dg_tags)
+            else:
+                eff_raw_conf = None
+                if enh_crops:
+                    allowed_enh = enh_coco_tags if model_key in COCO_KEYS else enh_primary_tags
+                    model_crops = orig_crops + [c for c in enh_crops if c[1] in allowed_enh]
+                else:
+                    model_crops = orig_crops
+            routed.append((model_key, eff_raw_conf, model_crops))
+        return routed
+
+    def _prepare_frame(
         self,
         image_source: str | Path | np.ndarray,
-        conf: float = 0.25,
         cam_id: int | None = None,
         hour: int | None = None,
-        use_temporal_gate: bool = True,
         use_roi: bool | None = None,
-    ) -> DetectionResult:
-        """Run the full 7-stage ensemble detection pipeline on one image."""
+    ) -> dict:
+        """Execute CPU-bound Stages 1-3 (scene context, optical views, OSD inpaint, smart crops & routing)."""
         if isinstance(image_source, np.ndarray):
             img_bgr = image_source
             image_path = None
         else:
             image_path = Path(image_source)
-            img_bgr = cv2.imread(str(image_path))
+            img_bgr = self.scene_provider._read_bgr_cached(image_path)
             if img_bgr is None:
                 raise FileNotFoundError(f"Failed to read image with OpenCV: {image_path}")
 
@@ -1925,56 +2027,44 @@ class RobustTrafficDetector:
             else (None, [], 0.15 * float(img_w * img_h))
         )
 
-        # Stage 4: Batched 5-expert inference with day/night specialist selection & crop routing
-        enh_primary_tags = {"full", "full_osd", "far_mid", "lower_left", "lower_right"}
-        enh_coco_tags = (
-            {"full", "full_osd", "far_mid", "lower_road", "lower_left", "lower_right"}
-            if is_night_or_glare
-            else {"full", "full_osd", "far_mid", "lower_road"}
+        routed_models = self._route_crops_for_frame(
+            orig_crops=orig_crops,
+            enh_crops=enh_crops,
+            deglare_crops=deglare_crops,
+            is_night_or_glare=is_night_or_glare,
         )
-        active_models = (
-            ("uvh26", "visdrone", "bdd100k", "yolo26x", "yolo11x")
-            if is_night_or_glare
-            else ("uvh26", "visdrone", "visdrone26l", "yolo26x", "yolo11x")
-        )
-        all_vehicles: list[RawDetection] = []
-        all_riders: list[RawDetection] = []
-        for model_key in active_models:
-            if is_night_or_glare:
-                eff_raw_conf = 0.16 if model_key == "visdrone" else 0.12
-                if model_key == "visdrone":
-                    # Restrict aerial VisDrone at night to upper/full crops to suppress wet-road stripe hallucinations.
-                    model_crops = [c for c in orig_crops if c[1] in ("full", "full_osd", "far_mid")] + [
-                        c for c in enh_crops if c[1] in ("full", "far_mid")
-                    ]
-                else:
-                    model_crops = list(orig_crops)
-                    if enh_crops:
-                        allowed_enh = enh_coco_tags if model_key in (COCO_KEYS | BDD_KEYS) else enh_primary_tags
-                        model_crops.extend(c for c in enh_crops if c[1] in allowed_enh)
-                    if deglare_crops:
-                        dg_tags = {"full"}
-                        if model_key in (COCO_KEYS | BDD_KEYS):
-                            dg_tags.update({"far_mid", "lower_road"})
-                        elif model_key in UVH_KEYS:
-                            dg_tags.add("lower_road")
-                        model_crops.extend(c for c in deglare_crops if c[1] in dg_tags)
-            else:
-                eff_raw_conf = None
-                if enh_crops:
-                    allowed_enh = enh_coco_tags if model_key in COCO_KEYS else enh_primary_tags
-                    model_crops = orig_crops + [c for c in enh_crops if c[1] in allowed_enh]
-                else:
-                    model_crops = orig_crops
-            v_dets, r_dets = self._run_model_on_crops(
-                model_key,
-                model_crops,
-                img_w,
-                img_h,
-                raw_conf_override=eff_raw_conf,
-            )
-            all_vehicles.extend(v_dets)
-            all_riders.extend(r_dets)
+        return {
+            "img_bgr": img_bgr,
+            "img_w": img_w,
+            "img_h": img_h,
+            "scene": scene,
+            "osd_mask": osd_mask,
+            "optical_profile": optical_profile,
+            "roi_mask": roi_mask,
+            "roi_polygons_px": roi_polygons_px,
+            "road_roi_area": road_roi_area,
+            "routed_models": routed_models,
+        }
+
+    def _finalize_frame_detections(
+        self,
+        prep: dict,
+        all_vehicles: list[RawDetection],
+        all_riders: list[RawDetection],
+        conf: float,
+        use_temporal_gate: bool,
+    ) -> DetectionResult:
+        """Execute Stages 5-8 (class corroboration, rider promotion, scene/BG/ROI gates, fusion)."""
+        img_bgr: np.ndarray = prep["img_bgr"]
+        img_w: int = prep["img_w"]
+        img_h: int = prep["img_h"]
+        scene: CameraSceneContext = prep["scene"]
+        osd_mask: np.ndarray = prep["osd_mask"]
+        optical_profile: dict = prep["optical_profile"]
+        roi_mask: np.ndarray | None = prep["roi_mask"]
+        roi_polygons_px: list[list[list[int]]] = prep["roi_polygons_px"]
+        road_roi_area: float = prep["road_roi_area"]
+        is_night_or_glare = bool(optical_profile["is_night_or_glare"])
 
         all_vehicles = self._corroborate_classes(all_vehicles, img_w, img_h)
 
@@ -2235,6 +2325,156 @@ class RobustTrafficDetector:
             foreground_ratio=foreground_ratio,
             roi_polygons_px=roi_polygons_px,
         )
+
+    def predict(
+        self,
+        image_source: str | Path | np.ndarray,
+        conf: float = 0.25,
+        cam_id: int | None = None,
+        hour: int | None = None,
+        use_temporal_gate: bool = True,
+        use_roi: bool | None = None,
+    ) -> DetectionResult:
+        """Run the full 7-stage ensemble detection pipeline on one image."""
+        prep = self._prepare_frame(
+            image_source=image_source,
+            cam_id=cam_id,
+            hour=hour,
+            use_roi=use_roi,
+        )
+        img_w, img_h = prep["img_w"], prep["img_h"]
+        all_vehicles: list[RawDetection] = []
+        all_riders: list[RawDetection] = []
+        for model_key, eff_raw_conf, model_crops in prep["routed_models"]:
+            v_dets, r_dets = self._run_model_on_crops(
+                model_key,
+                model_crops,
+                img_w,
+                img_h,
+                raw_conf_override=eff_raw_conf,
+            )
+            all_vehicles.extend(v_dets)
+            all_riders.extend(r_dets)
+        return self._finalize_frame_detections(
+            prep=prep,
+            all_vehicles=all_vehicles,
+            all_riders=all_riders,
+            conf=conf,
+            use_temporal_gate=use_temporal_gate,
+        )
+
+    def predict_batch(
+        self,
+        image_sources: list[str | Path | np.ndarray],
+        conf: float = 0.25,
+        cam_ids: list[int | None] | None = None,
+        hours: list[int | None] | None = None,
+        use_temporal_gate: bool = True,
+        use_roi: bool | None = None,
+        yolo_batch: int = 64,
+        num_workers: int = 8,
+        return_images: bool = False,
+    ) -> list[DetectionResult] | list[tuple[DetectionResult, np.ndarray]]:
+        """Run the full pipeline across a batch of images with parallel CPU prep and batched GPU inference."""
+        n = len(image_sources)
+        if n == 0:
+            return []
+
+        self.scene_provider._ensure_manifest()
+        cam_list = cam_ids if cam_ids is not None else [None] * n
+        hour_list = hours if hours is not None else [None] * n
+
+        def _prep_one(idx: int) -> dict:
+            return self._prepare_frame(
+                image_source=image_sources[idx],
+                cam_id=cam_list[idx],
+                hour=hour_list[idx],
+                use_roi=use_roi,
+            )
+
+        if num_workers > 1 and n > 1:
+            with ThreadPoolExecutor(max_workers=min(num_workers, n)) as pool:
+                preps = list(pool.map(_prep_one, range(n)))
+        else:
+            preps = [_prep_one(i) for i in range(n)]
+
+        frame_vehicles: list[list[RawDetection]] = [[] for _ in range(n)]
+        frame_riders: list[list[RawDetection]] = [[] for _ in range(n)]
+
+        # Bucket by (model_key, eff_raw_conf, (img_w, img_h)) and dispatch frame-aligned GPU chunks
+        # so every GPU forward call sees complete frame crop sets and identical letterbox dimensions.
+        buckets: dict[tuple[str, float, tuple[int, int]], list[tuple[int, list[tuple[str, str, tuple[int, int, int, int], np.ndarray]]]]] = defaultdict(list)
+        for idx, prep in enumerate(preps):
+            img_shape_wh = (prep["img_w"], prep["img_h"])
+            for model_key, eff_raw_conf, model_crops in prep["routed_models"]:
+                eff_conf = self.raw_conf if eff_raw_conf is None else float(eff_raw_conf)
+                buckets[(model_key, eff_conf, img_shape_wh)].append((idx, model_crops))
+
+        max_crops = max(1, int(yolo_batch))
+        for (model_key, eff_conf, (img_w, img_h)), entries in buckets.items():
+            model = self.models[model_key]
+            chunk: list[tuple[int, list[tuple[str, str, tuple[int, int, int, int], np.ndarray]]]] = []
+            chunk_count = 0
+
+            def _flush_chunk(items_chunk: list[tuple[int, list[tuple[str, str, tuple[int, int, int, int], np.ndarray]]]]) -> None:
+                if not items_chunk:
+                    return
+                flat_imgs = [crop[3] for _, crops in items_chunk for crop in crops]
+                results = model.predict(
+                    source=flat_imgs,
+                    imgsz=self.imgsz,
+                    conf=eff_conf,
+                    iou=0.75,
+                    max_det=500,
+                    half=self.use_half,
+                    verbose=False,
+                )
+                offset = 0
+                for frame_idx, f_crops in items_chunk:
+                    cnt = len(f_crops)
+                    v_dets, r_dets = self._parse_model_results(
+                        model_key=model_key,
+                        crop_items=f_crops,
+                        results=results[offset : offset + cnt],
+                        img_w=img_w,
+                        img_h=img_h,
+                    )
+                    frame_vehicles[frame_idx].extend(v_dets)
+                    frame_riders[frame_idx].extend(r_dets)
+                    offset += cnt
+
+            for entry in entries:
+                f_len = len(entry[1])
+                if chunk and (chunk_count + f_len) > max_crops:
+                    _flush_chunk(chunk)
+                    chunk = []
+                    chunk_count = 0
+                chunk.append(entry)
+                chunk_count += f_len
+            _flush_chunk(chunk)
+
+        # Free crop arrays before post-processing.
+        for prep in preps:
+            prep["routed_models"] = []
+
+        def _finish_one(idx: int) -> DetectionResult:
+            return self._finalize_frame_detections(
+                prep=preps[idx],
+                all_vehicles=frame_vehicles[idx],
+                all_riders=frame_riders[idx],
+                conf=conf,
+                use_temporal_gate=use_temporal_gate,
+            )
+
+        if num_workers > 1 and n > 1:
+            with ThreadPoolExecutor(max_workers=min(num_workers, n)) as pool:
+                det_results = list(pool.map(_finish_one, range(n)))
+        else:
+            det_results = [_finish_one(i) for i in range(n)]
+
+        if return_images:
+            return [(det_results[i], preps[i]["img_bgr"]) for i in range(n)]
+        return det_results
 
 
 def draw_detections(
