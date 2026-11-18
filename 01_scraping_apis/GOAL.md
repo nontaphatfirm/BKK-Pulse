@@ -28,6 +28,7 @@ This module fulfills the **Required Web Scraping Task (>= 3 Simple APIs)** for *
   - `timezone=Asia/Bangkok`
 - **Spatial Grid Resolution Note (~9-11 km, Verified):**
   - Open-Meteo reanalysis models operate at a ~9-11 km (`0.1 deg`) spatial grid resolution. Across our 100 cameras (`lat: 13.698-13.824`, `lon: 100.395-100.630`), rounding to `(round(lat, 1), round(lon, 1))` maps onto **5 distinct grid cells**, whereas `(round(lat, 2), round(lon, 2))` maps onto **55 coordinate pairs**.
+  - *Measured in `data/weather_air_poi.parquet`:* the 55 requested coordinates return only **10 distinct weather series** and **8 distinct air-quality series** across the 100 cameras.
   - Deduplicate coordinate queries by `(round(lat, 2), round(lon, 2))` (or pass comma-separated coordinates in batched requests) with a `0.3s` polite delay to avoid HTTP rate limits, then map results back to all 100 `cam_id`s.
   - Because `0.1 deg` (~11 km) meteorological grids cannot resolve hyper-local tropical convective rain cells or lingered wet-pavement effects on their own, downstream analyses in Task 04 fuse API `rain_mm` with camera-level CCTV image processing (`visual_rain_flag`, `wet_road_flag`, `rain_severity_score`, plus optical stats in `image_quality_manifest.parquet`) for intersection-level rain detection.
 
@@ -44,7 +45,9 @@ This module fulfills the **Required Web Scraping Task (>= 3 Simple APIs)** for *
 > [!IMPORTANT]
 > **Anti-429 Rule (Single Bounding-Box Query):** Never issue 100 separate `around:500` Overpass queries per camera -- the public Overpass server will throttle and block your IP with `HTTP 429 Too Many Requests`. Execute **one single Overpass QL query** covering the entire Bangkok bounding box (`BBox = (13.65, 100.35, 13.90, 100.65)` for South, West, North, East -- verified to cover 100/100 cameras).
 
-- Cache the raw JSON response locally (`data/raw_osm_pois_bkk.json`), then compute vectorized **Haversine distances** in Python between all 100 cameras and extracted POI coordinates (`distance <= 500 m`).
+- Query transit as `node` elements, and schools / malls / markets / hospitals as `nwr` (node, way, relation) with `out center;` -- most campuses, malls and hospitals are mapped as building outlines, so a node-only query misses them.
+- `nwr` can return the same place twice (e.g. a `shop=supermarket` node plus its tagged building outline). `build_poi_counts()` drops a POI that shares the category and a non-empty `name` with a POI of a *different* OSM type within `150 m` (outline kept over node; `11` of `5,447` cached elements). Unnamed or same-type neighbours are kept, because they are usually distinct places (e.g. a supermarket node inside a mall outline).
+- Cache the raw JSON response locally (`data/raw_osm/bkk_pois.json`), then compute vectorized **Haversine distances** in Python between all 100 cameras and extracted POI coordinates (`distance <= 500 m`).
 - Do **not** rely on OSM `lanes` tags as a road capacity denominator (>50% of Bangkok road segments lack accurate per-direction lane tags; Task 03 computes pixel-level `road_roi_area` instead).
 
 ---
@@ -86,8 +89,8 @@ Granularity: `168 hours (2026-08-25 00:00 to 2026-08-31 23:00) x 100 cameras = 1
 
 ## 4. Definition of Done Checklist
 
-- [ ] Complete Batch 1 camera verification (17 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
-- [ ] Implement weather ingestion script and cache raw API responses.
-- [ ] Implement single-bbox Overpass QL ingestion script and Haversine 500m spatial join.
-- [ ] Implement air quality ingestion script (`PM2.5`, `NO2`, `CO`).
-- [ ] Export `data/weather_air_poi.parquet` (16,800 rows, zero `NaN` values) and coordinate between Task 01 & Task 02 (**ปลื้ม** & **กร**) to produce `data/external_weather_poi.parquet`.
+- [x] Complete Batch 1 camera verification (17 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
+- [x] Implement weather ingestion script and cache raw API responses.
+- [x] Implement single-bbox Overpass QL ingestion script and Haversine 500m spatial join.
+- [x] Implement air quality ingestion script (`PM2.5`, `NO2`, `CO`).
+- [x] Export `data/weather_air_poi.parquet` (16,800 rows, zero `NaN` values) and coordinate between Task 01 & Task 02 (**ปลื้ม** & **กร**) to produce `data/external_weather_poi.parquet`.

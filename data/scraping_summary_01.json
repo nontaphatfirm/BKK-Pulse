@@ -8,8 +8,8 @@
   "nulls": 0,
   "poi_columns": {
     "transit": 31,
-    "school": 10,
-    "mall": 11,
-    "hospital": 8
+    "school": 16,
+    "mall": 20,
+    "hospital": 13
   }
 }
