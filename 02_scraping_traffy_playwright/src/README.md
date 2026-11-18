@@ -3,6 +3,19 @@
 Data contract, matching rule and run instructions: [`../README.md`](../README.md).
 Course specification: [`../GOAL.md`](../GOAL.md).
 
+## Which script do I run?
+
+| I want to… | Run this |
+| :--- | :--- |
+| Build the 6-month dataset | `fetch_traffy_geojson.py` (add `--combine-cache` to reuse downloaded pages) |
+| Rebuild after camera coordinates changed | `fetch_traffy_geojson.py --combine-cache`, then `merge_external_dataset.py` |
+| Produce Table 4 | `merge_external_dataset.py` (needs Task 01's `weather_air_poi.parquet`) |
+| Re-capture the UI screenshots and XHR evidence | `scrape_traffy_playwright.py` |
+
+`scrape_traffy_playwright.py` writes only to `artifacts/`. It is not part of the data
+pipeline — it captures whatever the live dashboard serves during the run, and no other
+module reads its output.
+
 ## Modules
 
 ```text
