@@ -549,9 +549,9 @@ CAMERA_CURATION: dict[int, dict[str, Any]] = {
     },
     158: {
         "location_th": "สะพานลอยใกล้ซอยเจริญนคร 46 ถนนเจริญนคร",
-        "location_detail_th": "ถนนเจริญนคร บริเวณซอยเจริญนคร 55 (เห็นรถทั้งสองทิศทาง)",
+        "location_detail_th": "บริเวณซอยเจริญนคร 46",
         "location_en": "Footbridge near Soi Charoen Nakhon 46 on Charoen Nakhon Road",
-        "location_detail_en": "Charoen Nakhon Road near Soi Charoen Nakhon 55 (both directions visible)",
+        "location_detail_en": "Near Soi Charoen Nakhon 46",
         "district": "Khlong San",
         "corridor": "Thon Buri - Charoen Nakhon - Borommaratchachonnani",
         "pair_id": None,
