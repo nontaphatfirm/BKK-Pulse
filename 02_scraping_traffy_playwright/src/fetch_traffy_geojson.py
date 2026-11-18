@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import argparse
 import gzip
+import hashlib
 import json
 import os
 import re
@@ -24,7 +25,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -33,6 +35,7 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CAMERA_PATH = PROJECT_ROOT / "Dataset_Clean_V1" / "cctv_info_cleaned.parquet"
 CACHE_DIR = PROJECT_ROOT / "data" / "raw_traffy_cache" / "pages"
+WINDOWS_PATH = PROJECT_ROOT / "data" / "raw_traffy_cache" / "windows.json"
 INCIDENT_PATH = PROJECT_ROOT / "data" / "traffy_complaints_near_cctv.parquet"
 COUNTS_PATH = PROJECT_ROOT / "data" / "traffy_camera_counts.parquet"
 SUMMARY_PATH = PROJECT_ROOT / "data" / "scraping_summary_02.json"
@@ -272,6 +275,143 @@ def _page_in_window(path: Path, start: str, end: str) -> bool:
     return page_start <= pd.Timestamp(end) and page_end >= pd.Timestamp(start)
 
 
+@dataclass(frozen=True)
+class CacheSegment:
+    window_start: str
+    window_end: str
+    pages: int
+    offsets: tuple[int, ...]
+    direction: str
+    complete: bool
+    first_ts: str | None
+    last_ts: str | None
+    sha256: dict[str, str]
+
+
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1 << 20), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def _read_page(path: Path) -> list[dict]:
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        return json.load(handle)
+
+
+def _page_offset(path: Path) -> int:
+    return int(PAGE_RE.match(path.name).group(3))
+
+
+def _page_timestamps(page: list[dict]) -> list[pd.Timestamp]:
+    stamps = pd.to_datetime([record.get("timestamp") for record in page], errors="coerce")
+    return [stamp for stamp in stamps if not pd.isna(stamp)]
+
+
+def _first_timestamp(page: list[dict]) -> pd.Timestamp | None:
+    stamps = _page_timestamps(page)
+    return stamps[0] if stamps else None
+
+
+def scan_cache(start: str, end: str) -> tuple[list[CacheSegment], list[str]]:
+    """Group cached pages into crawl segments and verify each offset chain."""
+    groups: dict[tuple[str, str], list[Path]] = {}
+    for path in sorted(CACHE_DIR.glob("*.json.gz")):
+        match = PAGE_RE.match(path.name)
+        if match is None or not _page_in_window(path, start, end):
+            continue
+        groups.setdefault((match.group(1), match.group(2)), []).append(path)
+
+    segments: list[CacheSegment] = []
+    problems: list[str] = []
+    for (window_start, window_end), paths in sorted(groups.items()):
+        paths.sort(key=_page_offset)
+        offsets = [_page_offset(path) for path in paths]
+        pages = [_read_page(path) for path in paths]
+
+        problem = None
+        if offsets[0] != 0:
+            problem = (
+                f"{window_start}..{window_end}: chain starts at offset "
+                f"{offsets[0]}, expected 0"
+            )
+        else:
+            for previous_offset, previous_page, offset in zip(offsets, pages, offsets[1:]):
+                expected = previous_offset + len(previous_page)
+                if offset != expected:
+                    problem = (
+                        f"{window_start}..{window_end}: missing offset {expected} "
+                        f"(chain jumps from {previous_offset} to {offset})"
+                    )
+                    break
+        if problem is not None:
+            problems.append(problem)
+            continue
+
+        first_records = [stamp for stamp in map(_first_timestamp, pages) if stamp is not None]
+        direction = (
+            "desc" if len(first_records) >= 2 and first_records[0] > first_records[-1] else "asc"
+        )
+        timestamps = [stamp for page in pages for stamp in _page_timestamps(page)]
+        segments.append(
+            CacheSegment(
+                window_start=window_start,
+                window_end=window_end,
+                pages=len(paths),
+                offsets=tuple(offsets),
+                direction=direction,
+                complete=not pages[-1],
+                first_ts=min(timestamps).isoformat() if timestamps else None,
+                last_ts=max(timestamps).isoformat() if timestamps else None,
+                sha256={str(offset): _sha256(path) for offset, path in zip(offsets, paths)},
+            )
+        )
+    return segments, problems
+
+
+def covered_interval(segment: CacheSegment) -> tuple[pd.Timestamp, pd.Timestamp]:
+    start = pd.Timestamp(segment.window_start)
+    end = pd.Timestamp(segment.window_end) + pd.Timedelta(days=1)
+    if segment.complete:
+        return start, end
+    if segment.direction == "asc":
+        return start, pd.Timestamp(segment.last_ts) if segment.last_ts else start
+    return (pd.Timestamp(segment.first_ts) if segment.first_ts else end), end
+
+
+def coverage_gaps(
+    segments: list[CacheSegment], start: str, end: str
+) -> list[tuple[pd.Timestamp, pd.Timestamp]]:
+    lower = pd.Timestamp(start)
+    upper = pd.Timestamp(end) + pd.Timedelta(days=1)
+    merged: list[tuple[pd.Timestamp, pd.Timestamp]] = []
+    for interval in sorted(covered_interval(segment) for segment in segments):
+        if merged and interval[0] <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], interval[1]))
+        else:
+            merged.append(interval)
+
+    gaps: list[tuple[pd.Timestamp, pd.Timestamp]] = []
+    cursor = lower
+    for interval_start, interval_end in merged:
+        interval_start = max(interval_start, lower)
+        interval_end = min(interval_end, upper)
+        if interval_end <= cursor:
+            continue
+        if interval_start > cursor:
+            gaps.append((cursor, interval_start))
+        cursor = max(cursor, interval_end)
+    if cursor < upper:
+        gaps.append((cursor, upper))
+    return gaps
+
+
 def load_cached_frame(start: str, end: str) -> tuple[pd.DataFrame, dict[str, int]]:
     """Load cached pages whose filename window intersects [start, end], then dedupe."""
     records: dict[str, dict] = {}
@@ -347,13 +487,37 @@ def build_outputs(
             start, end, refresh=refresh, max_pages=max_pages, fail_on_throttle=fail_on_throttle
         )
     coverage = coverage_report(raw, start, end)
-    complete = fetch["termination"] in {"empty_page", "cache"} and coverage["complete"]
-    if not complete and not allow_partial:
-        raise IncompleteWindow(
-            f"{start}..{end} is incomplete: termination={fetch['termination']}, "
+    if coverage["days_missing"] or coverage["largest_gap_hours"] > MAX_GAP_HOURS:
+        print(
+            f"[WARN] coverage report (advisory only): "
             f"days_missing={coverage['days_missing'][:10]}, "
-            f"largest_gap={coverage['largest_gap_hours']}h. Rerun with --allow-partial to build anyway."
+            f"largest_gap_hours={coverage['largest_gap_hours']}"
         )
+    segments, problems = scan_cache(start, end)
+    gaps = coverage_gaps(segments, start, end)
+    complete = not problems and not gaps
+    if not complete and not allow_partial:
+        detail = "; ".join(problems) if problems else "offset chains intact"
+        gap_text = ", ".join(f"{left} .. {right}" for left, right in gaps)
+        raise IncompleteWindow(
+            f"{start}..{end} is incomplete: {detail}; gaps=[{gap_text}]. "
+            "Rerun with --allow-partial to build anyway."
+        )
+    WINDOWS_PATH.write_text(
+        json.dumps(
+            {
+                "generated_at": _now_iso(),
+                "window": {"start": start, "end": end},
+                "segments": [asdict(segment) for segment in segments],
+                "covered": complete,
+                "gaps": [[left.isoformat(), right.isoformat()] for left, right in gaps],
+                "problems": problems,
+            },
+            indent=2,
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     complaints = _nearest_camera(raw, cameras)
 
     matched = complaints[complaints["distance_m"] <= MATCH_RADIUS_M].copy()
@@ -442,6 +606,10 @@ def build_outputs(
         "fetch": fetch,
         "coverage": coverage,
         "dropped": dropped,
+        "cache_segments": [asdict(segment) for segment in segments],
+        "coverage_gaps": [
+            [left.isoformat(), right.isoformat()] for left, right in gaps
+        ],
     }
     return incidents, counts, summary
 
@@ -488,21 +656,30 @@ def main() -> None:
             fail_on_throttle=args.fail_on_throttle,
         )
         coverage = coverage_report(frame, args.start, args.end)
+        segments, problems = scan_cache(args.start, args.end)
+        gaps = coverage_gaps(segments, args.start, args.end)
+        complete = not problems and not gaps
         progress = {
             "window_start": args.start,
             "window_end": args.end,
             "records": int(len(frame)),
             "first_timestamp": str(frame["timestamp"].min()),
             "last_timestamp": str(frame["timestamp"].max()),
-            "complete": report["termination"] == "empty_page" and coverage["complete"],
+            "complete": complete,
             "fetch": report,
             "coverage": coverage,
             "dropped": dropped,
+            "cache_segments": [asdict(segment) for segment in segments],
+            "coverage_gaps": [
+                [left.isoformat(), right.isoformat()] for left, right in gaps
+            ],
         }
-        if not progress["complete"] and not args.allow_partial:
+        if not complete and not args.allow_partial:
+            detail = "; ".join(problems) if problems else "offset chains intact"
+            gap_text = ", ".join(f"{left} .. {right}" for left, right in gaps)
             raise IncompleteWindow(
-                f"{args.start}..{args.end} is incomplete: termination={report['termination']}, "
-                f"days_missing={coverage['days_missing'][:10]}. Rerun with --allow-partial to keep the prefix."
+                f"{args.start}..{args.end} is incomplete: {detail}; gaps=[{gap_text}]. "
+                "Rerun with --allow-partial to keep the prefix."
             )
         (PROJECT_ROOT / "data" / "traffy_fetch_progress.json").write_text(
             json.dumps(progress, indent=2), encoding="utf-8"
