@@ -421,6 +421,10 @@ def process_camera(
     hours = [int(h) for h in cam_df["hour"].tolist()]
     filenames = [str(fn) for fn in cam_df["clean_filename"].tolist()]
 
+    t_cam_start = time.perf_counter()
+    log_every = max(batch_frames * 4, 96)
+    next_log_end = min(n_cam, max(1, batch_frames))
+
     for start in range(0, n_cam, max(1, batch_frames)):
         end = min(n_cam, start + max(1, batch_frames))
         chunk_paths = paths[start:end]
@@ -452,6 +456,15 @@ def process_camera(
 
         if save_images and save_tasks:
             _save_annotated_batch(save_tasks, scale=save_scale, workers=workers)
+
+        if end >= next_log_end and end < n_cam:
+            elapsed_cam = max(time.perf_counter() - t_cam_start, 1e-6)
+            print(
+                f"  -> cam_{cam_id:<4}: {end:>4}/{n_cam} ({100.0 * end / n_cam:5.1f}%) | "
+                f"{end / elapsed_cam:4.2f} img/s",
+                flush=True,
+            )
+            next_log_end = min(n_cam, end + log_every)
 
     return enforce_contract_dtypes(pd.DataFrame(rows))
 
