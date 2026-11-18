@@ -135,13 +135,15 @@ def _request_page(start: str, end: str, offset: int, attempts: int = 15) -> list
     raise RuntimeError(f"Traffy page failed after retries: offset={offset}")
 
 
-def _compact(feature: dict) -> dict | None:
+def _compact(feature: dict) -> tuple[dict | None, str | None]:
     props = feature.get("properties") or {}
     geometry = feature.get("geometry") or {}
     coords = geometry.get("coordinates") or []
     ticket_id = str(props.get("ticket_id") or "").strip()
-    if not ticket_id or len(coords) < 2:
-        return None
+    if not ticket_id:
+        return None, "no_id"
+    if len(coords) < 2:
+        return None, "no_coords"
     timestamp = props.get("timestamp")
     return {
         "ticket_id": ticket_id,
@@ -151,17 +153,30 @@ def _compact(feature: dict) -> dict | None:
         "type_raw": str(props.get("type") or ""),
         "description": str(props.get("description") or ""),
         "status": str(props.get("state") or ""),
-    }
+    }, None
 
 
-def load_page(start: str, end: str, offset: int, refresh: bool, attempts: int = 15) -> list[dict]:
+def load_page(
+    start: str,
+    end: str,
+    offset: int,
+    refresh: bool,
+    dropped: dict[str, int],
+    attempts: int = 15,
+) -> list[dict]:
     path = _page_path(start, end, offset)
     if path.exists() and not refresh:
         with gzip.open(path, "rt", encoding="utf-8") as handle:
             return json.load(handle)
 
     features = _request_page(start, end, offset, attempts=attempts)
-    compact = [c for c in (_compact(f) for f in features) if c is not None]
+    compact = []
+    for feature in features:
+        record, reason = _compact(feature)
+        if record is None:
+            dropped[reason] += 1
+        else:
+            compact.append(record)
     path.parent.mkdir(parents=True, exist_ok=True)
     staging = path.with_name(path.name + ".tmp")
     with gzip.open(staging, "wt", encoding="utf-8") as handle:
@@ -179,13 +194,16 @@ def fetch_complaints(
 ) -> tuple[pd.DataFrame, dict]:
     """Page through the feed until an empty page, then dedupe by ticket id."""
     records: dict[str, dict] = {}
+    dropped = {"no_id": 0, "no_coords": 0}
     offset = 0
     pages = 0
     termination = "max_pages"
     for page in range(max_pages):
         try:
             # Once a cached prefix exists, do not stall the whole pipeline on a throttled API.
-            batch = load_page(start, end, offset, refresh, attempts=8 if records else 15)
+            batch = load_page(
+                start, end, offset, refresh, dropped, attempts=8 if records else 15
+            )
         except RuntimeError as exc:
             if not records or fail_on_throttle:
                 raise
@@ -213,6 +231,8 @@ def fetch_complaints(
         raise RuntimeError("Traffy fetch returned no records")
 
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], errors="coerce")
+    dropped["null_timestamp"] = int(frame["timestamp"].isna().sum())
+    dropped["null_coords"] = int(frame[["lat", "lon"]].isna().any(axis=1).sum())
     frame = frame.dropna(subset=["timestamp", "lat", "lon"]).copy()
     frame["problem_type"] = frame["type_raw"].map(classify)
     frame["timestamp"] = frame["timestamp"].astype("datetime64[us]")
@@ -221,7 +241,7 @@ def fetch_complaints(
         "pages": pages,
         "terminal_offset": offset,
     }
-    return frame, report
+    return frame, report, dropped
 
 
 def coverage_report(frame: pd.DataFrame, start: str, end: str) -> dict:
@@ -252,7 +272,7 @@ def _page_in_window(path: Path, start: str, end: str) -> bool:
     return page_start <= pd.Timestamp(end) and page_end >= pd.Timestamp(start)
 
 
-def load_cached_frame(start: str, end: str) -> pd.DataFrame:
+def load_cached_frame(start: str, end: str) -> tuple[pd.DataFrame, dict[str, int]]:
     """Load cached pages whose filename window intersects [start, end], then dedupe."""
     records: dict[str, dict] = {}
     paths = [p for p in sorted(CACHE_DIR.glob("*.json.gz")) if _page_in_window(p, start, end)]
@@ -264,6 +284,12 @@ def load_cached_frame(start: str, end: str) -> pd.DataFrame:
     if frame.empty:
         raise RuntimeError("No cached Traffy pages found")
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], errors="coerce")
+    dropped = {
+        "no_id": 0,
+        "no_coords": 0,
+        "null_timestamp": int(frame["timestamp"].isna().sum()),
+        "null_coords": int(frame[["lat", "lon"]].isna().any(axis=1).sum()),
+    }
     frame = frame.dropna(subset=["timestamp", "lat", "lon"]).copy()
     lower = pd.Timestamp(start)
     upper = pd.Timestamp(end) + pd.Timedelta(days=1)
@@ -271,7 +297,7 @@ def load_cached_frame(start: str, end: str) -> pd.DataFrame:
     frame["problem_type"] = frame["type_raw"].map(classify)
     frame["timestamp"] = frame["timestamp"].astype("datetime64[us]")
     print(f"[traffy] combined {len(paths)} cached pages -> {len(frame):,} records in window")
-    return frame
+    return frame, dropped
 
 
 def _nearest_camera(frame: pd.DataFrame, cameras: pd.DataFrame) -> pd.DataFrame:
@@ -314,10 +340,10 @@ def build_outputs(
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
     cameras = pd.read_parquet(CAMERA_PATH)[["cam_id", "lat", "lon"]]
     if combine_cache:
-        raw = load_cached_frame(start, end)
+        raw, dropped = load_cached_frame(start, end)
         fetch = {"termination": "cache", "pages": 0, "terminal_offset": 0}
     else:
-        raw, fetch = fetch_complaints(
+        raw, fetch, dropped = fetch_complaints(
             start, end, refresh=refresh, max_pages=max_pages, fail_on_throttle=fail_on_throttle
         )
     coverage = coverage_report(raw, start, end)
@@ -415,6 +441,7 @@ def build_outputs(
         "complete": complete,
         "fetch": fetch,
         "coverage": coverage,
+        "dropped": dropped,
     }
     return incidents, counts, summary
 
@@ -453,7 +480,7 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.fetch_only:
-        frame, report = fetch_complaints(
+        frame, report, dropped = fetch_complaints(
             args.start,
             args.end,
             refresh=args.refresh,
@@ -470,6 +497,7 @@ def main() -> None:
             "complete": report["termination"] == "empty_page" and coverage["complete"],
             "fetch": report,
             "coverage": coverage,
+            "dropped": dropped,
         }
         if not progress["complete"] and not args.allow_partial:
             raise IncompleteWindow(
