@@ -1,0 +1,75 @@
+{
+  "window": {
+    "start": "2026-05-01",
+    "end": "2026-10-31"
+  },
+  "generated_at": "2026-11-18T02:52:23+00:00",
+  "git_commit": "608ba0f56cdb791a0493ce746af50acb589ab438",
+  "complete": true,
+  "termination": "cache",
+  "pages": 190,
+  "segments": {
+    "count": 8,
+    "covered": [
+      [
+        "2026-05-01T00:00:00",
+        "2026-06-01T00:00:00"
+      ],
+      [
+        "2026-09-25T13:18:13",
+        "2026-11-01T00:00:00"
+      ],
+      [
+        "2026-06-01T00:00:00",
+        "2026-07-01T00:00:00"
+      ],
+      [
+        "2026-07-01T00:00:00",
+        "2026-08-01T00:00:00"
+      ],
+      [
+        "2026-08-01T00:00:00",
+        "2026-09-01T00:00:00"
+      ],
+      [
+        "2026-08-30T00:00:00",
+        "2026-08-31T00:00:00"
+      ],
+      [
+        "2026-09-01T00:00:00",
+        "2026-09-25T00:00:00"
+      ],
+      [
+        "2026-09-25T00:00:00",
+        "2026-09-26T00:00:00"
+      ]
+    ]
+  },
+  "coverage": {
+    "days_in_window": 184,
+    "days_with_records": 184,
+    "days_missing": [],
+    "hours_in_window": 4416,
+    "empty_hours": 9,
+    "largest_gap_hours": 3.05,
+    "complete": true
+  },
+  "rows": 70822,
+  "dropped": {
+    "no_id": 0,
+    "no_coords": 0,
+    "null_timestamp": 0,
+    "null_coords": 0
+  },
+  "allow_partial_reason": null,
+  "outputs": {
+    "traffy_complaints_near_cctv.parquet": {
+      "rows": 70822,
+      "sha256": "de6c943a24ea87805b860f091ba556213bf1293af7bc30b81e01eeebd0b1e00b"
+    },
+    "traffy_camera_counts.parquet": {
+      "rows": 100,
+      "sha256": "65d6bce6c97055ab201f088927940edbf350d71ba6a85753f479e3837142447f"
+    }
+  }
+}
