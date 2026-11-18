@@ -23,16 +23,16 @@
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
 | [x] | `112` | Thiam Ruam Mit Intersection (Thiam Ruam Mit Road) | Towards Huai Khwang / Ratchadaphisek Road | แยกเทียมร่วมมิตร (ถนนเทียมร่วมมิตร) | Huai Khwang | Ratchadaphisek | `PAIR_JX_THIAMRUAMMIT` | `Inbound` |
-| [x] | `1408` | Thiam Ruam Mit Intersection (Cyber World Tower) | From Huai Khwang Intersection towards Thiam Ruam Mit Intersection | แยกเทียมร่วมมิตร (หน้าอาคารไซเบอร์เวิลด์) | Huai Khwang | Ratchadaphisek | `PAIR_JX_THIAMRUAMMIT` | `Inbound` |
-| [x] | `118` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | From Sutthisan-Vibhavadi Rangsit Intersection | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `Outbound` |
-| [x] | `119` | Ratchada-Sutthisan Intersection (Ratchadaphisek Road) | From Huai Khwang Intersection *(coords updated)* | แยกรัชดา-สุทธิสาร (ด้านถนนรัชดาภิเษก) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `Outbound` |
-| [x] | `120` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | From Soi Lat Phrao 64 *(coords updated)* | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `None` |
+| [x] | `1408` | Thiam Ruam Mit Intersection (Cyber World Tower) | At Thiam Ruam Mit Intersection (in front of Cyber World Tower) | แยกเทียมร่วมมิตร (หน้าอาคารไซเบอร์เวิลด์) | Huai Khwang | Ratchadaphisek | `PAIR_JX_THIAMRUAMMIT` | `None` |
+| [x] | `118` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | At Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road side) | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `None` |
+| [x] | `119` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | At Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road side) *(coords updated)* | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `None` |
+| [x] | `120` | Ratchada-Sutthisan Intersection (Sutthisan Winitchai Road) | At Ratchada-Sutthisan Intersection *(coords updated)* | แยกรัชดา-สุทธิสาร (ด้านถนนสุทธิสารวินิจฉัย) | Huai Khwang | Ratchadaphisek | `PAIR_ARM_SUTTHISAN` | `None` |
 | [x] | `123` | Ratchada-Lat Phrao Intersection (Ratchadaphisek Road) | From Ratchada-Sutthisan Intersection | แยกรัชดา-ลาดพร้าว (ด้านถนนรัชดาภิเษก) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `Outbound` |
-| [x] | `124` | Ratchada-Lat Phrao Intersection (Lat Phrao Road) | From Chok Chai 4 Intersection | แยกรัชดา-ลาดพร้าว (ด้านถนนลาดพร้าว) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `Inbound` |
+| [x] | `124` | Ratchada-Lat Phrao Intersection (Lat Phrao Road) | At Ratchada-Lat Phrao Intersection | แยกรัชดา-ลาดพร้าว (ด้านถนนลาดพร้าว) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `None` |
 | [x] | `125` | Ratchada-Lat Phrao Intersection (Ratchadaphisek Road) | From Ratchayothin Intersection towards Ratchada-Sutthisan | แยกรัชดา-ลาดพร้าว (ด้านถนนรัชดาภิเษก) | Chatuchak | Ratchadaphisek | `PAIR_ARM_RATCHADALATPHRAO` | `Inbound` |
 | [x] | `126` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Inbound` |
 | [x] | `127` | Footbridge near Soi Ratchadaphisek 30 on Ratchadaphisek Road | From Ratchada-Lat Phrao Intersection towards Ratchayothin Intersection *(coords updated)* | สะพานลอยซอยรัชดาภิเษก 30 ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `FB_03_Ratchada30` | `Outbound` |
-| [x] | `135` | Footbridge in front of Toyota Sure on Ratchadaphisek Road | From Ratchayothin Intersection towards Ratchada-Lat Phrao Intersection | สะพานลอยหน้าโตโยต้าชัวร์ ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `None` | `Inbound` |
+| [x] | `135` | Footbridge in front of Toyota Sure on Ratchadaphisek Road | Between Ratchayothin and Ratchada-Lat Phrao Intersections (both directions visible) | สะพานลอยหน้าโตโยต้าชัวร์ ถนนรัชดาภิเษก | Chatuchak | Ratchadaphisek | `None` | `None` |
 | [x] | `211` | Footbridge near Soi Ratchadaphisek 3 on Ratchadaphisek Road | From Rama 9 Intersection towards Thiam Ruam Mit Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 3 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
 | [x] | `212` | Footbridge near Big C Ratchadaphisek on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Rama 9 Intersection | สะพานลอยใกล้บิ๊กซีรัชดา ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Inbound` |
 | [x] | `215` | Footbridge near Soi Ratchadaphisek 7 on Ratchadaphisek Road | From Thiam Ruam Mit Intersection towards Huai Khwang Intersection | สะพานลอยใกล้ซอยรัชดาภิเษก 7 ถนนรัชดาภิเษก | Din Daeng | Ratchadaphisek | `None` | `Outbound` |
@@ -60,7 +60,7 @@
 | [x] | `178` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Saphan Khwai Intersection towards Victory Monument | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Inbound` |
 | [x] | `179` | Footbridge in front of Phyathai 2 Hospital on Phahon Yothin Road | From Victory Monument towards Saphan Khwai Intersection | สะพานลอยหน้าโรงพยาบาลพญาไท 2 ถนนพหลโยธิน | Phaya Thai | Phahon Yothin - Lat Phrao | `FB_02_Phyathai2` | `Outbound` |
 | [x] | `1070` | Footbridge near Soi Phahon Yothin 18/2 on Phahon Yothin Road | From Kamphaeng Phet Intersection towards Lat Phrao Intersection | สะพานลอยใกล้ซอยพหลโยธิน 18/2 ถนนพหลโยธิน | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Outbound` |
-| [x] | `1071` | Kamphaeng Phet Intersection (Phahon Yothin Road) | From Lat Phrao Intersection (near Soi Phahon Yothin 18) | แยกกำแพงเพชร (ด้านถนนพหลโยธิน) | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `Inbound` |
+| [x] | `1071` | Kamphaeng Phet Intersection (Phahon Yothin Road) | At Kamphaeng Phet Intersection (Phahon Yothin Road side) | แยกกำแพงเพชร (ด้านถนนพหลโยธิน) | Chatuchak | Phahon Yothin - Lat Phrao | `None` | `None` |
 | [x] | `1112` | Sutthisan Intersection (Sutthisan Winitchai Road) | Sutthisan Intersection (Sutthisan Winitchai Road) | แยกสุทธิสาร (ถนนสุทธิสารวินิจฉัย) | Din Daeng | Phahon Yothin - Lat Phrao | `None` | `None` |
 | [x] | `938` | Ramkhamhaeng - Rama 9 Intersection | Ramkhamhaeng - Rama 9 Intersection *(98 frozen frames)* | แยกรามคำแหง-พระราม 9 | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
 | [x] | `939` | Mahadthai Intersection | Mahadthai Intersection (Ramkhamhaeng Bridge) *(95 frozen frames)* | แยกมหาดไทย | Bang Kapi | East Bangkok (Ramkhamhaeng - On Nut) | `None` | `None` |
@@ -79,15 +79,15 @@
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
 | [x] | `75` | Ratchada-Naradhiwas Intersection (Naradhiwas Road) | From Naradhiwas-Rama 3 Intersection | แยกรัชดา-นราธิวาส (ด้านถนนนราธิวาสฯ) | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Inbound` |
-| [x] | `88` | Chan-Sathu Pradit Intersection | Towards Chan-Naradhiwas Intersection | แยกจันทน์-สาธุประดิษฐ์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
+| [x] | `88` | Chan-Sathu Pradit Intersection | At Chan-Sathu Pradit Intersection | แยกจันทน์-สาธุประดิษฐ์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
 | [x] | `186` | Directional sign gantry to Rama 3 Bridge on Ratchadaphisek Road | From Ratchada-Naradhiwas Intersection towards Sathu Pradit Intersection | โครงสร้างป้ายบอกทางขึ้นสะพานพระราม 3 ถนนรัชดาภิเษก | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `188` | Footbridge near Rama 3 Soi 68 on Rama 3 Road | From Na Ranong Intersection towards Nang Linchi Intersection | สะพานลอยใกล้ซอยพระรามที่ 3 ซอย 68 ถนนพระรามที่ 3 | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `194` | Footbridge near Soi Convent on North Sathon Road | From Witthayu Intersection towards Sathon-Naradhiwas Intersection | สะพานลอยใกล้ปากซอยคอนแวนต์ ถนนสาทรเหนือ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `196` | Footbridge in front of Makro on Naradhiwas Ratchanakharin Road | From Sathon-Naradhiwas Intersection towards Chan-Naradhiwas Intersection | สะพานลอยหน้าแม็คโคร ถนนนราธิวาสราชนครินทร์ | Sathon | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
 | [x] | `206` | Footbridge opposite Soi Naradhiwas 20 on Naradhiwas Ratchanakharin Road | From Chan-Naradhiwas Intersection towards Ratchada-Naradhiwas Intersection *(6 exclusions; coords updated)* | สะพานลอยตรงข้ามซอยนราธิวาสราชนครินทร์ 20 ถนนนราธิวาสราชนครินทร์ | Yan Nawa | Sathon - Naradhiwas - Rama 3 | `None` | `Outbound` |
-| [x] | `599` | Surasak Intersection | Towards Sathon-Surasak Intersection | แยกสุรศักดิ์ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
-| [x] | `603` | Silom-Naradhiwas Intersection | From Sathon-Naradhiwas Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `Inbound` |
-| [x] | `604` | Silom-Naradhiwas Intersection | Silom-Naradhiwas Intersection (Naradhiwas Rd towards Sathon-Naradhiwas Intersection) | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `None` |
+| [x] | `599` | Surasak Intersection | At Surasak Intersection | แยกสุรศักดิ์ | Bang Rak | Sathon - Naradhiwas - Rama 3 | `None` | `None` |
+| [x] | `603` | Silom-Naradhiwas Intersection | At Silom-Naradhiwas Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `None` |
+| [x] | `604` | Silom-Naradhiwas Intersection | At Silom-Naradhiwas Intersection | แยกสีลม-นราธิวาส | Bang Rak | Sathon - Naradhiwas - Rama 3 | `PAIR_JX_SILOM_NARADHIWAS` | `None` |
 | [x] | `11` | Near Soi Ratchawithi 6 on Ratchawithi Road | Between Victory Monument and Din Daeng Intersection (both directions) | ใกล้ซอยราชวิถี 6 ถนนราชวิถี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
 | [x] | `82` | Footbridge near Soi Ratchaprarop 3 on Ratchaprarop Road | Between Pratu Nam and Mo Leng Intersections (both directions: 4 northbound / 1 southbound contraflow lane) | สะพานลอยใกล้ซอยราชปรารภ 3 ถนนราชปรารภ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
 | [x] | `239` | Footbridge near Triam Udom Suksa School on Phayathai Road | From Pathum Wan Intersection towards Sam Yan Intersection | สะพานลอยใกล้โรงเรียนเตรียมอุดมศึกษา ถนนพญาไท | Pathum Wan | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
@@ -103,23 +103,23 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [x] | `250` | Footbridge near Soi Phetchaburi 38 on Phetchaburi Road | From Phrom Phong Intersection towards Asok-Phetchaburi Intersection | สะพานลอยใกล้ซอยเพชรบุรี 38 ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Inbound` |
-| [x] | `251` | Footbridge near Wat Ditsahongsaram (Wat Makkasan) on Phetchaburi Road | From Phetchaburi Expressway Intersection towards Mit Samphan Intersection | สะพานลอยใกล้วัดดิสหงษาราม ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `Outbound` |
-| [x] | `256` | Footbridge near Soi Phetchaburi 27 on Phetchaburi Road | From Pratu Nam Intersection towards Chalerm Maha Nakhon Expressway | สะพานลอยใกล้ซอยเพชรบุรี 27 ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
-| [x] | `500` | Pratu Nam Intersection | Pratu Nam Intersection (from Ratchathewi Intersection towards Soi Phetchaburi 27) *(78 corrupt/green exclusions)* | แยกประตูน้ำ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `250` | Footbridge near Soi Phetchaburi 38 on Phetchaburi Road | Between Phrom Phong and Asok-Phetchaburi Intersections (both directions visible) | สะพานลอยใกล้ซอยเพชรบุรี 38 ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `251` | Footbridge near Wat Ditsahongsaram (Wat Makkasan) on Phetchaburi Road | Between Phetchaburi Expressway and Mit Samphan Intersections (both directions visible) | สะพานลอยใกล้วัดดิสหงษาราม ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `256` | Footbridge near Soi Phetchaburi 27 on Phetchaburi Road | Between Pratu Nam Intersection and Chalerm Maha Nakhon Expressway (both directions visible) | สะพานลอยใกล้ซอยเพชรบุรี 27 ถนนเพชรบุรี | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
+| [x] | `500` | Pratu Nam Intersection | At Pratu Nam Intersection *(78 corrupt/green exclusions)* | แยกประตูน้ำ | Ratchathewi | Pathum Wan - Phetchaburi - Victory Monument | `None` | `None` |
 | [x] | `26` | Bukkhalo Intersection (Charoen Nakhon Road) | From Charoen Nakhon / Rat Burana Road | แยกบุคคโล (ด้านถนนเจริญนคร) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `PAIR_ARM_BUKKHALO` | `Inbound` |
-| [x] | `1195` | Bukkhalo Intersection (Charoen Nakhon Road) | Charoen Nakhon Road (Outbound) | แยกบุคคโล (ด้านถนนเจริญนคร) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `PAIR_ARM_BUKKHALO` | `Outbound` |
-| [x] | `32` | Bang Yi Ruea Intersection (Thoet Thai Road) | From Talat Phlu Intersection | แยกบางยี่เรือ (ด้านถนนเทอดไท) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
-| [x] | `36` | Ratchada-Ratchaphruek Intersection (Ratchadaphisek Road) | From Mahai Sawan Intersection | แยกรัชดา-ราชพฤกษ์ (ด้านถนนรัชดาภิเษก) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
+| [x] | `1195` | Bukkhalo Intersection (Charoen Nakhon Road) | At Bukkhalo Intersection (Charoen Nakhon Road side) | แยกบุคคโล (ด้านถนนเจริญนคร) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `PAIR_ARM_BUKKHALO` | `None` |
+| [x] | `32` | Bang Yi Ruea Intersection (Thoet Thai Road) | Bang Yi Ruea Intersection (Thoet Thai Road side) | แยกบางยี่เรือ (ด้านถนนเทอดไท) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
+| [x] | `36` | Ratchada-Ratchaphruek Intersection (Ratchadaphisek Road) | At Ratchada-Ratchaphruek Intersection | แยกรัชดา-ราชพฤกษ์ (ด้านถนนรัชดาภิเษก) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
 | [x] | `1103` | Ratchada-Ratchaphruek Intersection (Ratchadaphisek Road) | From Tha Phra Intersection | แยกรัชดา-ราชพฤกษ์ (ด้านถนนรัชดาภิเษก) | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `Inbound` |
 | [x] | `1076` | Footbridge near Soi Thoet Thai 21 on Ratchaphruek Road | From Taksin Intersection towards Ratchada-Ratchaphruek Intersection | สะพานลอยใกล้ซอยเทอดไท 21 ถนนราชพฤกษ์ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `Outbound` |
-| [x] | `158` | Footbridge near Soi Charoen Nakhon 46 on Charoen Nakhon Road | From Charoen Nakhon Tai Intersection towards Bukkhalo Intersection | สะพานลอยใกล้ซอยเจริญนคร 46 ถนนเจริญนคร | Khlong San | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `Outbound` |
+| [x] | `158` | Footbridge near Soi Charoen Nakhon 46 on Charoen Nakhon Road | Charoen Nakhon Road near Soi Charoen Nakhon 55 (both directions visible) | สะพานลอยใกล้ซอยเจริญนคร 46 ถนนเจริญนคร | Khlong San | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
 | [x] | `1078` | Footbridge in front of Wat Suwan on Charoen Nakhon Road | From Khlong San Intersection towards Charoen Nakhon Tai Intersection | สะพานลอยหน้าวัดสุวรรณ ถนนเจริญนคร | Khlong San | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `FB_06_WatSuwan` | `Outbound` |
 | [x] | `1132` | Footbridge in front of Wat Suwan on Charoen Nakhon Road | From Charoen Nakhon Tai Intersection towards Khlong San Intersection | สะพานลอยหน้าวัดสุวรรณ ถนนเจริญนคร | Khlong San | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `FB_06_WatSuwan` | `Inbound` |
 | [x] | `529` | Phutthamonthon Sai 2 - Borommaratchachonnani Interchange | Phutthamonthon Sai 2 / Borommaratchachonnani | จุดตัดถนนพุทธมณฑลสาย 2 | Thawi Watthana | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
 | [x] | `572` | Borommaratchachonnani Elevated Highway (Taling Chan Ramp) | Taling Chan ascending ramp | ทางคู่ขนานลอยฟ้าบรมราชชนนี (ช่วงทางขึ้นตลิ่งชัน) | Taling Chan | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `Inbound` |
 | [x] | `1188` | Kanchanaphisek Road (Chimphli Interchange) | Overlooking Kanchanaphisek Road (Motorway 9) towards Bang Chueak Nang Interchange (both directions) | ถนนกาญจนาภิเษก (ต่างระดับฉิมพลี) | Taling Chan | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
-| [x] | `595` | Ban Khaek Intersection | Itsaraphap & Prajadhipok Roads (from Pho Sam Ton Intersection) | แยกบ้านแขก | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
+| [x] | `595` | Ban Khaek Intersection | At Ban Khaek Intersection | แยกบ้านแขก | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
 
 ---
 
@@ -128,7 +128,7 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [x] | `915` | Wongwian Yai Roundabout | Wongwian Yai Roundabout (SW quadrant looking NNE towards Intharaphithak & Prajadhipok) | วงเวียนใหญ่ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
+| [x] | `915` | Wongwian Yai Roundabout | At Wongwian Yai Roundabout | วงเวียนใหญ่ | Thon Buri | Thon Buri - Charoen Nakhon - Borommaratchachonnani | `None` | `None` |
 | [x] | `18` | Saphan Daeng Intersection (Thahan Road) | Saphan Daeng Bridge towards Kiakkai Intersection (both directions visible) | แยกสะพานแดง (ด้านถนนทหาร) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
 | [x] | `1028` | Saphan Daeng Intersection | Saphan Daeng Intersection | แยกสะพานแดง | Dusit | Old Town - Dusit - Rama 5 | `PAIR_OV_SAPHANDAENG` | `None` |
 | [x] | `70` | In front of Bank of Thailand on Sam Sen Road | From Thewet Intersection towards Bang Khun Phrom Intersection (with contraflow lane) | หน้าธนาคารแห่งประเทศไทย ถนนสามเสน | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_2W_BOT_SAMSEN` | `None` |
@@ -138,12 +138,12 @@
 | [x] | `230` | Entrance to Soi Ranong 2 on Rama 5 Road | Between Saphan Daeng and Kesakomon Intersections (both directions visible) | ปากซอยระนอง 2 ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `233` | Opposite Chitralada Palace on Rama 5 Road | Between Ratchawithi and Wat Benchamabophit Intersections (both directions visible) | ตรงข้ามพระตำหนักจิตรลดารโหฐาน ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `PAIR_2W_CHITRALADA` | `None` |
 | [x] | `1063` | Opposite Chitralada Palace on Rama 5 Road | Between Wat Benchamabophit and Ratchawithi Intersections (both directions visible) | ตรงข้ามพระตำหนักจิตรลดารโหฐาน ถนนพระรามที่ 5 | Dusit | Old Town - Dusit - Rama 5 | `PAIR_2W_CHITRALADA` | `None` |
-| [x] | `301` | U Thong Nok Intersection | Nakhon Ratchasima Rd towards Kan Ruean Intersection (one-way + contraflow bus lane) | แยกอู่ทองนอก | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `301` | U Thong Nok Intersection | At U Thong Nok Intersection (U Thong Nok Road side) | แยกอู่ทองนอก | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `332` | Ratchawat Intersection | Ratchawat Intersection towards Phichai Intersection (both directions and cross traffic visible) *(5 scanline smear exclusions)* | แยกราชวัตร | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `363` | Khet Dusit Intersection | Khet Dusit Intersection, Rama 5 & Sukhothai Roads (multi-directional view) | แยกเขตดุสิต | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `370` | Thewet Intersection | Krung Kasem Rd between Thewet and Pracha Kasem Intersections (both directions) *(low contrast_std verified healthy)* | แยกเทเวศร์ | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_THEWET` | `None` |
 | [x] | `371` | Thewet Intersection | Thewet Intersection crosswalks (multi-directional intersection view) *(low contrast_std verified healthy)* | แยกเทเวศร์ | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_THEWET` | `None` |
-| [x] | `546` | Panichayakarn Intersection (Phitsanulok Road) | Phitsanulok Rd side towards Chamai Maruchet Bridge / Government House *(night wet-road glare kept for Task 04)* | แยกพาณิชยการ (ด้านถนนพิษณุโลก) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
+| [x] | `546` | Panichayakarn Intersection (Phitsanulok Road) | At Panichayakarn Intersection (Phitsanulok Road side) *(night wet-road glare kept for Task 04)* | แยกพาณิชยการ (ด้านถนนพิษณุโลก) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
 | [x] | `1368` | Panichayakarn Intersection (Rama 5 Road) | Rama 5 Rd side past RMUTP (both directions) *(night wet-road glare kept for Task 04)* | แยกพาณิชยการ (ด้านถนนพระรามที่ 5) | Dusit | Old Town - Dusit - Rama 5 | `PAIR_JX_PANICHAYAKARN` | `None` |
 
 ---
@@ -153,20 +153,20 @@
 
 | Verified | `cam_id` | `location_en` | `location_detail_en` | `location_th` | `district` | `corridor` | `pair_id` | `direction` |
 | :---: | :---: | :--- | :--- | :--- | :--- | :--- | :--- | :---: |
-| [x] | `68` | In front of Bangkok Bank Worachak Branch on Worachak Road | From Maen Si Intersection towards Worachak Intersection *(1 blocked_by_crow exclusion)* | หน้าธนาคารกรุงเทพ สาขาวรจักร | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `68` | In front of Bangkok Bank Worachak Branch on Worachak Road | Between Worachak and Maen Si Intersections (both directions visible) *(1 blocked_by_crow exclusion)* | หน้าธนาคารกรุงเทพ สาขาวรจักร | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `228` | In front of Klang Hospital on Luang Road | From Klang Hospital Intersection towards Worachak Intersection | หน้าโรงพยาบาลกลาง ถนนหลวง | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `395` | Sao Chingcha Intersection | Sao Chingcha Intersection *(348x261 px, 72 frozen frames)* | แยกเสาชิงช้า | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `411` | Phra Athit Road (Camera 1) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
-| [x] | `412` | Phra Athit Road (Camera 2) | Phra Athit Road | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
-| [x] | `413` | Tanao Road | Tanao Road *(1 blocked_by_pickup exclusion)* | แนวถนนตะนาว 1 | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `414` | Under Phra Phuttha Yodfa Bridge (Memorial Bridge) | Towards Phra Nakhon area and Sanam Chai | บริเวณใต้สะพานพุทธ | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `411` | Phra Athit Road (Camera 1) | Phra Athit Road *(coords updated)* | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
+| [x] | `412` | Phra Athit Road (Camera 2) | Phra Athit Road *(coords updated)* | แนวถนนพระอาทิตย์ 2 | Phra Nakhon | Old Town - Dusit - Rama 5 | `PAIR_OV_PHRAATHIT` | `None` |
+| [x] | `413` | Tanao Road | Tanao Road *(1 blocked_by_pickup exclusion)* *(coords updated)* | แนวถนนตะนาว 1 | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `414` | Under Phra Phuttha Yodfa Bridge (Memorial Bridge) | Towards Phra Nakhon area and Sanam Chai *(coords updated)* | บริเวณใต้สะพานพุทธ | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `556` | Vajira Intersection | From Wat Prasat Bunyawat | แยกวชิระ | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
 | [x] | `569` | Jor Por Ror Intersection | Jor Por Ror Intersection | แยก จ.ป.ร. | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `576` | Bang Lamphu Intersection | Towards Khao San Road / Sanam Luang | แยกบางลำพู | Phra Nakhon | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [x] | `630` | Kesakomon Intersection (Amnuay Songkhram Road) | From Saphan Daeng Intersection *(25 corrupt/stretched/blurry exclusions)* | แยกเกษะโกมล (ด้านถนนอำนวยสงคราม) | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `630` | Kesakomon Intersection (Rama 5 Road) | Between Kesakomon and Ratchawat Intersections (both directions visible) *(25 corrupt/stretched/blurry exclusions)* | แยกเกษะโกมล (ด้านถนนพระราม 5) | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `913` | S.A.B. Intersection | S.A.B. Intersection (Charoen Krung - Worachak Road) | แยกเอส.เอ.บี. | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
-| [x] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | Towards Lan Luang Intersection *(5 overexposed_glare exclusions)* | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
+| [x] | `1039` | Near Narit Damrat Bridge (Khlong Mahanak) | At Narit Damrat Bridge *(5 overexposed_glare exclusions)* | ใกล้สะพานนริศดำรัส (คลองมหานาค) | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `1060` | In front of Sai Panya School on Krung Kasem Road | From Rama 1 Road | หน้าโรงเรียนสายปัญญา ถนนกรุงเกษม | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
-| [x] | `1362` | Samsen Road | Towards Tha Wasukri Pier *(coords updated)* | ถนนสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `Inbound` |
+| [x] | `1362` | Samsen Road | Samsen Road in front of the entrance to Wat Rajadhivas Vihara *(coords updated)* | ถนนสามเสน | Dusit | Old Town - Dusit - Rama 5 | `None` | `None` |
 | [x] | `1589` | Maen Si Intersection | Maen Si Intersection | แยกแม้นศรี | Pom Prap Sattru Phai | Old Town - Dusit - Rama 5 | `None` | `None` |
 
