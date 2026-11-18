@@ -2,12 +2,30 @@
 
 See full technical specification in [`../GOAL.md`](../GOAL.md).
 
-## Recommended Module Architecture
+## Module Architecture
 
 ```text
 01_scraping_apis/src/
-├── fetch_weather_openmeteo.py      # Source 1: Hourly weather archive ingestion
-├── fetch_pois_overpass.py          # Source 2: Single-BBox Overpass QL + 500m Haversine matcher
-├── fetch_air_quality_openmeteo.py  # Source 3: Hourly PM2.5, NO2, CO ingestion
-└── build_weather_air_poi.py        # Pipeline runner exporting data/weather_air_poi.parquet
+├── fetch_weather_air_poi.py   # Entrypoint: Open-Meteo weather + air quality (one batched request each),
+│                              # joins 500m POI counts, exports data/weather_air_poi.parquet
+└── fetch_pois_overpass.py     # Single-BBox Overpass QL query + 500m Haversine matcher (imported by the entrypoint)
 ```
+
+## Run
+
+```bash
+cd 01_scraping_apis/src
+python fetch_weather_air_poi.py            # uses cached API responses when present
+python fetch_weather_air_poi.py --refresh  # re-download weather, air quality and OSM POIs
+```
+
+## Outputs
+
+| Path | Description |
+| :--- | :--- |
+| `data/weather_air_poi.parquet` | 16,800 rows (100 cameras x 168 hours), 14 columns, zero nulls |
+| `data/raw_weather_air/weather.json`, `air_quality.json` | Cached Open-Meteo responses |
+| `data/raw_osm/bkk_pois.json` | Cached Overpass response (transit nodes + school/mall/hospital nodes, ways and relations) |
+| `data/scraping_summary_01.json` | Row/null counts and max POI counts |
+
+Then run `02_scraping_traffy_playwright/src/merge_external_dataset.py` to rebuild `data/external_weather_poi.parquet`.

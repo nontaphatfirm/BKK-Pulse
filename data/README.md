@@ -15,7 +15,9 @@ This directory stores the intermediate and production `.parquet` and `.json` art
 | File Path | Producer Module | Description |
 | :--- | :---: | :--- |
 | `data/weather_air_poi.parquet` | `01_scraping_apis` | Hourly Open-Meteo weather, air quality (`PM2.5`, `NO2`, `CO`), and 500m OSM POI counts |
-| `data/traffy_complaints_near_cctv.parquet` | `02_scraping_traffy_playwright` | Incident-level BMA Traffy Fondue reports matched within 500m-1km of cameras |
+| `data/traffy_complaints_near_cctv.parquet` | `02_scraping_traffy_playwright` | Incident-level BMA Traffy Fondue reports (May-Oct 2026) matched within 1 km of their nearest camera |
+| `data/traffy_camera_counts.parquet` | `02_scraping_traffy_playwright` | Per-camera Traffy counts: 6-month totals and 7-day (`*_7d`) week totals |
+| `data/traffy_hourly_week.parquet` | `02_scraping_traffy_playwright` | Hourly in-week Traffy complaint counts (`*_1h`) on the Table 4 `(cam_id, timestamp)` key |
 | `data/external_weather_poi.parquet` | `01` & `02` | **Canonical Table 4:** Merged hourly weather, air quality, OSM POIs, and Traffy hotspot counts |
 | `data/vehicle_counts_sample.parquet` | `03_cv_yolo_pipeline` | **Priority 1 Pilot Table:** 5-camera subset (~3,000 rows) for immediate DS/BI development |
 | `data/vehicle_counts.parquet` | `03_cv_yolo_pipeline` | **Canonical Table 3:** Full 60,029-frame vehicle counts, PCU, and road occupancy ratios (`V2.0`) |

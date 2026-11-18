@@ -157,6 +157,8 @@ def build_weather_air(cameras: pd.DataFrame, refresh: bool = False) -> pd.DataFr
     frame = grid_frame.merge(poi_counts, on="cam_id", how="left")
 
     frame["timestamp"] = pd.to_datetime(frame["timestamp"]).astype("datetime64[us]")
+    # Sort before gap-filling so ffill/bfill runs along each camera's own timeline.
+    frame = frame.sort_values(["cam_id", "timestamp"]).reset_index(drop=True)
     numeric_cols = [
         "rain_mm",
         "temp_c",
@@ -171,8 +173,8 @@ def build_weather_air(cameras: pd.DataFrame, refresh: bool = False) -> pd.DataFr
         if frame[column].isna().any():
             # Keep the contract's "zero NaN" promise; report before filling.
             missing = int(frame[column].isna().sum())
-            print(f"[warn] {column}: {missing} missing values -> forward/back fill")
-            frame[column] = frame[column].ffill().bfill()
+            print(f"[warn] {column}: {missing} missing values -> per-camera forward/back fill")
+            frame[column] = frame.groupby("cam_id")[column].transform(lambda s: s.ffill().bfill())
 
     for column in [
         "nearby_transit_count",
@@ -215,7 +217,7 @@ def main() -> None:
     frame.to_parquet(OUTPUT_PATH, index=False)
 
     summary = {
-        "output": str(OUTPUT_PATH.relative_to(PROJECT_ROOT)),
+        "output": OUTPUT_PATH.relative_to(PROJECT_ROOT).as_posix(),
         "rows": int(len(frame)),
         "cameras": int(frame["cam_id"].nunique()),
         "hours_per_camera": int(frame.groupby("cam_id").size().max()),

@@ -100,7 +100,7 @@ Export `pcu_score`, `composite_density`, `congestion_index`, `low_visibility_fla
 ### Module 2.3: CCTV Image-Processing Rain & Wet-Road Detection and Recovery Analysis
 
 #### Why Image Processing Is Needed Alongside Weather APIs
-- **Coarse Weather Grid Limitation:** Open-Meteo reanalysis operates on a ~9-11 km (`0.1 deg`) spatial grid (`5` cells across our 100 cameras), missing hyper-local tropical storms. For example, at Camera `529` on August 30 at `16:05`, heavy rain haze drops `contrast_std` to `~25.0` while city-center grid cells report only `1.5 mm`.
+- **Coarse Weather Grid Limitation:** Open-Meteo reanalysis operates on a ~9-11 km (`0.1 deg`) spatial grid (only `10` distinct weather series across our 100 cameras), missing hyper-local tropical storms. For example, at Camera `529` on August 30 at `16:05`, heavy rain haze drops `contrast_std` to `~25.0` while city-center grid cells report only `1.5 mm`.
 - **Daytime Contrast-Only Limitation:** Simple rules based only on global `contrast_std` during daytime (`07:00-18:00`) miss two critical conditions observed in the dataset:
   1. **Post-rain wet/flooded pavement:** Immediately after rain eases (e.g., Camera `529` at `16:25`), `contrast_std` rebounds to normal (`~48.7`) even though asphalt remains soaked with strong specular vehicle reflections.
   2. **Global sky glare & evening rain (`18:00-21:00`):** Bright overcast upper skies trigger high full-frame `glare_ratio` on dry afternoons (e.g., Camera `529` at `14:45`), while rain/wet roads after `18:00` require road-zone optical cues.

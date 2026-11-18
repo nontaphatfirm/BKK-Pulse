@@ -1,24 +1,73 @@
 {
-  "started_at": "2026-11-12T07:34:00.384938+00:00",
+  "started_at": "2026-11-17T13:43:23.637013+00:00",
   "target_url": "https://bangkok.traffy.in.th/",
   "steps": [
     {
       "step": "goto",
-      "at": "2026-11-12T07:34:02.073686+00:00",
+      "at": "2026-11-17T13:43:31.214366+00:00",
       "url": "https://bangkok.traffy.in.th/"
     },
     {
-      "step": "networkidle",
-      "at": "2026-11-12T07:34:05.230697+00:00"
+      "step": "networkidle_timeout",
+      "at": "2026-11-17T13:44:31.218869+00:00"
+    },
+    {
+      "step": "xhr district:เขตจตุจักร",
+      "at": "2026-11-17T13:44:51.024278+00:00",
+      "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed?group_id=18059",
+      "status": 200
+    },
+    {
+      "step": "xhr district:เขตดินแดง",
+      "at": "2026-11-17T13:45:00.719149+00:00",
+      "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed?group_id=18015",
+      "status": 200
+    },
+    {
+      "step": "district reset",
+      "at": "2026-11-17T13:45:07.030963+00:00"
+    },
+    {
+      "step": "open advanced filter",
+      "at": "2026-11-17T13:45:07.119004+00:00"
+    },
+    {
+      "step": "xhr category:น้ำท่วม(flood)",
+      "at": "2026-11-17T13:45:24.654971+00:00",
+      "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed?start=2026-09-26 00:00&problem_type=น้ำท่วม",
+      "status": 200
+    },
+    {
+      "step": "xhr category:ถนน(traffic)",
+      "at": "2026-11-17T13:45:31.296866+00:00",
+      "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed?problem_type=ถนน",
+      "status": 200
+    },
+    {
+      "step": "xhr category:ผิดกฎจราจร(traffic)",
+      "at": "2026-11-17T13:45:43.333726+00:00",
+      "url": "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed?problem_type=ผิดกฎจราจร",
+      "status": 200
     },
     {
       "step": "click สถิติ",
-      "at": "2026-11-12T07:34:13.654137+00:00"
+      "at": "2026-11-17T13:45:53.751978+00:00",
+      "url": "https://bangkok.traffy.in.th/top"
     }
   ],
   "title": "Traffy x Bangkok สถิติ",
   "final_url": "https://bangkok.traffy.in.th/top",
-  "finished_at": "2026-11-12T07:34:19.993489+00:00",
-  "network_requests": 12,
+  "finished_at": "2026-11-17T13:45:54.004338+00:00",
+  "network_requests": 21,
+  "filtered_xhr_captured": 5,
+  "complaints_captured": 1704,
+  "complaints_by_filter": {
+    "initial_load": 100,
+    "district:เขตจตุจักร": 299,
+    "district:เขตดินแดง": 540,
+    "category:น้ำท่วม(flood)": 280,
+    "category:ถนน(traffic)": 226,
+    "category:ผิดกฎจราจร(traffic)": 259
+  },
   "interacted": true
 }

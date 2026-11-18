@@ -33,6 +33,7 @@ CAMERA_PATH = PROJECT_ROOT / "Dataset_Clean_V1" / "cctv_info_cleaned.parquet"
 CACHE_DIR = PROJECT_ROOT / "data" / "raw_traffy_cache" / "pages"
 INCIDENT_PATH = PROJECT_ROOT / "data" / "traffy_complaints_near_cctv.parquet"
 COUNTS_PATH = PROJECT_ROOT / "data" / "traffy_camera_counts.parquet"
+HOURLY_PATH = PROJECT_ROOT / "data" / "traffy_hourly_week.parquet"
 SUMMARY_PATH = PROJECT_ROOT / "data" / "scraping_summary_02.json"
 
 API_URL = "https://api.traffy.in.th/postgrest/rpc/get_bkk_geojson_feed"
@@ -178,6 +179,13 @@ def fetch_complaints(
 
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], errors="coerce")
     frame = frame.dropna(subset=["timestamp", "lat", "lon"]).copy()
+    # The feed can return pages outside [start, end]; bound it like load_cached_frame().
+    lower = pd.Timestamp(start)
+    upper = pd.Timestamp(end) + pd.Timedelta(days=1)
+    outside = int(((frame["timestamp"] < lower) | (frame["timestamp"] >= upper)).sum())
+    if outside:
+        print(f"[traffy] dropped {outside:,} records outside {start}..{end}")
+    frame = frame[(frame["timestamp"] >= lower) & (frame["timestamp"] < upper)].copy()
     frame["problem_type"] = frame["type_raw"].map(classify)
     frame["timestamp"] = frame["timestamp"].astype("datetime64[us]")
     return frame
@@ -234,6 +242,45 @@ def _nearest_camera(frame: pd.DataFrame, cameras: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
+def hourly_week_counts(matched: pd.DataFrame, cam_ids: pd.Series) -> pd.DataFrame:
+    """Hourly complaint activity per camera during the CCTV week (100 x 168 rows).
+
+    Companion to the static 6-month hotspot counts in Table 4: same
+    (cam_id, timestamp) key, so downstream modules can join it when they need
+    the in-week temporal profile. Hours with no complaints are zero-filled.
+    """
+    hours = pd.date_range(WEEK_START, pd.Timestamp(WEEK_END).floor("h"), freq="h")
+    grid = pd.MultiIndex.from_product(
+        [sorted(cam_ids.astype("int64")), hours], names=["cam_id", "timestamp"]
+    )
+    week = matched[
+        (matched["timestamp"] >= hours[0]) & (matched["timestamp"] < hours[-1] + pd.Timedelta(hours=1))
+    ].assign(timestamp=lambda f: f["timestamp"].dt.floor("h"))
+    counts = (
+        week.pivot_table(
+            index=["nearest_cam_id", "timestamp"],
+            columns="problem_type",
+            values="ticket_id",
+            aggfunc="count",
+            fill_value=0,
+        )
+        .reindex(columns=["flood", "traffic", "other"], fill_value=0)
+        .rename_axis(index=["cam_id", "timestamp"], columns=None)
+        .reindex(grid, fill_value=0)
+    )
+    frame = pd.DataFrame(
+        {
+            "traffy_complaint_count_1h": counts.sum(axis=1),
+            "traffy_flood_count_1h": counts["flood"],
+            "traffy_traffic_count_1h": counts["traffic"],
+        }
+    ).astype("int64").reset_index()
+    frame["timestamp"] = frame["timestamp"].astype("datetime64[us]")
+    if len(frame) != len(cam_ids) * 168:
+        raise RuntimeError(f"Expected {len(cam_ids) * 168} hourly rows, got {len(frame)}")
+    return frame
+
+
 def build_outputs(
     start: str,
     end: str,
@@ -241,7 +288,7 @@ def build_outputs(
     max_pages: int = MAX_PAGES,
     fail_on_throttle: bool = False,
     combine_cache: bool = False,
-) -> tuple[pd.DataFrame, pd.DataFrame, dict]:
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, dict]:
     cameras = pd.read_parquet(CAMERA_PATH)[["cam_id", "lat", "lon"]]
     raw = (
         load_cached_frame(start, end)
@@ -319,6 +366,7 @@ def build_outputs(
         }
     )
     counts = counts.merge(week_counts, on="cam_id", how="left")
+    hourly = hourly_week_counts(matched, cameras["cam_id"])
 
     summary = {
         "window_start": start,
@@ -332,9 +380,10 @@ def build_outputs(
         "cameras_with_any_complaint": int((counts["traffy_complaint_count"] > 0).sum()),
         "cameras_with_flood_complaint": int((counts["traffy_flood_count"] > 0).sum()),
         "week_complaints_within_1000m": int(len(week)),
+        "week_hours_with_complaints": int((hourly["traffy_complaint_count_1h"] > 0).sum()),
         "match_radius_m": MATCH_RADIUS_M,
     }
-    return incidents, counts, summary
+    return incidents, counts, hourly, summary
 
 
 def main() -> None:
@@ -386,7 +435,7 @@ def main() -> None:
         print(json.dumps(progress, indent=2))
         return
 
-    incidents, counts, summary = build_outputs(
+    incidents, counts, hourly, summary = build_outputs(
         args.start,
         args.end,
         refresh=args.refresh,
@@ -396,10 +445,12 @@ def main() -> None:
     )
     incidents.to_parquet(INCIDENT_PATH, index=False)
     counts.to_parquet(COUNTS_PATH, index=False)
+    hourly.to_parquet(HOURLY_PATH, index=False)
     SUMMARY_PATH.write_text(json.dumps(summary, indent=2), encoding="utf-8")
     print(json.dumps(summary, indent=2))
     print(f"[write] {INCIDENT_PATH.relative_to(PROJECT_ROOT)} ({len(incidents):,} rows)")
     print(f"[write] {COUNTS_PATH.relative_to(PROJECT_ROOT)} ({len(counts):,} rows)")
+    print(f"[write] {HOURLY_PATH.relative_to(PROJECT_ROOT)} ({len(hourly):,} rows)")
 
 
 if __name__ == "__main__":

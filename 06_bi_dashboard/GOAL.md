@@ -13,6 +13,13 @@
 > - `data/analytics_traffic_metrics.parquet`, `data/footbridge_tidal_flow.parquet`, `data/rain_resilience_ranking.parquet`, `data/camera_clusters_pca.parquet`  
 > - `data/ml_forecast_predictions.parquet`, `data/ml_model_metrics.json`, `data/ml_shap_importance.parquet`, `models/lgbm_congestion_forecaster.txt`
 
+> [!NOTE]
+> **Input availability (checked 2026-11-18; no dashboard code exists yet in `src/`):**
+> - **Available & contract-valid:** `cctv_info_cleaned.parquet`, `image_quality_manifest.parquet`, `cleaning_summary.json`, `data/external_weather_poi.parquet`, `data/traffy_complaints_near_cctv.parquet`, `data/traffy_hourly_week.parquet`.
+> - **Not yet produced upstream:** `data/vehicle_counts_sample.parquet`, `data/vehicle_counts.parquet` (Task 03); `analytics_traffic_metrics`, `footbridge_tidal_flow`, `rain_resilience_ranking`, `camera_clusters_pca` (Task 04); `ml_forecast_predictions`, `ml_model_metrics.json`, `ml_shap_importance`, `models/lgbm_congestion_forecaster.txt` (Task 05). Until then only Tab 4 and the Tab 1 base map can be built.
+> - **Traffy semantics for maps/KPIs:** each complaint belongs to one nearest camera (`<= 1 km`), and `traffy_traffic_count` is mostly violations / road-surface reports, not congestion (see [`DATA_CONTRACT.md`](../DATA_CONTRACT.md) Table 4).
+> - **CCTV images** (`cctv_images/<cam_id>/`) are distributed via Google Drive, not git; get the full clean set before building the snapshot drawer or the anomaly gallery.
+
 ---
 
 ## 1. Objective & Immediate Day-1 Execution Advantage

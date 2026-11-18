@@ -26,8 +26,9 @@ Thumbs.db
 *.swp
 
 # Heavy regenerable raw data (archived separately)
+# Rebuild with: python 02_scraping_traffy_playwright/src/fetch_traffy_geojson.py
+# (data/traffy_complaints_near_cctv.parquet is a Task 02 deliverable and IS committed)
 data/raw_traffy_cache/
-data/traffy_complaints_near_cctv.parquet
 
 # Temporary workspace directories (local scratch/audit files that do not need to be committed)
 **/workspace/

@@ -119,7 +119,7 @@
 ---
 
 ### Table 4: `data/external_weather_poi.parquet`
-- **Status:** `Planned` -- Co-produced by Tasks `01_scraping_apis` & `02_scraping_traffy_playwright` (**ปลื้ม** `[@siravidthongsook]` & **กร** `[@kkooAAA]`, with support from **นิว** `[@Pranithi-New]`)
+- **Status:** `Ready` -- Co-produced by Tasks `01_scraping_apis` & `02_scraping_traffy_playwright` (**ปลื้ม** `[@siravidthongsook]` & **กร** `[@kkooAAA]`, with support from **นิว** `[@Pranithi-New]`)
 - **Granularity:** Hourly records from `2026-08-25 00:00:00` to `2026-08-31 23:00:00` across 100 cameras (`168 hours x 100 cameras = 16,800 rows`)
 - **Primary Key:** `(cam_id, timestamp)` *(where `timestamp` is floored to the hour, e.g., `2026-08-25 07:00:00`)*
 
@@ -127,21 +127,30 @@
 | :--- | :--- | :--- | :---: |
 | `cam_id` | `int64` | Camera identifier (matching `cctv_info_cleaned`) | Task 01 & 02 |
 | `timestamp` | `datetime64[us]` | Hourly timestamp (`YYYY-MM-DD HH:00:00`) | Task 01 & 02 |
-| `rain_mm` | `float64` | Hourly precipitation / rainfall (mm) from Open-Meteo Archive API | Task 01 |
+| `rain_mm` | `float64` | Hourly precipitation / rainfall (mm) from Open-Meteo Archive API *(coarse grid -- see note below)* | Task 01 |
 | `temp_c` | `float64` | Air temperature at 2m (deg C) | Task 01 |
 | `humidity_pct` | `float64` | Relative humidity (%) | Task 01 |
 | `wind_speed_kmh` | `float64` | Wind speed at 10m (km/h) | Task 01 |
 | `pm25` | `float64` | Hourly PM2.5 concentration (ug/m3) from Open-Meteo Air Quality API *(city-wide context)* | Task 01 |
 | `no2` | `float64` | Hourly Nitrogen Dioxide NO2 concentration (ug/m3) *(city-wide context)* | Task 01 |
 | `co` | `float64` | Hourly Carbon Monoxide CO concentration (ug/m3) *(city-wide context)* | Task 01 |
-| `nearby_transit_count` | `int64` | Count of BTS/MRT/ARL stations & bus stops within 500m radius (OSM Overpass) | Task 01 |
+| `nearby_transit_count` | `int64` | Count of BTS/MRT/ARL stations & bus stops within 500m radius (OSM Overpass, nodes) | Task 01 |
 | `nearby_school_count` | `int64` | Count of schools, colleges & universities within 500m radius (OSM Overpass) | Task 01 |
 | `nearby_mall_count` | `int64` | Count of malls, department stores & markets within 500m radius (OSM Overpass) | Task 01 |
 | `nearby_hospital_count` | `int64` | Count of hospitals & clinics within 500m radius (OSM Overpass) | Task 01 |
 | `poi_total_count` | `int64` | Total POI count across all 4 categories within 500m radius | Task 01 |
-| `traffy_complaint_count` | `int64` | Nearby BMA Traffy Fondue complaint hotspot count within 500m-1km | Task 02 |
-| `traffy_flood_count` | `int64` | Nearby flooding / drainage complaint hotspot count within 500m-1km | Task 02 |
-| `traffy_traffic_count` | `int64` | Nearby traffic congestion / signal failure / road obstruction hotspot count within 500m-1km | Task 02 |
+| `traffy_complaint_count` | `int64` | BMA Traffy Fondue complaints (all categories) **whose nearest camera is this one, at `<= 1 km`**, May-Oct 2026 total *(static per camera)* | Task 02 |
+| `traffy_flood_count` | `int64` | Subset of `traffy_complaint_count` whose Traffy type contains `น้ำท่วม` (flooding) or `ท่อระบายน้ำ` (drainage) | Task 02 |
+| `traffy_traffic_count` | `int64` | Subset of `traffy_complaint_count` whose Traffy type contains `จราจร`, `ถนน`, `กีดขวาง` or `อุบัติเหตุ` -- **mostly traffic violations / illegal parking (`ผิดกฎจราจร`) and road-surface reports (`ถนน`)**, plus obstructions and accidents; *not* a congestion measure | Task 02 |
+
+> [!IMPORTANT]
+> **Traffy counting rule -- nearest camera, not every camera within 1 km.** Each complaint is assigned to its single nearest camera (Haversine) and kept only if that distance is `<= 1,000 m`; complaints farther than 1 km from every camera are dropped. A complaint is therefore counted **once**, so per-camera totals sum to the row count of `data/traffy_complaints_near_cctv.parquet`. This is *not* "all complaints within 1 km of the camera": ~72% of matched complaints lie within 1 km of two or more cameras, so in dense clusters (e.g. footbridge pairs `224/225`, `119/120`) a camera's count depends on how close its neighbours are. Compare cameras' Traffy exposure with that in mind. Categories are matched in priority order flood → traffic → other.
+
+> [!NOTE]
+> **Weather / air-quality resolution:** Open-Meteo is queried at `55` camera coordinates (`round(lat, 2), round(lon, 2)`), but its reanalysis grid is coarse: the 100 cameras receive only **`10` distinct weather series** and **`8` distinct air-quality series**. These columns carry hourly temporal signal, not intersection-level spatial differences.
+
+> [!NOTE]
+> The `traffy_*_count` columns are 6-month structural hotspot totals and repeat the same value in all 168 hours of a camera; they are not hourly features. For in-week hourly complaint activity, join `data/traffy_hourly_week.parquet` on `(cam_id, timestamp)` (columns `traffy_complaint_count_1h`, `traffy_flood_count_1h`, `traffy_traffic_count_1h`; see [`02_scraping_traffy_playwright/GOAL.md`](02_scraping_traffy_playwright/GOAL.md)).
 
 ---
 
