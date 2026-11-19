@@ -95,17 +95,17 @@
 ---
 
 ### Table 3: `data/vehicle_counts.parquet` (and Pilot `data/vehicle_counts_sample.parquet`)
-- **Status:** `In Progress` -- Produced by Task `03_cv_yolo_pipeline` (**เฟิร์ม** `[@nontaphatfirm]`, with support from **นิว** `[@Pranithi-New]`)
-  - **Pilot Fast-Track (`data/vehicle_counts_sample.parquet`):** 5 representative cameras (~3,000 rows) generated first for immediate use by Tasks 04, 05, and 06.
-  - **Full Production (`data/vehicle_counts.parquet`):** All `60,029` valid frames across 100 cameras (`V2.0`).
+- **Status:** `Ready` -- Produced by Task `03_cv_yolo_pipeline` (**เฟิร์ม** `[@nontaphatfirm]`, with support from **นิว** `[@Pranithi-New]`)
+  - **Pilot Fast-Track (`data/vehicle_counts_sample.parquet`):** 5 representative cameras (`26, 136, 137, 150, 546` -- `2,929` rows)
+  - **Full Production (`data/vehicle_counts.parquet`):** All `60,029` valid frames across 100 cameras (`V2.1`)
 - **Primary Key:** `(cam_id, timestamp)`
 
 | Column Name | Data Type | Description | Example Value |
 | :--- | :--- | :--- | :--- |
 | `cam_id` | `int64` | Camera identifier | `26` |
 | `timestamp` | `datetime64[us]` | Frame capture timestamp (matches `image_quality_manifest.parquet`) | `2026-08-25 07:40:41` |
-| `car_count` | `int64` | Count of dynamic 4-wheel passenger vehicles (post stationary-box filtering) | `14` |
-| `motorcycle_count` | `int64` | Count of dynamic 2-wheel/3-wheel vehicles (post stationary-box filtering) | `8` |
+| `car_count` | `int64` | Count of dynamic 4-wheel & 3-wheel passenger vehicles (post stationary-box & ROI filtering) | `14` |
+| `motorcycle_count` | `int64` | Count of dynamic 2-wheel vehicles (post stationary-box & ROI filtering) | `8` |
 | `bus_count` | `int64` | Count of buses / public transit vans | `1` |
 | `truck_count` | `int64` | Count of commercial trucks | `2` |
 | `total_vehicle_count` | `int64` | Total dynamic motorized vehicles (`car + motorcycle + bus + truck`) | `25` |
