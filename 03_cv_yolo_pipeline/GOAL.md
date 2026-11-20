@@ -3,6 +3,7 @@
 > **Assigned Owner:** เฟิร์ม ([@nontaphatfirm](https://github.com/nontaphatfirm)) *(Optional Flex Support: นิว [@Pranithi-New](https://github.com/Pranithi-New))*  
 > **Role:** Computer Vision & Data Engineering Pipeline  
 > **Source Directory:** [`src/`](src/README.md)  
+> **Detailed Architecture & Methodology:** [`PIPELINE_ARCHITECTURE.md`](PIPELINE_ARCHITECTURE.md)  
 > **Production Batch Entrypoint:** [`src/run_batch_cv_pipeline.py`](src/run_batch_cv_pipeline.py) / [`Colab_A100_Batch_Detection.ipynb`](Colab_A100_Batch_Detection.ipynb)  
 > **Single-Image & ROI Utilities:** [`src/predict_yolo26x.py`](src/predict_yolo26x.py), [`src/generate_initial_rois.py`](src/generate_initial_rois.py), [`src/edit_camera_rois.py`](src/edit_camera_rois.py)  
 > **Input Data:**  

@@ -1,6 +1,6 @@
 # Task 03 Source Directory (`03_cv_yolo_pipeline/src/`)
 
-See full technical specification in [`../GOAL.md`](../GOAL.md).
+See full technical specification in [`../GOAL.md`](../GOAL.md) and the detailed 8-stage pipeline breakdown, formulas, and production results in [`../PIPELINE_ARCHITECTURE.md`](../PIPELINE_ARCHITECTURE.md).
 
 ## Scripts & Notebooks
 
@@ -54,6 +54,7 @@ python run_pipeline.py --check-contract
 ```text
 03_cv_yolo_pipeline/
 ├── GOAL.md                             # Stage 03 technical spec & completed DoD checklist
+├── PIPELINE_ARCHITECTURE.md            # Detailed 8-stage CV architecture, formulas, ROI/BG prep & results
 ├── Colab_A100_Batch_Detection.ipynb    # Resumable Colab A100/L4/T4 execution notebook
 └── src/
     ├── README.md                       # This guide & production summary

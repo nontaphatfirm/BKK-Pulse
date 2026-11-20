@@ -110,6 +110,7 @@ Data_Science_Project/
 ├── 02_scraping_traffy_playwright/         # [Task 02 - ปลื้ม, กร] Interactive Traffy Fondue Scraping
 ├── 03_cv_yolo_pipeline/                   # [Task 03 - เฟิร์ม] Computer Vision & Feature Pipeline
 │   ├── GOAL.md                            # Task 03 technical spec, pipeline rules & completed DoD checklist
+│   ├── PIPELINE_ARCHITECTURE.md           # Full 8-stage CV architecture, formulas, ROI/BG prep & results
 │   ├── Colab_A100_Batch_Detection.ipynb   # Resumable Google Colab A100/L4/T4 execution notebook
 │   └── src/
 │       ├── README.md                      # Production usage & completeness verification summary
