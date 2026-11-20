@@ -3,7 +3,7 @@ Run YOLO object detection on a user-selected image with switchable models,
 class-remapped NMS (safe 4-wheeler grouping), optional agnostic NMS, and SAHI tiling.
 
 Supported model presets (--model):
-    - ensemble (5-expert UVH-26 + VisDrone-11x/26l + YOLO26x + YOLO11x + BG/OSD Gates)
+    - ensemble (6-weight day/night UVH-26 + VisDrone-11x/26l + BDD100K-26m + YOLO26x + YOLO11x + BG/OSD/ROI Gates)
     - yolo26x.pt (COCO pretrained)
     - dronefreak/visdrone-yolo11x
     - dronefreak/visdrone-yolo26l

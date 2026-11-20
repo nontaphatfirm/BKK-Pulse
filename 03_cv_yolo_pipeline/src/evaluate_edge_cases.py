@@ -496,7 +496,6 @@ def main() -> None:
                 "motorcycle_count": cnt.get("motorcycle", 0),
                 "bus_count": cnt.get("bus", 0),
                 "truck_count": cnt.get("truck", 0),
-                "three_wheeler_count": cnt.get("three-wheeler", 0),
                 "total_vehicles": total_v,
                 "pcu_score": round(pcu, 2),
                 "bbox_total_area": float(res.bbox_total_area),
@@ -567,7 +566,6 @@ def main() -> None:
                     "motorcycle": int(ens_row["motorcycle_count"]),
                     "bus": int(ens_row["bus_count"]),
                     "truck": int(ens_row["truck_count"]),
-                    "three-wheeler": int(ens_row["three_wheeler_count"]),
                 },
             }
         )

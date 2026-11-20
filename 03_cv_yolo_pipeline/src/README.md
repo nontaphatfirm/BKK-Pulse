@@ -38,6 +38,17 @@ python run_pipeline.py --check-contract
   - **Visual Archive (`Google Drive` / local `.zip`):** `60,029` annotated bounding-box + ROI JPEGs (`scale=1.5`, `3,923.91 MB`, excluded from Git via `.gitignore`)
 - **Contract Status:** `python run_pipeline.py --check-contract` → `[PASS]` on Tables `1`, `2`, `3a`, `3b`, and `4`.
 
+## Completeness & Verification Checklist
+
+| Check / Deliverable | Verified Result |
+| :--- | :--- |
+| **`data/vehicle_counts.parquet`** | `60,029` rows × `13` cols; exact 1-to-1 `(cam_id, timestamp)` match against `image_quality_manifest.parquet[is_valid]` (`0` missing, `0` extra); `0` nulls, `0` negatives, `0` `inf` |
+| **`data/vehicle_counts_sample.parquet`** | `2,929` rows × `13` cols across pilot cameras `[26, 136, 137, 150, 546]`; exact subset of `vehicle_counts.parquet` |
+| **Formula & ROI Floor Audit** | `total_vehicle_count == car + moto + bus + truck` (`True`); `max_pcu_diff = 0.0`, `max_occ_diff = 0.0`; `0` cameras below `15%` ROI floor (Cam `395` `348×261` → `road_roi_area = 28,646.0` ≥ `13,624.2`) |
+| **`data/camera_rois.json` & Backgrounds** | `100 / 100` cameras with reviewed Road ROIs; `200 / 200` cached median plates (`100` `_bg.jpg` + `100` `_bg_night.jpg`) in `data/median_backgrounds/` |
+| **Sanity Check (Busiest vs. Quietest Cams)** | Top avg vehicles/frame: `cam_277` (`32.34`), `cam_11` (`24.88`), `cam_75` (`23.23`), `cam_599` (`22.32`), `cam_124` (`21.62`); Quietest: `cam_179` (`2.47`), `cam_370` (`2.77`), `cam_170` (`3.48`), `cam_619` (`3.60`), `cam_1063` (`3.95`) |
+| **Visual Inspection Archive (Non-Git)** | `60,029` annotated `.jpg` frames (`scale=1.5`, `3,923.91 MB`) archived externally (`.zip` & `data/annotated_frames/` excluded via `.gitignore`) |
+
 ## Module Structure
 
 ```text

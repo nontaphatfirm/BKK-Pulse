@@ -43,6 +43,7 @@ import pandas as pd
 import torch
 from scipy import ndimage
 from ultralytics import YOLO
+from ultralytics.cfg import DEFAULT_CFG_DICT
 from ultralytics.models.sam import SAM2Predictor
 
 SRC_DIR = Path(__file__).resolve().parent
@@ -224,11 +225,16 @@ def extract_traffic_evidence_for_camera(
         motion_freq[osd_mask > 0] = 0.0
 
     use_half = torch.cuda.is_available()
+    precision_kwargs: dict[str, object] = (
+        ({"quantize": 16} if use_half else {})
+        if "quantize" in DEFAULT_CFG_DICT
+        else {"half": use_half}
+    )
     res_coco = coco_model.predict(
-        yolo_imgs, imgsz=448, conf=0.22, iou=0.55, batch=16, half=use_half, verbose=False
+        yolo_imgs, imgsz=448, conf=0.22, iou=0.55, batch=16, verbose=False, **precision_kwargs
     )
     res_vd = visdrone_model.predict(
-        yolo_imgs, imgsz=448, conf=0.26, iou=0.55, batch=16, half=use_half, verbose=False
+        yolo_imgs, imgsz=448, conf=0.26, iou=0.55, batch=16, verbose=False, **precision_kwargs
     )
 
     yolo_grays = [motion_grays[i] for i in yolo_idx]

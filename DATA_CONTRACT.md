@@ -114,7 +114,7 @@
 | `road_roi_area` | `float64` | Active road surface area in pixels for this camera (`>= 15%` of frame area) | `42500.0` |
 | `road_occupancy_ratio` | `float64` | Spatial occupancy ratio (`bbox_total_area / road_roi_area`) | `0.4341` |
 | `foreground_ratio` | `float64` | Pixel foreground ratio relative to clean-road Median Background | `0.3812` |
-| `filtered_static_boxes` | `int64` | Number of static false-positive boxes removed by the `IoU > 0.65` filter | `1` |
+| `filtered_static_boxes` | `int64` | Number of static / off-background / OSD / glare false-positive boxes suppressed in current frame | `1` |
 
 ---
 

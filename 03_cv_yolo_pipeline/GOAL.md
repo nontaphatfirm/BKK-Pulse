@@ -3,14 +3,15 @@
 > **Assigned Owner:** เฟิร์ม ([@nontaphatfirm](https://github.com/nontaphatfirm)) *(Optional Flex Support: นิว [@Pranithi-New](https://github.com/Pranithi-New))*  
 > **Role:** Computer Vision & Data Engineering Pipeline  
 > **Source Directory:** [`src/`](src/README.md)  
-> **Existing Detection Prototype:** [`src/predict_yolo26x.py`](src/predict_yolo26x.py)  
+> **Production Batch Entrypoint:** [`src/run_batch_cv_pipeline.py`](src/run_batch_cv_pipeline.py) / [`Colab_A100_Batch_Detection.ipynb`](Colab_A100_Batch_Detection.ipynb)  
+> **Single-Image & ROI Utilities:** [`src/predict_yolo26x.py`](src/predict_yolo26x.py), [`src/generate_initial_rois.py`](src/generate_initial_rois.py), [`src/edit_camera_rois.py`](src/edit_camera_rois.py)  
 > **Input Data:**  
-> - Valid ASCII-renamed images in `Dataset_Clean_V1/cctv_images/` (`60,029` images across 100 cameras, `V2.0`)  
+> - Valid ASCII-renamed images in `Dataset_Clean_V1/cctv_images/` (`60,029` images across 100 cameras, `V2.1`)  
 > - Frame manifest in [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet)  
 > **Primary Output Artifacts:**  
-> 1. **Priority 1 (Day-1 Fast Track):** `data/vehicle_counts_sample.parquet` *(5 representative cameras, ~3,000 frames, to unblock Tasks 04, 05, and 06 immediately)*  
+> 1. **Priority 1 (Day-1 Fast Track):** `data/vehicle_counts_sample.parquet` *(5 representative cameras, `2,929` rows)*  
 > 2. **Full Production Dataset:** `data/vehicle_counts.parquet` *(all `60,029` valid frames across 100 cameras per [`DATA_CONTRACT.md`](../DATA_CONTRACT.md))*  
-> 3. **Clean-Road Background Library:** `data/median_backgrounds/<cam_id>_bg.jpg` *(100 clean-road background plates for dashboard visual comparison)*
+> 3. **Clean-Road Backgrounds & Active Road ROIs:** `data/median_backgrounds/<cam_id>_bg[_night].jpg` *(`200` day + night background plates)* & `data/camera_rois.json` *(`100/100` reviewed)*
 
 ---
 
@@ -63,7 +64,7 @@ Reuse the model resolution and `apply_nms_and_remap` logic already implemented i
 - All 4 model checkpoints (`models/yolo26x.pt`, `models/dronefreak--visdrone-yolo11x/best.pt`, `models/dronefreak--visdrone-yolo26l/best.pt`, and `models/iisc-aim--UVH-26/UVH-26-MV-YOLOv11-X.pt`) are **already downloaded and cached locally in `models/`**.
 - **Execution Speed Rule (Single-Pass Inference Only for Batch Runs):** Do **not** enable `--sahi` sliced tiling across all 60,029 images (multi-tile SAHI increases inference time by `5x-10x` with minimal gain on `352 x 288` frames when paired with `foreground_ratio`). Benchmark single-pass models on the 5-camera pilot, pick the best single-pass checkpoint (e.g., `iisc-aim/UVH-26` or `yolo26x.pt`), and run batched GPU inference (`batch=32` or `64`). Reserve `--sahi` strictly for single-image interactive inspection in the dashboard.
 - Apply `CANONICAL_CLASS_MAP` in `grouped` NMS mode so fine-grained 4-wheeler subclasses (`sedan`, `hatchback`, `suv`, `muv`, `van`) merge into `car`, and 2-wheeler subclasses (`motor`, `motorbike`, `two-wheeler`) merge into `motorcycle` **before** class-aware NMS runs -- preventing intra-4-wheeler boxes from suppressing adjacent motorcycles.
-- Retain raw frame-level bounding box coordinates `[x1, y1, x2, y2]`, confidence scores, and canonical class IDs (`car`, `motorcycle`, `bus`, `truck`, `three-wheeler`) for Step 4.
+- Retain raw frame-level bounding box coordinates `[x1, y1, x2, y2]`, confidence scores, and canonical class IDs (`car`, `motorcycle`, `bus`, `truck` — with `three-wheeler` folded into `car`) for Step 4.
 
 ---
 

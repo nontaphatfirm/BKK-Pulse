@@ -1,20 +1,22 @@
 """
 Multi-Expert Edge-Case-Resilient Vehicle Detection Pipeline (`03_cv_yolo_pipeline`).
 
-Combines five locally cached pretrained specialist detectors:
-  1. iisc-aim/UVH-26 (YOLOv11-X)         -- Asian two-wheelers, three-wheelers & compact cars
+Combines six locally cached pretrained specialist detectors (5 active per regime):
+  1. iisc-aim/UVH-26 (YOLOv11-X)         -- Asian two-wheelers, three-wheelers (-> car) & compact cars
   2. dronefreak/visdrone-yolo11x         -- Dense/small far-field queued vehicles & riders
-  3. dronefreak/visdrone-yolo26l         -- Complementary VisDrone architecture for tiny distant vehicles
-  4. yolo26x.pt (COCO YOLOv26-X)         -- High-precision cars, buses, trucks & night/rain anchors
-  5. yolo11x.pt (COCO YOLOv11-X)         -- Complementary COCO anchor for rain, glare & occlusion cross-voting
+  3. dronefreak/visdrone-yolo26l         -- Complementary daytime VisDrone architecture for tiny distant traffic
+  4. dronefreak/bdd100k-yolo26m          -- Night/glare automotive specialist (replaces visdrone26l at night)
+  5. yolo26x.pt (COCO YOLOv26-X)         -- High-precision cars, buses, trucks & night/rain anchors
+  6. yolo11x.pt (COCO YOLOv11-X)         -- Complementary COCO anchor for rain, glare & occlusion cross-voting
 
 Augmented with physics-informed computer vision & scene gates:
   - Per-camera multi-regime Median Background (day + night) & edge NCC verification
   - Adjacent-frame temporal stationary filter (eliminates off-road parked cars)
-  - Optical condition profiling + highlight-compressed CLAHE/gamma view for night glare & heavy rain
-  - TELEA OSD text inpainting + OSD-excluded background matching + OSD-text box veto
-  - Boundary-safe full-height sub-crops + rider+two-wheeler confidence boosting
-  - Perspective-aware geometric gates, two-tier weighted fusion & IoMin/center-distance duplicate pruning
+  - Optical condition profiling + highlight-compressed CLAHE/gamma/deglare views for night glare & heavy rain
+  - TELEA OSD text inpainting + OSD-excluded background matching + two-row OSD-text box veto
+  - Crosswalk oscillation & phantom-2W guards, rider+two-wheeler confidence boosting, 4-class unification (`3W -> car`)
+  - Perspective-aware geometric gates, two-tier weighted fusion, Road ROI ground-contact filtering (`data/camera_rois.json`)
+  - Single-image `predict()` & frame-aligned GPU batched `predict_batch()` (`quantize=16` / `half=` auto-compat)
 """
 
 from __future__ import annotations
