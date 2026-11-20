@@ -3,10 +3,13 @@
 > **Assigned Owners:** ปลื้ม ([@siravidthongsook](https://github.com/siravidthongsook)) & กร ([@kkooAAA](https://github.com/kkooAAA)) *(Optional Flex Support: นิว [@Pranithi-New](https://github.com/Pranithi-New))*  
 > **Role:** Interactive Web Scraping & Spatial Incident Matching  
 > **Source Directory:** [`src/`](src/README.md)  
+> **Implemented Pipeline & `V2.1` Runbook:** [`README.md`](README.md)  
 > **Input Tables:** [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet) and `data/weather_air_poi.parquet` (from Task 01)  
 > **Primary Output Artifacts:**  
-> 1. `data/traffy_complaints_near_cctv.parquet` *(incident-level table for map overlays)*  
-> 2. `data/external_weather_poi.parquet` *(canonical Table 4 combining Tasks 01 & 02 per [`DATA_CONTRACT.md`](../DATA_CONTRACT.md))*
+> 1. `data/traffy_complaints_near_cctv.parquet` *(incident-level table for map overlays; gitignored, reproducible offline via `--combine-cache`)*  
+> 2. `data/traffy_camera_counts.parquet` *(6-month & 7-day per-camera totals, structural flood baseline)*  
+> 3. `data/traffy_provenance.json` *(crawl completeness & SHA-256 provenance manifest)*  
+> 4. `data/external_weather_poi.parquet` *(canonical Table 4 combining Tasks 01 & 02 per [`DATA_CONTRACT.md`](../DATA_CONTRACT.md))*
 
 ---
 

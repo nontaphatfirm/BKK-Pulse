@@ -12,7 +12,7 @@ Course specification: [`../GOAL.md`](../GOAL.md).
 | Produce Table 4 | `merge_external_dataset.py` (needs Task 01's `weather_air_poi.parquet`) |
 | Re-capture the UI screenshots and XHR evidence | `scrape_traffy_playwright.py` |
 
-`scrape_traffy_playwright.py` writes only to `artifacts/`. It is not part of the data
+`scrape_traffy_playwright.py` writes only to `02_scraping_traffy_playwright/artifacts/`. It is not part of the data
 pipeline — it captures whatever the live dashboard serves during the run, and no other
 module reads its output.
 

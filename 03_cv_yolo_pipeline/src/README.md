@@ -36,7 +36,7 @@ python run_pipeline.py --check-contract
   - **Per-Frame Means:** `10.52` vehicles/frame (`11.02` day vs. `8.67` night; max `69`), `10.03` PCU/frame, `0.1780` `road_occupancy_ratio`, `0.2888` `foreground_ratio`
   - **Static/Noise Filtering:** `1,993,934` static false-positive boxes suppressed across `60,029` frames (`2.50%` / `1,503` zero-vehicle frames)
   - **Visual Archive (`Google Drive` / local `.zip`):** `60,029` annotated bounding-box + ROI JPEGs (`scale=1.5`, `3,923.91 MB`, excluded from Git via `.gitignore`)
-- **Contract Status:** `python run_pipeline.py --check-contract` → `[PASS]` on Tables `1`, `2`, `3a`, `3b`, and `4`.
+- **Contract Status:** `python run_pipeline.py --check-contract --strict` → `[PASS]` on Tables `1`, `2`, `3a`, `3b`, `4`, and `Traffy provenance`.
 
 ## Completeness & Verification Checklist
 

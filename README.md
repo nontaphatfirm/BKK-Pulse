@@ -70,9 +70,9 @@ This repository is organized into **seven self-contained task directories (`00_`
 | **`01_scraping_apis/`** | **ปลื้ม**, **กร** *(+ นิว support)* | **3 Simple APIs:** Open-Meteo Weather, OSM Overpass POIs (500m), Open-Meteo Air Quality | [`GOAL.md`](01_scraping_apis/GOAL.md) | [`fetch_weather_air_poi.py`](01_scraping_apis/src/fetch_weather_air_poi.py) | `Complete (16,800 rows)` |
 | **`02_scraping_traffy_playwright/`** | **ปลื้ม**, **กร** *(+ นิว support)* | **Interactive Playwright:** BMA Traffy Fondue flood/traffic monsoon hotspots & spatial matching | [`GOAL.md`](02_scraping_traffy_playwright/GOAL.md) | [`fetch_traffy_geojson.py`](02_scraping_traffy_playwright/src/fetch_traffy_geojson.py) | `Complete (70,886 matched)` |
 | **`03_cv_yolo_pipeline/`** | **เฟิร์ม** *(+ นิว support)* | Batched multi-expert YOLO (`day/night`), Median BG, Static/ROI Filter (`60,029` frames) | [`GOAL.md`](03_cv_yolo_pipeline/GOAL.md) | [`run_batch_cv_pipeline.py`](03_cv_yolo_pipeline/src/run_batch_cv_pipeline.py) | `Complete (60,029 rows)` |
-| **`04_ds_traffic_analytics/`** | **สอง** *(+ นิว support)* | PCU, Adaptive `P95` Congestion Index, Corridor Shockwave, Tidal Flow, CV Rain/Wet-Road Detection, K-Means | [`GOAL.md`](04_ds_traffic_analytics/GOAL.md) | [`04_ds_traffic_analytics/src/`](04_ds_traffic_analytics/src/README.md) | `Spec Ready` |
-| **`05_ds_ml_forecasting/`** | **สอง**, **เฟิร์ม** *(+ นิว support)* | Gap-safe `t + 30m` LightGBM forecaster, Naive baseline, What-If model & SHAP | [`GOAL.md`](05_ds_ml_forecasting/GOAL.md) | [`05_ds_ml_forecasting/src/`](05_ds_ml_forecasting/src/README.md) | `Spec Ready` |
-| **`06_bi_dashboard/`** | **โม่** *(+ นิว support)* | 4-Tab Streamlit Command Center (Map + Early Warning, Tidal, Weather/What-If, CCTV Health) | [`GOAL.md`](06_bi_dashboard/GOAL.md) | [`06_bi_dashboard/src/`](06_bi_dashboard/src/README.md) | `Spec Ready (Day-1 Data Ready)` |
+| **`04_ds_traffic_analytics/`** | **สอง** *(+ นิว support)* | PCU, Adaptive `P95` Congestion Index, Corridor Shockwave, Tidal Flow, CV Rain/Wet-Road Detection, K-Means | [`GOAL.md`](04_ds_traffic_analytics/GOAL.md) | [`04_ds_traffic_analytics/src/`](04_ds_traffic_analytics/src/README.md) | `Spec Ready (Inputs Ready)` |
+| **`05_ds_ml_forecasting/`** | **สอง**, **เฟิร์ม** *(+ นิว support)* | Gap-safe `t + 30m` LightGBM forecaster, Naive baseline, What-If model & SHAP | [`GOAL.md`](05_ds_ml_forecasting/GOAL.md) | [`05_ds_ml_forecasting/src/`](05_ds_ml_forecasting/src/README.md) | `Spec Ready (Awaiting Task 04)` |
+| **`06_bi_dashboard/`** | **โม่** *(+ นิว support)* | 4-Tab Streamlit Command Center (Map + Early Warning, Tidal, Weather/What-If, CCTV Health) | [`GOAL.md`](06_bi_dashboard/GOAL.md) | [`06_bi_dashboard/src/`](06_bi_dashboard/src/README.md) | `Spec Ready (Tables 1-4 Ready)` |
 
 ---
 
@@ -107,7 +107,22 @@ Data_Science_Project/
 │       └── clean_dataset_v1.py            # Production script generating Dataset_Clean_V1/
 │
 ├── 01_scraping_apis/                      # [Task 01 - ปลื้ม, กร] Weather, OSM POI & Air Quality APIs
+│   ├── GOAL.md                            # Task 01 technical spec & completed DoD checklist
+│   └── src/
+│       ├── README.md                      # Module architecture & CLI run commands
+│       ├── fetch_weather_air_poi.py       # Batched Open-Meteo weather/AQ + POI table builder
+│       └── fetch_pois_overpass.py         # Single-bbox Overpass QL query + 150m cross-type dedupe
 ├── 02_scraping_traffy_playwright/         # [Task 02 - ปลื้ม, กร] Interactive Traffy Fondue Scraping
+│   ├── GOAL.md                            # Task 02 course specification & completed DoD checklist
+│   ├── README.md                          # Production schema, completeness gate & V2.1 snapshot
+│   ├── artifacts/                         # Playwright step screenshots, XHR logs & tag audit CSVs
+│   └── src/
+│       ├── README.md                      # Script roles & rebuild guide
+│       ├── fetch_traffy_geojson.py        # PostgREST crawl, cache segment gate & nearest-cam match
+│       ├── merge_external_dataset.py      # Trailing 7-day as-of counts -> Table 4 parquet
+│       ├── scrape_traffy_playwright.py    # Interactive Playwright XHR & screenshot capture
+│       ├── audit_categories.py            # Cache type-label audit CSV generator
+│       └── category_map.json              # Explicit 98-tag flood / traffic / other map
 ├── 03_cv_yolo_pipeline/                   # [Task 03 - เฟิร์ม] Computer Vision & Feature Pipeline
 │   ├── GOAL.md                            # Task 03 technical spec, pipeline rules & completed DoD checklist
 │   ├── PIPELINE_ARCHITECTURE.md           # Full 8-stage CV architecture, formulas, ROI/BG prep & results
@@ -130,7 +145,7 @@ Data_Science_Project/
 ├── models/                                # (Gitignored) Cached YOLO weights & trained LightGBM model
 ├── Dataset/                               # (Gitignored) Raw BMA CCTV dataset (61,319 images)
 └── Dataset_Clean_V1/                      # Cleaned dataset & manifest tables generated by Task 00 (Google Drive QA Ready)
-    ├── README.md                          # V1 cleaning summary, Batch 1-6 QA checklist & workflow rules
+    ├── README.md                          # V2.1 cleaning summary, Batch 1-6 QA checklist & workflow rules
     ├── CLEANING_CHANGELOG.md              # Mandatory version history & change ledger for final report
     ├── cleaning_summary.json              # Machine-readable quality gate metrics
     ├── cctv_info_cleaned.parquet          # Cleaned & enriched metadata for 100 cameras
@@ -154,13 +169,13 @@ pip install -r requirements.txt
 # 3. Install Chromium browser binary (required for Task 02 Playwright scraper)
 playwright install chromium
 
-# 4. Validate existing Parquet tables against DATA_CONTRACT.md
-python run_pipeline.py --check-contract
+# 4. Validate existing Parquet tables & Traffy provenance against DATA_CONTRACT.md
+python run_pipeline.py --check-contract --strict
 
 # 5. Run end-to-end pipeline (pilot 5-camera sample mode or full 100-camera mode)
 python run_pipeline.py --sample
 python run_pipeline.py --all
 
-# 6. Test interactive / CLI YOLO vehicle detection prototype (Task 03)
+# 6. Run single-image interactive / CLI YOLO vehicle detector (Task 03)
 python 03_cv_yolo_pipeline/src/predict_yolo26x.py --list-models
 ```

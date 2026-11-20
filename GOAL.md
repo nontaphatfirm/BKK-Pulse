@@ -21,7 +21,7 @@
 | Course Requirement | BKK-Pulse Implementation | Responsible Modules |
 | :--- | :--- | :--- |
 | **Required Task: Web Scraping** *(>= 3 Simple APIs OR >= 1 Interactive Website)* | **3 Simple APIs:** Open-Meteo Weather, OpenStreetMap Overpass POIs, Open-Meteo Air Quality; **Interactive Scraping:** Automated Playwright scraper + GeoJSON backfill for BMA Traffy Fondue monsoon hotspots | [`01_scraping_apis`](01_scraping_apis/GOAL.md), [`02_scraping_traffy_playwright`](02_scraping_traffy_playwright/GOAL.md) |
-| **Component 1: Data Engineering (DE)** *(Cleansing, Preparation, Workflow Management)* | 5-Stage Automated Image Quality Gate; bilingual metadata repair (`district`, `corridor`, `direction`); single-pass batch YOLO inference, Median Background extraction, Stationary Box Filter (`IoU > 0.65`), Auto Road ROI (`15%` floor), Parquet/DuckDB schema & CLI orchestrator | [`run_pipeline.py`](run_pipeline.py), [`00_data_cleaning_and_qa`](00_data_cleaning_and_qa/GOAL.md), [`03_cv_yolo_pipeline`](03_cv_yolo_pipeline/GOAL.md) |
+| **Component 1: Data Engineering (DE)** *(Cleansing, Preparation, Workflow Management)* | 5-Stage Automated Image Quality Gate; bilingual metadata repair (`district`, `corridor`, `direction`); batched day/night multi-expert YOLO ensemble, dual-regime Median Backgrounds, static/OSD/glare suppression, 100-camera reviewed Road ROIs (`15%` floor), Parquet/DuckDB schema & CLI orchestrator | [`run_pipeline.py`](run_pipeline.py), [`00_data_cleaning_and_qa`](00_data_cleaning_and_qa/GOAL.md), [`03_cv_yolo_pipeline`](03_cv_yolo_pipeline/GOAL.md) |
 | **Component 2: Data Science (DS)** *(Analytics, Unsupervised & Supervised ML)* | PCU & adaptive Day/Night P95 Congestion Index; CCTV image-processing rain & wet-road detection (`visual_rain_flag`, `wet_road_flag`, `rain_severity_score`); Corridor Shockwaves, Tidal Flow & Rain Recovery; K-Means (`k=4`) + PCA clustering; LightGBM `t + 30m` forecasting vs. Naive baseline + SHAP | [`04_ds_traffic_analytics`](04_ds_traffic_analytics/GOAL.md), [`05_ds_ml_forecasting`](05_ds_ml_forecasting/GOAL.md) |
 | **Component 3: BI Dashboard** *(Interactive Visualization & Decision Support)* | **4-Tab Streamlit Command Center:** Map + 30-Min Early Warning & Camera Inspector (Tab 1); Corridor Shockwaves, Tidal Flow & K-Means Archetypes (Tab 2); CV Weather Vulnerability, Interactive What-If Simulator & SHAP (Tab 3); BMA CCTV Network Health Audit (Tab 4) | [`06_bi_dashboard`](06_bi_dashboard/GOAL.md) |
 | **Component 4: Actionable Insights** *(Policy & Engineering Recommendations)* | Exportable **Reversible Lane** time windows (`.csv`); **Top 10 rain-vulnerable bottlenecks** combining CV rain/wet-road detection & Traffy flood hotspots; proactive 30-minute gridlock warnings; priority maintenance dispatch tickets (`.csv`) for faulty CCTV cameras and IP subnets | All Modules (`00`-`06`) |
@@ -40,7 +40,7 @@ flowchart TD
         EXT_WEB["BMA Traffy Fondue Web Platform<br/>Playwright Interactive + GeoJSON"]
     end
 
-    subgraph Task00["00_data_cleaning_and_qa (V2.0 Final Lock)"]
+    subgraph Task00["00_data_cleaning_and_qa (V2.1 Final Lock)"]
         CLEAN_SCRIPT["src/clean_dataset_v1.py<br/>5-Stage Image Quality Gate + Metadata Repair"]
         CLEAN_IMG["Dataset_Clean_V1/cctv_images/<br/>60,029 Valid ASCII-Renamed Images"]
         TBL_META["1. cctv_info_cleaned.parquet<br/>100 Cameras + Corridor + Direction"]
@@ -49,8 +49,8 @@ flowchart TD
 
     subgraph ParallelTracks["Phase 1: Parallel Execution Across 6 Team Members (+ นิว Flex Support)"]
         T01["01_scraping_apis (ปลื้ม, กร)<br/>Weather + 500m OSM POIs + PM2.5/NO2"]
-        T02["02_scraping_traffy_playwright (ปลื้ม, กร)<br/>Playwright Traffy Fondue Hotspots"]
-        T03["03_cv_yolo_pipeline (เฟิร์ม)<br/>Single-Pass YOLO + Median BG + Static Filter + ROI"]
+        T02["02_scraping_traffy_playwright (ปลื้ม, กร)<br/>Playwright + PostgREST Traffy Hotspots"]
+        T03["03_cv_yolo_pipeline (เฟิร์ม)<br/>Multi-Expert Batch YOLO + Day/Night BG + Static Filter + Reviewed ROIs"]
 
         TBL_EXT["4. data/external_weather_poi.parquet<br/>Hourly Weather, Air Quality, POIs & Traffy Hotspots"]
         TBL_SAMPLE["3a. data/vehicle_counts_sample.parquet<br/>5-Camera Pilot Dataset for Immediate DS/BI Dev"]
@@ -103,17 +103,17 @@ flowchart TD
 
 To prevent downstream Data Science (`04`, `05`) and BI Dashboard (`06`) members from waiting on full Computer Vision inference across all 60,029 images, the project executes in three structured phases:
 
-### Phase 0: Baseline Cleaning Verification & 5-Camera Pilot Generation
+### Phase 0: Baseline Cleaning Verification & 5-Camera Pilot Generation *(Completed)*
 1. **Baseline Cleaning V1 (Completed):** [`00_data_cleaning_and_qa/src/clean_dataset_v1.py`](00_data_cleaning_and_qa/src/clean_dataset_v1.py) processed all 61,319 images into [`Dataset_Clean_V1/`](Dataset_Clean_V1/README.md).
-2. **Distributed Image & Metadata QA (`V2.0` Final Lock):** All 6 members (**ปลื้ม**, **กร**, **เฟิร์ม**, **สอง**, **นิว**, **โม่**) audited their assigned batches (`100/100` metadata & visual sweeps `[x]`, resolving `cam_id=225` & `CHG-B4-02`, `181` `manual_excluded` frames) into `main`, locking **`60,029` valid frames (`0` warnings)**.
-3. **5-Camera Pilot Dataset (เฟิร์ม `@nontaphatfirm` -- Priority 1):** Runs the YOLO + ROI pipeline on 5 representative cameras (`26`, `136`, `137`, `150`, `546` -- ~3,000 frames) and exports `data/vehicle_counts_sample.parquet` conforming to [`DATA_CONTRACT.md`](DATA_CONTRACT.md). This immediately unblocks **สอง**, **โม่**, and **นิว**.
+2. **Distributed Image & Metadata QA (`V2.1` Final Lock — Completed):** All 6 members (**ปลื้ม**, **กร**, **เฟิร์ม**, **สอง**, **นิว**, **โม่**) audited their assigned batches (`100/100` `[x]`), resolved `CHG-B4-02` (`181` `manual_excluded` frames -> `60,029` valid frames, `0` warnings), and refined 30 camera metadata entries in `PR #12` / `V2.1` (`24 Inbound / 18 Outbound / 58 "None"`, `4` Old Town coords `411–414`).
+3. **5-Camera Pilot Dataset (`data/vehicle_counts_sample.parquet` — Completed):** `2,929` rows across the 5 pilot cameras (`26`, `136`, `137`, `150`, `546`) exported and verified against [`DATA_CONTRACT.md`](DATA_CONTRACT.md).
 
-### Phase 1: Parallel Track Development
-- **ปลื้ม (`@siravidthongsook`) & กร (`@kkooAAA`) (`01_scraping_apis` & `02_scraping_traffy_playwright`):** Build and merge `data/weather_air_poi.parquet`, `data/traffy_complaints_near_cctv.parquet`, and `data/external_weather_poi.parquet`.
-- **เฟิร์ม (`@nontaphatfirm`) (`03_cv_yolo_pipeline`):** Executes single-pass batch inference across all 60,029 valid images to produce `data/vehicle_counts.parquet` and `data/median_backgrounds/`.
-- **สอง (`@theme222`) & เฟิร์ม (`@nontaphatfirm`) (`04_ds_traffic_analytics` & `05_ds_ml_forecasting`):** **สอง** leads analytical, CV rain/wet-road detection, and K-Means pipelines (`04`), and co-develops the LightGBM `t + 30m` forecasting & SHAP pipeline (`05`) with **เฟิร์ม** against `vehicle_counts_sample.parquet`, then swaps in full `vehicle_counts.parquet` once complete.
-- **โม่ (`@moaqilo`) (`06_bi_dashboard`):** Immediately builds **Tab 4 (BMA CCTV Network Health Audit)** and the **Tab 1 Base Map** using [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](Dataset_Clean_V1/cctv_info_cleaned.parquet) and [`Dataset_Clean_V1/image_quality_manifest.parquet`](Dataset_Clean_V1/image_quality_manifest.parquet), then integrates analytical outputs from `01`-`05`.
-- **นิว (`@Pranithi-New`) (Cross-Module Support):** Flexibly joins any priority module (`01`-`06`) to accelerate implementation, integration, and QA.
+### Phase 1: Parallel Track Development *(Tasks 01–03 Completed & Merged; Tasks 04–06 Active)*
+- **ปลื้ม (`@siravidthongsook`) & กร (`@kkooAAA`) (`01_scraping_apis` & `02_scraping_traffy_playwright` — Completed):** Built and merged `data/weather_air_poi.parquet` (`16,800 x 14`), `data/traffy_camera_counts.parquet` (`100 x 7`), `data/external_weather_poi.parquet` (`16,800 x 17`, trailing 7-day as-of Traffy counts), and `data/traffy_provenance.json` (`190` pages, `complete: true`), plus gitignored `data/traffy_complaints_near_cctv.parquet` (`70,886` rows).
+- **เฟิร์ม (`@nontaphatfirm`) (`03_cv_yolo_pipeline` — Completed):** Executed batched multi-expert day/night YOLO ensemble inference across all `60,029` valid `V2.1` frames, producing `data/vehicle_counts.parquet` (`60,029 x 13`), `data/vehicle_counts_sample.parquet`, `data/camera_rois.json` (`100/100` reviewed), and `200` day/night plates in `data/median_backgrounds/`.
+- **สอง (`@theme222`) & เฟิร์ม (`@nontaphatfirm`) (`04_ds_traffic_analytics` & `05_ds_ml_forecasting` — Active Next):** **สอง** leads analytical, CV rain/wet-road detection, and K-Means pipelines (`04`) directly on full `V2.1` Tables 1–4, then co-develops the LightGBM `t + 30m` forecasting & SHAP pipeline (`05`) with **เฟิร์ม**.
+- **โม่ (`@moaqilo`) (`06_bi_dashboard` — Active):** Builds the 4-Tab Streamlit dashboard (`tab1`–`tab4`) directly against `V2.1` `Dataset_Clean_V1/`, `data/vehicle_counts.parquet`, `data/external_weather_poi.parquet`, and `data/median_backgrounds/`, then plugs in outputs from `04`–`05`.
+- **นิว (`@Pranithi-New`) (Cross-Module Support):** Flexibly joins priority modules (`04`–`06`) to accelerate implementation, integration, and QA.
 
 ### Phase 2: System Integration & Final Presentation (By Sun 6 Dec 2026)
 - Run `python run_pipeline.py --check-contract --strict` to verify all Parquet schemas against [`DATA_CONTRACT.md`](DATA_CONTRACT.md).
@@ -124,11 +124,11 @@ To prevent downstream Data Science (`04`, `05`) and BI Dashboard (`06`) members 
 
 ## 5. Team Kickoff Checklist
 
-- [ ] **1. Project Walkthrough:** Review [`README.md`](README.md), [`Info/EDA.md`](Info/EDA.md), and [`Info/2110403_2026s1_Project_CEDT.pdf`](Info/2110403_2026s1_Project_CEDT.pdf).
-- [ ] **2. Phase 0 Cleaning Review:** Inspect [`Dataset_Clean_V1/README.md`](Dataset_Clean_V1/README.md) and complete the 6 batches in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
-- [ ] **3. Role Assignment (`01`-`06`):** Each member opens their respective `0X_<module_name>/GOAL.md` specification and creates their feature branch per [`CONTRIBUTING.md`](CONTRIBUTING.md).
-- [ ] **4. Data Contract Sign-Off:** Review [`DATA_CONTRACT.md`](DATA_CONTRACT.md) primary keys (`cam_id`, `timestamp`), column names, and edge cases.
+- [x] **1. Project Walkthrough:** Review [`README.md`](README.md), [`Info/EDA.md`](Info/EDA.md), and [`Info/2110403_2026s1_Project_CEDT.pdf`](Info/2110403_2026s1_Project_CEDT.pdf).
+- [x] **2. Phase 0 Cleaning Review:** Inspect [`Dataset_Clean_V1/README.md`](Dataset_Clean_V1/README.md) and complete the 6 batches in [`00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md`](00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
+- [x] **3. Role Assignment (`01`-`06`):** Each member opens their respective `0X_<module_name>/GOAL.md` specification and creates their feature branch per [`CONTRIBUTING.md`](CONTRIBUTING.md).
+- [x] **4. Data Contract Sign-Off:** Review [`DATA_CONTRACT.md`](DATA_CONTRACT.md) primary keys (`cam_id`, `timestamp`), column names, and edge cases.
 - [ ] **5. Milestones:**
-  - **Milestone 1 (Sun 15 Nov 2026):** MCV group registration + Phase 0 Camera Audit Checklist + `data/vehicle_counts_sample.parquet`.
-  - **Milestone 2:** Deliver full `data/external_weather_poi.parquet` (Tasks 01 & 02) and `data/vehicle_counts.parquet` (Task 03).
-  - **Milestone 3 (Before Sun 6 Dec 2026):** Deliver analytical & CV weather tables (Task 04), LightGBM + What-If model + SHAP (Task 05), integrated 4-tab Streamlit dashboard (Task 06), and 15-min presentation package.
+  - [x] **Milestone 1 (Sun 15 Nov 2026):** MCV group registration + Phase 0 Camera Audit Checklist + `data/vehicle_counts_sample.parquet`.
+  - [x] **Milestone 2 (Wed 18 – Fri 20 Nov 2026):** Deliver full `data/external_weather_poi.parquet` (Tasks 01 & 02) and `data/vehicle_counts.parquet` (Task 03) on `V2.1`.
+  - [ ] **Milestone 3 (Before Sun 6 Dec 2026):** Deliver analytical & CV weather tables (Task 04), LightGBM + What-If model + SHAP (Task 05), integrated 4-tab Streamlit dashboard (Task 06), and 15-min presentation package.

@@ -4,11 +4,13 @@
 > **Role:** Data Science -- Traffic Engineering Analytics & Unsupervised Learning  
 > **Source Directory:** [`src/`](src/README.md)  
 > **Input Tables & Images:**  
-> - [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet)  
-> - [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet)  
+> - [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet) *(`Ready` — `100` cams, `V2.1`)*  
+> - [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet) *(`Ready` — `61,319` rows, `60,029` valid)*  
 > - `Dataset_Clean_V1/cctv_images/` *(optional direct input if CV rain/wet-road extraction runs in Task 04)*  
-> - `data/vehicle_counts_sample.parquet` *(Phase 0 Pilot)* -> `data/vehicle_counts.parquet` *(Full Table 3 from Task 03)*  
-> - `data/external_weather_poi.parquet` *(Full Table 4 from Tasks 01 & 02)*  
+> - `data/vehicle_counts.parquet` *(`Ready` — Full Table 3 from Task 03, `60,029` rows; `data/vehicle_counts_sample.parquet` `2,929` rows also available)*  
+> - `data/external_weather_poi.parquet` *(`Ready` — Full Table 4 from Tasks 01 & 02, `16,800` rows)*  
+> - `data/traffy_camera_counts.parquet` *(`Ready` — 6-month per-camera Traffy structural flood baseline)*  
+> - `data/camera_rois.json` & `data/median_backgrounds/` *(`Ready` — `100` reviewed ROIs & `200` day/night background plates)*  
 > **Primary Output Artifacts (Consumed by Tasks 05 & 06):**  
 > 1. `data/analytics_traffic_metrics.parquet` *(frame-level normalized `congestion_index` 0-100, `low_visibility_flag`, `visual_rain_flag`, `wet_road_flag`, and `rain_severity_score`)*  
 > 2. `data/footbridge_tidal_flow.parquet` *(macro 80-camera & micro 6-footbridge-pair tidal imbalance metrics)*  
@@ -37,6 +39,8 @@ This module translates raw Computer Vision detections, cleaned CCTV imagery, and
    ```text
    PCU[i, t] = 1.0 * Car[i, t] + 0.33 * Motorcycle[i, t] + 2.5 * Bus[i, t] + 2.5 * Truck[i, t]
    ```
+
+   *(Note: `data/vehicle_counts.parquet` preserves all 4 disaggregated class counts `car_count`, `motorcycle_count`, `bus_count`, `truck_count` and raw areas `bbox_total_area`, `road_roi_area`, `foreground_ratio`. You may adjust PCU weights—e.g. separating `truck` vs. `bus` equivalents—or clip `road_occupancy_ratio`, where `10 / 60,029` frames exceed `1.0` up to `1.2703`, directly inside Task 04 without re-running Task 03.)*
 
 2. **Optical Low-Visibility & Glare Detection (`low_visibility_flag`):**  
    As highlighted in [`Info/2110403_2026s1_Project_CEDT.pdf`](../Info/2110403_2026s1_Project_CEDT.pdf) (Slide 5), nighttime headlight bloom (`glare_ratio > 0.05`), low light (`hour >= 18` or `brightness_mean < 60.0`), and heavy rain blur (`contrast_std < 30.0`) reduce YOLO bounding-box recall while pixel foreground differences (`foreground_ratio`) still capture vehicle queues and headlight beams:
@@ -76,8 +80,8 @@ Export `pcu_score`, `composite_density`, `congestion_index`, `low_visibility_fla
 1. **Corridor Space-Time Heatmaps:**
    - Order cameras geographically along major corridors defined in `cctv_info_cleaned.parquet` (e.g., `Ratchadaphisek` ordered South-to-North: Rama 9 `1815` -> Thiam Ruam Mit `112` -> Huai Khwang `215` -> Sutthisan `118/119` -> Lat Phrao `123/125` -> Criminal Court `224/225`).
    - Construct space-time matrices (`X`: 10-min intervals `06:00-21:00`; `Y`: ordered corridor cameras; `Value`: `congestion_index`) to reveal backward-propagating traffic shockwaves.
-2. **Macro Directional Flow (55 Directional Cameras):**
-   - Compare aggregate hourly profiles of all **32 `Inbound`** vs. **23 `Outbound`** directional cameras across weekdays vs. weekends *(excluding the `45` multi-directional/`"None"` cameras)*.
+2. **Macro Directional Flow (42 Directional Cameras in `V2.1`):**
+   - Compare aggregate hourly profiles of all **24 `Inbound`** vs. **18 `Outbound`** directional cameras across weekdays vs. weekends *(excluding the `58` multi-directional/`"None"` cameras; always filter `direction.isin(["Inbound", "Outbound"])` dynamically rather than hardcoding counts)*.
 3. **Micro Spotlight on the 6 True Bidirectional Footbridge Pairs (`footbridge_bidirectional`):**
    - Analyze the 6 opposite-facing footbridge camera pairs:
      1. `FB_01_LatPhrao_BigC` (`137` Inbound vs. `136` Outbound -- Big C Extra Lat Phrao)
@@ -100,7 +104,7 @@ Export `pcu_score`, `composite_density`, `congestion_index`, `low_visibility_fla
 ### Module 2.3: CCTV Image-Processing Rain & Wet-Road Detection and Recovery Analysis
 
 #### Why Image Processing Is Needed Alongside Weather APIs
-- **Coarse Weather Grid Limitation:** Open-Meteo reanalysis operates on a ~9-11 km (`0.1 deg`) spatial grid (`5` cells across our 100 cameras), missing hyper-local tropical storms. For example, at Camera `529` on August 30 at `16:05`, heavy rain haze drops `contrast_std` to `~25.0` while city-center grid cells report only `1.5 mm`.
+- **Coarse Weather Grid Limitation:** Open-Meteo reanalysis operates on a ~9-11 km (`0.1 deg`) spatial grid (`55` rounded `0.01 deg` query cells yielding `10` distinct weather series across our 100 cameras), missing hyper-local tropical storms. For example, at Camera `529` on August 30 at `16:05`, heavy rain haze drops `contrast_std` to `~25.0` while city-center grid cells report only `1.5 mm`.
 - **Daytime Contrast-Only Limitation:** Simple rules based only on global `contrast_std` during daytime (`07:00-18:00`) miss two critical conditions observed in the dataset:
   1. **Post-rain wet/flooded pavement:** Immediately after rain eases (e.g., Camera `529` at `16:25`), `contrast_std` rebounds to normal (`~48.7`) even though asphalt remains soaked with strong specular vehicle reflections.
   2. **Global sky glare & evening rain (`18:00-21:00`):** Bright overcast upper skies trigger high full-frame `glare_ratio` on dry afternoons (e.g., Camera `529` at `14:45`), while rain/wet roads after `18:00` require road-zone optical cues.
@@ -113,21 +117,21 @@ Regardless of the specific algorithm chosen, the CCTV image-processing rain pipe
 3. **`rain_severity_score` (`float64`, `0-100`):** Continuous camera-level weather severity score (`0` = dry/clear, `100` = severe tropical downpour / wet-road hazard) usable for severity-weighted statistical analysis, LightGBM forecasting (Task 05), and BI visualization (Task 06).
 
 **Target Analyses Enabled by These Outputs:**
-- **Spatio-Temporal Rain Propagation & API Cross-Check:** Map which of the 100 camera locations experienced visual rain/wet roads at each 10-minute step, compare against coarse Open-Meteo `rain_mm` grids, and cross-reference with structural flood hotspots (`traffy_flood_count` from Task 02).
+- **Spatio-Temporal Rain Propagation & API Cross-Check:** Map which of the 100 camera locations experienced visual rain/wet roads at each 10-minute step, compare against coarse Open-Meteo `rain_mm` grids, and cross-reference with 6-month structural flood hotspots from `data/traffy_camera_counts.parquet` *(since Table 4's trailing 7-day `traffy_flood_count` is sparse: `mean=0.1767`, `max=3`)*.
 - **Pre / During / Post-Rain Congestion & Recovery Quantification (`data/rain_resilience_ranking.parquet`):**
   1. **Dry Baseline (`mu_dry`):** Mean `congestion_index` at the same time-of-day on dry frames.
   2. **Rain & Wet-Road Surge (`delta_congestion_rain`):** Peak and mean `congestion_index` increase during active rain (`visual_rain_flag`) and wet-road tail windows (`wet_road_flag`) relative to `mu_dry`.
   3. **Recovery Duration (`tau_recovery_min` in minutes):** Elapsed time (in 10-minute frame increments) after rainfall stops until `congestion_index` returns within `+/- 10%` of `mu_dry`, revealing whether wet/flooded road conditions keep intersections congested long after rain ceases.
-  4. **Leaderboard Export:** Rank and export the **Top 10 Rain-Vulnerable Intersections** (including `traffy_flood_count`) to `data/rain_resilience_ranking.parquet`.
+  4. **Leaderboard Export:** Rank and export the **Top 10 Rain-Vulnerable Intersections** (joining 6-month `traffy_flood_count` from `data/traffy_camera_counts.parquet`) to `data/rain_resilience_ranking.parquet`.
 
 #### Illustrative Example Approaches *(Optional Reference -- Implementer May Use Alternative Methods)*
-**สอง** (`04`, in collaboration with **เฟิร์ม** if sharing image passes in Task 03, or **นิว** if joining CV feature work) is free to choose any image-processing or ML method that satisfies the goal above. Examples include:
+**สอง** (`04`, optionally supported by **นิว**) is free to choose any image-processing or ML method that satisfies the goal above. Examples include:
 - **Example A -- Multi-Cue OpenCV Feature Pipeline (Fast, CPU-only on `Dataset_Clean_V1/cctv_images/`):**
-  - *Road vs. Sky ROI Masking:* Measure reflection and surface cues in the lower ~`50-65%` road zone (or Task 03's `road_roi` mask) so bright upper-sky clouds do not create false positives.
+  - *Road vs. Sky ROI Masking:* Reuse Task 03's reviewed Road ROI polygons (`data/camera_rois.json`) or measure reflection cues in the lower ~`50-65%` road zone so bright upper-sky clouds do not create false positives.
   - *Same-Hour Camera Baseline:* Normalize cues against each camera's own dry median at a matching time window (daytime vs. dusk/night).
   - *Complementary Visual Features:* Combine **contrast & edge sharpness drops** (`contrast_std`, `cv2.Laplacian` variance for rain mist/blur), **color desaturation** (HSV `S` drop during overcast rain), and **road specular highlight anomalies** (lower-ROI glare / reflection uniformity for wet roads across both day and `18:00-21:00` night scenes).
 - **Example B -- Background-Residual / Rain-Streak Texture Filtering:**
-  - Compare current frames against clean Median Background plates (`data/median_backgrounds/<cam_id>_bg.jpg`) using high-pass, morphological Top-Hat, or Sobel/gradient filters to detect falling rain streaks or puddle ripples.
+  - Compare current frames against Task 03's cached day & night Median Background plates (`data/median_backgrounds/<cam_id>_bg.jpg` and `_bg_night.jpg`) using high-pass, morphological Top-Hat, or Sobel/gradient filters to detect falling rain streaks or puddle ripples.
 - **Example C -- Lightweight Optical Classifier or Spatial Consensus:**
   - Train a compact supervised classifier (e.g., Logistic Regression / Random Forest / lightweight CNN) using visually verified clear vs. rainy frames to output calibrated `0-100` probabilities, optionally smoothed across nearby cameras within `1-2 km` to filter isolated lens smudges.
 

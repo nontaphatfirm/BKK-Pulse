@@ -4,11 +4,12 @@
 > **Role:** Data Science -- Supervised Machine Learning & Model Explainability  
 > **Source Directory:** [`src/`](src/README.md)  
 > **Input Tables:**  
-> - [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet)  
-> - [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet)  
-> - `data/vehicle_counts_sample.parquet` *(Phase 0 Pilot)* -> `data/vehicle_counts.parquet` *(Full Table 3 from Task 03)*  
-> - `data/external_weather_poi.parquet` *(Full Table 4 from Tasks 01 & 02)*  
-> - `data/analytics_traffic_metrics.parquet` *(Target `congestion_index` & CV visual weather cues from Task 04)*  
+> - [`Dataset_Clean_V1/cctv_info_cleaned.parquet`](../Dataset_Clean_V1/cctv_info_cleaned.parquet) *(`Ready` — `V2.1`)*  
+> - [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet) *(`Ready` — `61,319` rows)*  
+> - `data/vehicle_counts.parquet` *(`Ready` — Full Table 3 from Task 03, `60,029` rows; `data/vehicle_counts_sample.parquet` `2,929` rows also available)*  
+> - `data/external_weather_poi.parquet` *(`Ready` — Full Table 4 from Tasks 01 & 02, `16,800` rows)*  
+> - `data/traffy_camera_counts.parquet` *(`Ready` — optional 6-month structural Traffy indicator)*  
+> - `data/analytics_traffic_metrics.parquet` *(`Pending Task 04` — target `congestion_index` & CV visual weather cues)*  
 > **Primary Output Artifacts:**  
 > 1. `data/ml_forecast_predictions.parquet` *(test-set predictions comparing `y_true`, `y_pred_lgbm`, `y_pred_naive`, `delta_30m_pred`, and `traffic_alert_level`)*  
 > 2. `data/ml_model_metrics.json` *(MAE, RMSE, and R2 evaluation metrics overall and during rush-hour/rain transitions)*  
@@ -29,7 +30,7 @@ Observing current congestion is reactive; urban traffic management requires **pr
 > **Mandatory Engineering Safeguard for Time-Series Lags:**  
 > Because the CCTV dataset records frames at **10-minute intervals** with two major structural discontinuities, naive `.shift(k)` operations across `groupby("cam_id")` will introduce severe temporal corruption:
 > 1. **Overnight Recording Gap (`21:00-06:00` daily):** No frames exist overnight. Shifting across midnight causes the `06:00` morning frame to use the previous night's `20:50` frame as its `10-minute lag`.
-> 2. **Central Acquisition Outage (`2026-08-27 06:00-08:50`) & Filtered Error Frames:** All 100 cameras dropped offline until `08:51` on August 27, and `1,290` defective/excluded frames (`1,109` automated + `181` `manual_excluded` in `V2.0`) were removed by Task 00.
+> 2. **Central Acquisition Outage (`2026-08-27 06:00-08:50`) & Filtered Error Frames:** All 100 cameras dropped offline until `08:51` on August 27, and `1,290` defective/excluded frames (`1,109` automated + `181` `manual_excluded` in `V2.1`) were removed by Task 00.
 
 ### Required Gap-Safe Lag Construction Protocol:
 1. Sort strictly by `["cam_id", "timestamp"]` and extract `date = df["timestamp"].dt.date`.
@@ -60,7 +61,7 @@ Observing current congestion is reactive; urban traffic management requires **pr
 3. **Spatial & Land-Use Context (from `cctv_info_cleaned` + Tasks 01 & 02):**
    - Categorical features: `cam_id`, `corridor`, `district`, `direction`
    - Spatial POI counts: `nearby_transit_count`, `nearby_school_count`, `nearby_mall_count`, `poi_total_count`
-   - Incident hotspot counts: `traffy_complaint_count`, `traffy_flood_count`
+   - Incident hotspot counts (leakage-free trailing 7-day as-of totals in Table 4): `traffy_complaint_count`, `traffy_flood_count` *(note: `traffy_flood_count` is sparse in target week with `mean=0.1767, max=3`; join `data/traffy_camera_counts.parquet` if adding a static 6-month structural flood prior)*
 4. **Meteorological & Camera Image-Derived Weather Indicators:**
    - API context: `rain_mm`, `temp_c`, `humidity_pct`, `pm25`
    - Optical stats: `brightness_mean`, `contrast_std`, `glare_ratio`
@@ -95,6 +96,6 @@ Never use random row shuffling (`shuffle=True`) on time-series data. Partition c
 ## 4. Definition of Done Checklist
 
 - [x] Complete assigned camera verifications in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md) (Batch 3: **เฟิร์ม**, Batch 4: **สอง**, Batch 5: **นิว**).
-- [ ] Implement gap-safe lag feature engineering and verify zero cross-day or cross-outage leakage on `data/vehicle_counts_sample.parquet`.
+- [ ] Implement gap-safe lag feature engineering and verify zero cross-day or cross-outage leakage on `data/vehicle_counts.parquet` (using `data/vehicle_counts_sample.parquet` for fast unit checks if needed).
 - [ ] Train LightGBM Regressor on the full dataset, benchmark against Naive Persistence, and save `models/lgbm_congestion_forecaster.txt`.
 - [ ] Export `data/ml_forecast_predictions.parquet`, `data/ml_model_metrics.json`, and `data/ml_shap_importance.parquet`.

@@ -6,6 +6,7 @@ See full technical specification in [`../GOAL.md`](../GOAL.md).
 
 ```text
 04_ds_traffic_analytics/src/
+├── run_traffic_analytics.py        # Orchestrator entrypoint (invoked by run_pipeline.py --stage 04)
 ├── compute_congestion_index.py     # Module 2.1: PCU & adaptive P95 Congestion Index (0-100)
 ├── analyze_corridor_and_tidal.py   # Module 2.2: Corridor heatmaps & 6-footbridge-pair tidal flow
 ├── analyze_rain_recovery.py        # Module 2.3: CCTV image-processing rain/wet-road detection & recovery time

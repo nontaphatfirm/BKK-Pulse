@@ -1,6 +1,6 @@
 # Task 00: Automated Image Quality Gate & Metadata Cleansing (`GOAL.md`)
 
-> **Module Owner:** All 6 Team Members *(Initial Pipeline Executed; Distributed Peer QA in Progress)*  
+> **Module Owner:** All 6 Team Members *(Completed -- Data `V2.1` Locked on `main`)*  
 > **Implementation Script:** [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py)  
 > **Output Directory:** [`Dataset_Clean_V1/`](../Dataset_Clean_V1/README.md)  
 > **Audit Checklist:** [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md)
@@ -11,7 +11,7 @@
 
 Before running object detection or spatio-temporal traffic modeling, raw CCTV streams must be sanitized to prevent corrupted frames and misaligned metadata from biasing downstream models. This module implements:
 
-1. **A 5-Stage Automated Image Quality Gate + Peer QA Exclusions** inspecting all **61,319 raw images** across 100 cameras and isolating **1,290 filtered frames (2.10%)** (`1,109` automated + `181` `manual_excluded`), leaving **60,029 valid frames (97.90%)** (`V2.0`).
+1. **A 5-Stage Automated Image Quality Gate + Peer QA Exclusions** inspecting all **61,319 raw images** across 100 cameras and isolating **1,290 filtered frames (2.10%)** (`1,109` automated + `181` `manual_excluded`), leaving **60,029 valid frames (97.90%)** (`V2.1`).
 2. **ASCII Filename Standardization** (`<cam_id>_<YYYYMMDD_HHMMSS>.jpg`) to eliminate Windows OpenCV (`cv2.imread`) Unicode path failures caused by Thai characters in raw filenames.
 3. **Metadata Cleansing & Spatial Enrichment** repairing misaligned `location_en` rows, stripping system noise (`connect BMAcctv`, `17/5000`, `(See Yellow)`), restoring 28-character truncated Thai location strings, and adding `district`, `corridor`, `pair_id`, `pair_type`, and `direction`.
 
@@ -46,7 +46,7 @@ The raw `Dataset/cctv_info.csv` contained severe row-shift errors and truncated 
    - `Sathon - Naradhiwas - Rama 3` (10 cameras)
    - `East Bangkok (Ramkhamhaeng - On Nut)` (3 cameras)
 3. **Directional & Pair Classification (`pair_id`, `pair_type`, `direction`):**
-   - Classifies flow orientation into `Inbound` (32 cameras), `Outbound` (23 cameras), and `None` (45 bidirectional/intersection-box cameras) after V1.1 Peer QA.
+   - Classifies flow orientation into `Inbound` (24 cameras), `Outbound` (18 cameras), and `None` (58 bidirectional/intersection-box cameras) in `V2.1` *(after moving undivided/multi-directional junction cameras to `"None"` in `V1.1` and `PR #12` / `V2.1`)*.
    - Identifies **6 True Bidirectional Footbridge Pairs (`footbridge_bidirectional`)** (`136/137`, `178/179`, `126/127`, `224/225`, `176/177`, `1132/1078`) for reversible-lane tidal analysis in Task 04.
 
 ---
@@ -57,7 +57,7 @@ The raw `Dataset/cctv_info.csv` contained severe row-shift errors and truncated 
 > - **Google Drive (`Dataset_Clean_V1/`) is READ-ONLY:** Use Drive only to inspect images and reference tables. Do **not** edit, delete, or re-upload files on Google Drive.
 > - **Branch & PR Only (Never Push Directly to `main`):** Create your own branch (e.g., `chore/00-qa-<your-name>`) and open a Pull Request into `main` so teammates' edits do not conflict.
 
-To ensure 100% metadata and image accuracy before locking the final `V2.0` tables:
+To audit metadata and image accuracy (completed for `V2.0` -> `V2.1` Final Lock):
 
 1. Open [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), where the 100 cameras are divided into **6 batches (16-17 cameras per member)**: Batch 1 (**ปลื้ม**), Batch 2 (**กร**), Batch 3 (**เฟิร์ม**), Batch 4 (**สอง**), Batch 5 (**นิว**), Batch 6 (**โม่**).
 2. Create a personal QA branch from `main` (`git checkout -b chore/00-qa-<your-name>`).
@@ -68,7 +68,7 @@ To ensure 100% metadata and image accuracy before locking the final `V2.0` table
    - Update `CAMERA_CURATION` (for metadata) or `MANUAL_EXCLUDED_IMAGES` (for broken/corrupted filenames, e.g., `"169_20260827_081012.jpg": "corrupt_artifact"`) in [`src/clean_dataset_v1.py`](src/clean_dataset_v1.py).
    - Log exact Before -> After details (including filenames of any bad frames found) in [`../Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).
    - Check off `[x]` your verified cameras in [`CAMERA_AUDIT_CHECKLIST.md`](CAMERA_AUDIT_CHECKLIST.md), then push your branch and open a **PR into `main`**.
-5. **Final Consolidation (Maintainer Only):** Once all 6 PRs are merged into `main`, the maintainer will run the final build once and sync `V2.0` to Google Drive:
+5. **Final Consolidation (Maintainer Only):** Once PRs are merged into `main`, the maintainer runs the final build once and syncs the locked `V2.1` dataset to Google Drive:
 
    ```bash
    python 00_data_cleaning_and_qa/src/clean_dataset_v1.py
@@ -85,4 +85,5 @@ To ensure 100% metadata and image accuracy before locking the final `V2.0` table
 - [x] Execute 5-stage Automated Image Quality Gate across all 61,319 images (`Dataset_Clean_V1/`).
 - [x] Generate `cctv_info_cleaned.parquet` and `image_quality_manifest.parquet`.
 - [x] Document `V1.0` cleaning rules, team audit guide, and version changelog in [`Dataset_Clean_V1/README.md`](../Dataset_Clean_V1/README.md) and [`Dataset_Clean_V1/CLEANING_CHANGELOG.md`](../Dataset_Clean_V1/CLEANING_CHANGELOG.md).
-- [x] Batches 1–6 peer audit PRs (`#2, #4, #6, #7, #8, #9`), `cam_id=225` visual sweep (`100/100` `[x]`), and `CHG-B4-02` resolution (`500`: `-78` corrupt frames, `1188`: `607` kept) consolidated into `main`, locking **`V2.0` (`60,029` valid images, `0` warnings)**.
+- [x] Batches 1–6 peer audit PRs (`#2, #4, #6, #7, #8, #9`), `cam_id=225` visual sweep (`100/100` `[x]`), and `CHG-B4-02` resolution (`500`: `-78` corrupt frames, `1188`: `607` kept) consolidated into `main`, locking `V2.0` (`60,029` valid images, `0` warnings).
+- [x] `V2.1` metadata polish (`PR #12` / `CHG-B6-02`) refined `30` camera descriptions/directions/coords (`Inbound: 24`, `Outbound: 18`, `"None": 58`; `411–414` coords) and rebuilt `cctv_info_cleaned` (`0` image changes, `60,029` valid frames).

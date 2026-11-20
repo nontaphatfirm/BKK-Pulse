@@ -14,9 +14,8 @@ See full technical specification in [`../GOAL.md`](../GOAL.md).
 ## Run
 
 ```bash
-cd 01_scraping_apis/src
-python fetch_weather_air_poi.py            # uses cached API responses when present
-python fetch_weather_air_poi.py --refresh  # re-download weather, air quality and OSM POIs
+python 01_scraping_apis/src/fetch_weather_air_poi.py            # uses cached API responses when present
+python 01_scraping_apis/src/fetch_weather_air_poi.py --refresh  # re-download weather, air quality and OSM POIs
 ```
 
 ## Outputs
