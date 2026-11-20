@@ -116,6 +116,9 @@
 | `foreground_ratio` | `float64` | Pixel foreground ratio relative to clean-road Median Background | `0.3812` |
 | `filtered_static_boxes` | `int64` | Number of static / off-background / OSD / glare false-positive boxes suppressed in current frame | `1` |
 
+> [!NOTE]
+> **Downstream Formula Flexibility (Task 04):** `total_vehicle_count`, `pcu_score`, and `road_occupancy_ratio` are baseline derived columns, while all four disaggregated class counts (`car_count`, `motorcycle_count`, `bus_count`, `truck_count`) and raw spatial metrics (`bbox_total_area`, `road_roi_area`, `foreground_ratio`) are preserved in `data/vehicle_counts.parquet`. Task `04_ds_traffic_analytics` can recompute custom PCU weights (e.g., differentiating `truck` vs. `bus` equivalents), custom vehicle totals, or clipped occupancy ratios (`10 / 60,029` frames exceed `1.0`, max `1.2703`, when tall vehicle boxes extend above the road polygon) without re-running Task `03` YOLO inference.
+
 ---
 
 ### Table 4: `data/external_weather_poi.parquet`
