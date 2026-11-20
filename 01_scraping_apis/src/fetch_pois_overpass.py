@@ -26,6 +26,9 @@ OVERPASS_URL = "https://overpass-api.de/api/interpreter"
 BBOX = (13.65, 100.35, 13.90, 100.65)
 CACHE_PATH = PROJECT_ROOT / "data" / "raw_osm" / "bkk_pois.json"
 RADIUS_M = 500.0
+# Same-name node vs outline pairs in the cached payload sit 0-114 m apart; the
+# next same-name pair is 376 m (a different branch of the same chain).
+DUPLICATE_RADIUS_M = 150.0
 USER_AGENT = "bkk-pulse-course-project/1.0 (Chulalongkorn DSDE)"
 
 OVERPASS_QUERY = """
@@ -35,13 +38,17 @@ OVERPASS_QUERY = """
   node["station"~"subway|light_rail"]({s},{w},{n},{e});
   node["highway"="bus_stop"]({s},{w},{n},{e});
   node["public_transport"="platform"]({s},{w},{n},{e});
-  node["amenity"~"school|university|college"]({s},{w},{n},{e});
-  node["shop"~"mall|department_store|supermarket"]({s},{w},{n},{e});
-  node["amenity"="marketplace"]({s},{w},{n},{e});
-  node["amenity"~"hospital|clinic"]({s},{w},{n},{e});
+  nwr["amenity"~"^(school|university|college)$"]({s},{w},{n},{e});
+  nwr["shop"~"^(mall|department_store|supermarket)$"]({s},{w},{n},{e});
+  nwr["amenity"="marketplace"]({s},{w},{n},{e});
+  nwr["amenity"~"^(hospital|clinic)$"]({s},{w},{n},{e});
 );
 out center tags;
 """
+# Transit stays node-only: stations/stops are mapped as nodes, while platform
+# ways would double-count the same station. Schools, malls, markets and
+# hospitals are mostly mapped as building/campus outlines (ways/relations),
+# so they use `nwr` + `out center` and are matched at their centroid.
 
 
 @dataclass(frozen=True)
@@ -113,7 +120,7 @@ def load_poi_payload(refresh: bool = False) -> dict:
     raise RuntimeError(f"Overpass download failed after 3 attempts: {last_error}")
 
 
-def haversine_m(lat1: float, lon1: np.ndarray, lat2: np.ndarray, lon2: np.ndarray) -> np.ndarray:
+def haversine_m(lat1: float, lon1: float, lat2: np.ndarray, lon2: np.ndarray) -> np.ndarray:
     radius = 6_371_000.0
     p1, p2 = math.radians(lat1), np.radians(lat2)
     dphi = p2 - p1
@@ -122,11 +129,39 @@ def haversine_m(lat1: float, lon1: np.ndarray, lat2: np.ndarray, lon2: np.ndarra
     return 2.0 * radius * np.arcsin(np.sqrt(h))
 
 
+def _drop_cross_type_duplicates(
+    candidates: list[tuple[float, float, str, str, str]],
+) -> list[tuple[float, float, str]]:
+    """Drop a POI mapped twice in OSM (e.g. a shop node plus its building outline).
+
+    `nwr` returns the same place as a node and as a way/relation when both carry
+    the category tags. A candidate is a duplicate only when it shares the
+    category and a non-empty name with an already-kept POI of a *different* OSM
+    type within DUPLICATE_RADIUS_M. Outlines (relation > way) are kept over
+    nodes. Unnamed or same-type neighbours are kept: they are usually distinct
+    places (e.g. a supermarket node inside a mall outline).
+    """
+    priority = {"relation": 0, "way": 1, "node": 2}
+    ordered = sorted(candidates, key=lambda c: priority.get(c[3], 3))
+    kept: list[tuple[float, float, str, str, str]] = []
+    for lat, lon, category, osm_type, name in ordered:
+        if name:
+            peers = [k for k in kept if k[2] == category and k[4] == name and k[3] != osm_type]
+            if peers:
+                distances = haversine_m(
+                    lat, lon, np.array([p[0] for p in peers]), np.array([p[1] for p in peers])
+                )
+                if (distances <= DUPLICATE_RADIUS_M).any():
+                    continue
+        kept.append((lat, lon, category, osm_type, name))
+    return [(lat, lon, category) for lat, lon, category, _, _ in kept]
+
+
 def build_poi_counts(cameras: pd.DataFrame, payload: dict | None = None, refresh: bool = False) -> pd.DataFrame:
     """Return one row per camera with 500m POI counts for the four categories."""
     payload = payload or load_poi_payload(refresh=refresh)
 
-    rows: list[tuple[float, float, str]] = []
+    candidates: list[tuple[float, float, str, str, str]] = []
     seen: set[tuple[str, int]] = set()
     for element in payload.get("elements", []):
         tags = element.get("tags", {})
@@ -141,7 +176,10 @@ def build_poi_counts(cameras: pd.DataFrame, payload: dict | None = None, refresh
         lon = element.get("lon", element.get("center", {}).get("lon"))
         if lat is None or lon is None:
             continue
-        rows.append((float(lat), float(lon), category))
+        name = str(tags.get("name") or "").strip().lower()
+        candidates.append((float(lat), float(lon), category, key[0], name))
+
+    rows = _drop_cross_type_duplicates(candidates)
 
     if not rows:
         raise RuntimeError("Overpass payload contained no usable POI elements")

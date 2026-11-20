@@ -5,7 +5,7 @@
   "cameras": 100,
   "timestamps": 168,
   "nulls": 0,
-  "traffy_cameras_with_reports": 100,
-  "max_complaints_per_camera": 3086,
-  "max_flood_per_camera": 401
+  "traffy_cameras_with_reports": 98,
+  "max_trailing7d_complaints": 193,
+  "max_trailing7d_flood": 3
 }

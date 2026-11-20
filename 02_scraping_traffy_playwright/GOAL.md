@@ -69,7 +69,7 @@ Merge hourly aggregated counts (`traffy_complaint_count`, `traffy_flood_count`, 
 
 ## 4. Definition of Done Checklist
 
-- [ ] Complete Batch 2 camera verification (16 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
-- [ ] Implement Playwright interactive scraper in `02_scraping_traffy_playwright/src/` and save execution screenshots.
-- [ ] Generate `data/traffy_complaints_near_cctv.parquet` with Haversine distance matching.
-- [ ] Merge with Task 01 output to produce the final `data/external_weather_poi.parquet` conforming to [`DATA_CONTRACT.md`](../DATA_CONTRACT.md).
+- [x] Complete Batch 2 camera verification (16 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
+- [x] Implement Playwright interactive scraper in `02_scraping_traffy_playwright/src/` and save execution screenshots.
+- [x] Generate `data/traffy_complaints_near_cctv.parquet` with Haversine distance matching.
+- [x] Merge with Task 01 output to produce the final `data/external_weather_poi.parquet` conforming to [`DATA_CONTRACT.md`](../DATA_CONTRACT.md).
