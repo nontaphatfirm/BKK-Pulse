@@ -3,14 +3,16 @@
 > **Assigned Owner:** เฟิร์ม ([@nontaphatfirm](https://github.com/nontaphatfirm)) *(Optional Flex Support: นิว [@Pranithi-New](https://github.com/Pranithi-New))*  
 > **Role:** Computer Vision & Data Engineering Pipeline  
 > **Source Directory:** [`src/`](src/README.md)  
-> **Existing Detection Prototype:** [`src/predict_yolo26x.py`](src/predict_yolo26x.py)  
+> **Detailed Architecture & Methodology:** [`PIPELINE_ARCHITECTURE.md`](PIPELINE_ARCHITECTURE.md)  
+> **Production Batch Entrypoint:** [`src/run_batch_cv_pipeline.py`](src/run_batch_cv_pipeline.py) / [`Colab_A100_Batch_Detection.ipynb`](Colab_A100_Batch_Detection.ipynb)  
+> **Single-Image & ROI Utilities:** [`src/predict_yolo26x.py`](src/predict_yolo26x.py), [`src/generate_initial_rois.py`](src/generate_initial_rois.py), [`src/edit_camera_rois.py`](src/edit_camera_rois.py)  
 > **Input Data:**  
-> - Valid ASCII-renamed images in `Dataset_Clean_V1/cctv_images/` (`60,029` images across 100 cameras, `V2.0`)  
+> - Valid ASCII-renamed images in `Dataset_Clean_V1/cctv_images/` (`60,029` images across 100 cameras, `V2.1`)  
 > - Frame manifest in [`Dataset_Clean_V1/image_quality_manifest.parquet`](../Dataset_Clean_V1/image_quality_manifest.parquet)  
 > **Primary Output Artifacts:**  
-> 1. **Priority 1 (Day-1 Fast Track):** `data/vehicle_counts_sample.parquet` *(5 representative cameras, ~3,000 frames, to unblock Tasks 04, 05, and 06 immediately)*  
+> 1. **Priority 1 (Day-1 Fast Track):** `data/vehicle_counts_sample.parquet` *(5 representative cameras, `2,929` rows)*  
 > 2. **Full Production Dataset:** `data/vehicle_counts.parquet` *(all `60,029` valid frames across 100 cameras per [`DATA_CONTRACT.md`](../DATA_CONTRACT.md))*  
-> 3. **Clean-Road Background Library:** `data/median_backgrounds/<cam_id>_bg.jpg` *(100 clean-road background plates for dashboard visual comparison)*
+> 3. **Clean-Road Backgrounds & Active Road ROIs:** `data/median_backgrounds/<cam_id>_bg[_night].jpg` *(`200` day + night background plates)* & `data/camera_rois.json` *(`100/100` reviewed)*
 
 ---
 
@@ -63,7 +65,7 @@ Reuse the model resolution and `apply_nms_and_remap` logic already implemented i
 - All 4 model checkpoints (`models/yolo26x.pt`, `models/dronefreak--visdrone-yolo11x/best.pt`, `models/dronefreak--visdrone-yolo26l/best.pt`, and `models/iisc-aim--UVH-26/UVH-26-MV-YOLOv11-X.pt`) are **already downloaded and cached locally in `models/`**.
 - **Execution Speed Rule (Single-Pass Inference Only for Batch Runs):** Do **not** enable `--sahi` sliced tiling across all 60,029 images (multi-tile SAHI increases inference time by `5x-10x` with minimal gain on `352 x 288` frames when paired with `foreground_ratio`). Benchmark single-pass models on the 5-camera pilot, pick the best single-pass checkpoint (e.g., `iisc-aim/UVH-26` or `yolo26x.pt`), and run batched GPU inference (`batch=32` or `64`). Reserve `--sahi` strictly for single-image interactive inspection in the dashboard.
 - Apply `CANONICAL_CLASS_MAP` in `grouped` NMS mode so fine-grained 4-wheeler subclasses (`sedan`, `hatchback`, `suv`, `muv`, `van`) merge into `car`, and 2-wheeler subclasses (`motor`, `motorbike`, `two-wheeler`) merge into `motorcycle` **before** class-aware NMS runs -- preventing intra-4-wheeler boxes from suppressing adjacent motorcycles.
-- Retain raw frame-level bounding box coordinates `[x1, y1, x2, y2]`, confidence scores, and canonical class IDs (`car`, `motorcycle`, `bus`, `truck`, `three-wheeler`) for Step 4.
+- Retain raw frame-level bounding box coordinates `[x1, y1, x2, y2]`, confidence scores, and canonical class IDs (`car`, `motorcycle`, `bus`, `truck` — with `three-wheeler` folded into `car`) for Step 4.
 
 ---
 
@@ -98,20 +100,20 @@ For each camera `i` with frame dimensions `(W[i], H[i])` *(note: `352 x 288` for
    ```
 
 > [!NOTE]
-> Fold `three-wheeler` detections into `motorcycle_count` or `car_count` consistently. Note that `brightness_mean`, `contrast_std`, and `glare_ratio` are already precomputed in `Dataset_Clean_V1/image_quality_manifest.parquet`.
+> `three-wheeler` detections (`tricycle`, `awning-tricycle`, `three-wheeler`) are consistently folded into `car_count` (`4` canonical classes: `car`, `motorcycle`, `bus`, `truck`). Note that `brightness_mean`, `contrast_std`, and `glare_ratio` are already precomputed in `Dataset_Clean_V1/image_quality_manifest.parquet`.
 
 ---
 
 ## 3. Deliverable Schema (`data/vehicle_counts.parquet`)
 
-Granularity: `60,029` rows (matching all `is_valid == True` rows in `image_quality_manifest.parquet`, `V2.0`).
+Granularity: `60,029` rows (matching all `is_valid == True` rows in `image_quality_manifest.parquet`, `V2.1`).
 
 | Column Name | Data Type | Description |
 | :--- | :--- | :--- |
 | `cam_id` | `int64` | Camera ID (matching `cctv_info_cleaned.parquet`) |
 | `timestamp` | `datetime64[us]` | Frame capture timestamp |
-| `car_count` | `int64` | Dynamic 4-wheel passenger vehicle count |
-| `motorcycle_count` | `int64` | Dynamic 2-wheel/3-wheel vehicle count |
+| `car_count` | `int64` | Dynamic 4-wheel & 3-wheel passenger vehicle count |
+| `motorcycle_count` | `int64` | Dynamic 2-wheel vehicle count |
 | `bus_count` | `int64` | Dynamic bus count |
 | `truck_count` | `int64` | Dynamic commercial truck count |
 | `total_vehicle_count` | `int64` | Sum of dynamic vehicles (`car + motorcycle + bus + truck`) |
@@ -127,6 +129,6 @@ Granularity: `60,029` rows (matching all `is_valid == True` rows in `image_quali
 ## 4. Definition of Done Checklist
 
 - [x] Complete Batch 3 camera verification (17 cameras) in [`CAMERA_AUDIT_CHECKLIST.md`](../00_data_cleaning_and_qa/CAMERA_AUDIT_CHECKLIST.md).
-- [ ] **Priority 1:** Generate 5-camera pilot dataset `data/vehicle_counts_sample.parquet` and notify **สอง**, **โม่**, and **นิว**.
-- [ ] Generate 100 clean-road background plates in `data/median_backgrounds/<cam_id>_bg.jpg`.
-- [ ] Execute single-pass batch inference across all 60,029 valid frames with Stationary Box Filtering and Auto Road ROI masking to produce `data/vehicle_counts.parquet`.
+- [x] **Priority 1:** Generate 5-camera pilot dataset `data/vehicle_counts_sample.parquet` (`2,929` rows across pilot cameras `26, 136, 137, 150, 546`) and pass `DATA_CONTRACT.md` validation.
+- [x] Generate clean-road day + night background plates (`200` `.jpg`s: `<cam_id>_bg.jpg` & `<cam_id>_bg_night.jpg`) in `data/median_backgrounds/` and curate 100-camera Road ROIs in `data/camera_rois.json`.
+- [x] Execute batched multi-expert CV inference across all `60,029` valid frames (`631,524` dynamic vehicles detected, `1,993,934` static traps suppressed) to produce `data/vehicle_counts.parquet` (`python run_pipeline.py --check-contract` `[PASS]`).

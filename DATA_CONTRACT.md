@@ -95,17 +95,17 @@
 ---
 
 ### Table 3: `data/vehicle_counts.parquet` (and Pilot `data/vehicle_counts_sample.parquet`)
-- **Status:** `In Progress` -- Produced by Task `03_cv_yolo_pipeline` (**เฟิร์ม** `[@nontaphatfirm]`, with support from **นิว** `[@Pranithi-New]`)
-  - **Pilot Fast-Track (`data/vehicle_counts_sample.parquet`):** 5 representative cameras (~3,000 rows) generated first for immediate use by Tasks 04, 05, and 06.
-  - **Full Production (`data/vehicle_counts.parquet`):** All `60,029` valid frames across 100 cameras (`V2.0`).
+- **Status:** `Ready` -- Produced by Task `03_cv_yolo_pipeline` (**เฟิร์ม** `[@nontaphatfirm]`, with support from **นิว** `[@Pranithi-New]`)
+  - **Pilot Fast-Track (`data/vehicle_counts_sample.parquet`):** 5 representative cameras (`26, 136, 137, 150, 546` -- `2,929` rows)
+  - **Full Production (`data/vehicle_counts.parquet`):** All `60,029` valid frames across 100 cameras (`V2.1`)
 - **Primary Key:** `(cam_id, timestamp)`
 
 | Column Name | Data Type | Description | Example Value |
 | :--- | :--- | :--- | :--- |
 | `cam_id` | `int64` | Camera identifier | `26` |
 | `timestamp` | `datetime64[us]` | Frame capture timestamp (matches `image_quality_manifest.parquet`) | `2026-08-25 07:40:41` |
-| `car_count` | `int64` | Count of dynamic 4-wheel passenger vehicles (post stationary-box filtering) | `14` |
-| `motorcycle_count` | `int64` | Count of dynamic 2-wheel/3-wheel vehicles (post stationary-box filtering) | `8` |
+| `car_count` | `int64` | Count of dynamic 4-wheel & 3-wheel passenger vehicles (post stationary-box & ROI filtering) | `14` |
+| `motorcycle_count` | `int64` | Count of dynamic 2-wheel vehicles (post stationary-box & ROI filtering) | `8` |
 | `bus_count` | `int64` | Count of buses / public transit vans | `1` |
 | `truck_count` | `int64` | Count of commercial trucks | `2` |
 | `total_vehicle_count` | `int64` | Total dynamic motorized vehicles (`car + motorcycle + bus + truck`) | `25` |
@@ -114,7 +114,10 @@
 | `road_roi_area` | `float64` | Active road surface area in pixels for this camera (`>= 15%` of frame area) | `42500.0` |
 | `road_occupancy_ratio` | `float64` | Spatial occupancy ratio (`bbox_total_area / road_roi_area`) | `0.4341` |
 | `foreground_ratio` | `float64` | Pixel foreground ratio relative to clean-road Median Background | `0.3812` |
-| `filtered_static_boxes` | `int64` | Number of static false-positive boxes removed by the `IoU > 0.65` filter | `1` |
+| `filtered_static_boxes` | `int64` | Number of static / off-background / OSD / glare false-positive boxes suppressed in current frame | `1` |
+
+> [!NOTE]
+> **Downstream Formula Flexibility (Task 04):** `total_vehicle_count`, `pcu_score`, and `road_occupancy_ratio` are baseline derived columns, while all four disaggregated class counts (`car_count`, `motorcycle_count`, `bus_count`, `truck_count`) and raw spatial metrics (`bbox_total_area`, `road_roi_area`, `foreground_ratio`) are preserved in `data/vehicle_counts.parquet`. Task `04_ds_traffic_analytics` can recompute custom PCU weights (e.g., differentiating `truck` vs. `bus` equivalents), custom vehicle totals, or clipped occupancy ratios (`10 / 60,029` frames exceed `1.0`, max `1.2703`, when tall vehicle boxes extend above the road polygon) without re-running Task `03` YOLO inference.
 
 ---
 

@@ -3,13 +3,15 @@ Run YOLO object detection on a user-selected image with switchable models,
 class-remapped NMS (safe 4-wheeler grouping), optional agnostic NMS, and SAHI tiling.
 
 Supported model presets (--model):
-    - yolo26x.pt (default, COCO pretrained)
+    - ensemble (6-weight day/night UVH-26 + VisDrone-11x/26l + BDD100K-26m + YOLO26x + YOLO11x + BG/OSD/ROI Gates)
+    - yolo26x.pt (COCO pretrained)
     - dronefreak/visdrone-yolo11x
     - dronefreak/visdrone-yolo26l
     - iisc-aim/UVH-26 (YOLOv11-X; or iisc-aim/UVH-26-s for lightweight YOLOv11-S)
 
 Usage:
     python 03_cv_yolo_pipeline/src/predict_yolo26x.py
+    python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model ensemble --no-show
     python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26
     python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --sahi
     python 03_cv_yolo_pipeline/src/predict_yolo26x.py Dataset_Clean_V1/cctv_images/26/26_20260825_074041.jpg --model iisc-aim/UVH-26 --imgsz 1280
@@ -75,6 +77,9 @@ MODEL_PRESETS: dict[str, HFModelSpec] = {
 }
 
 MODEL_ALIASES: dict[str, str] = {
+    "ensemble": "ensemble",
+    "multi": "ensemble",
+    "robust": "ensemble",
     "coco": "yolo26x.pt",
     "yolo26x": "yolo26x.pt",
     "visdrone-yolo11x": "dronefreak/visdrone-yolo11x",
@@ -86,12 +91,17 @@ MODEL_ALIASES: dict[str, str] = {
 }
 
 SELECTABLE_MODELS: list[str] = [
+    "ensemble",
     "yolo26x.pt",
     "dronefreak/visdrone-yolo11x",
     "dronefreak/visdrone-yolo26l",
     "iisc-aim/UVH-26",
     "iisc-aim/UVH-26-s",
 ]
+
+MODEL_DISPLAY_LABELS: dict[str, str] = {
+    "ensemble": "ensemble (5-expert UVH-26 + VisDrone-11x/26l + YOLO26x/11x + BG/OSD Gate)",
+}
 
 # Motorized road-vehicle classes across COCO, VisDrone, and UVH-26 (matched case-insensitively).
 VEHICLE_CLASSES_LOWER: set[str] = {
@@ -133,9 +143,9 @@ CANONICAL_CLASS_MAP: dict[str, str] = {
     "tempo-traveller": "bus",
     "truck": "truck",
     "lcv": "truck",
-    "tricycle": "three-wheeler",
-    "awning-tricycle": "three-wheeler",
-    "three-wheeler": "three-wheeler",
+    "tricycle": "car",
+    "awning-tricycle": "car",
+    "three-wheeler": "car",
 }
 
 CANONICAL_ID_TO_NAME: dict[int, str] = {
@@ -143,7 +153,6 @@ CANONICAL_ID_TO_NAME: dict[int, str] = {
     1: "motorcycle",
     2: "bus",
     3: "truck",
-    4: "three-wheeler",
 }
 CANONICAL_NAME_TO_ID: dict[str, int] = {name: cid for cid, name in CANONICAL_ID_TO_NAME.items()}
 MAX_BOX_OFFSET = 7680.0
@@ -211,6 +220,9 @@ def resolve_model_source(model_arg: str) -> str:
     if preset is not None:
         return str(download_hf_weights(preset))
 
+    cache_candidate = MODELS_CACHE_DIR / normalized
+    if cache_candidate.is_file():
+        return str(cache_candidate)
     local_candidate = Path(normalized)
     if local_candidate.is_file():
         return str(local_candidate)
@@ -223,6 +235,7 @@ def resolve_model_source(model_arg: str) -> str:
 def print_available_models() -> None:
     """Print available model presets and aliases."""
     print("Available models:")
+    print(f"  - {'ensemble':<30} 5-expert UVH-26 + VisDrone-11x/26l + YOLO26x + YOLO11x + BG/OSD Gates (aliases: multi, robust)")
     print(f"  - {'yolo26x.pt':<30} COCO pretrained (aliases: coco, yolo26x)")
     for key, spec in MODEL_PRESETS.items():
         display = (
@@ -257,7 +270,8 @@ def pick_options_gui(
         value=initial_model if initial_model in SELECTABLE_MODELS else SELECTABLE_MODELS[0]
     )
     for idx, model_name in enumerate(SELECTABLE_MODELS, start=1):
-        ttk.Radiobutton(frame, text=model_name, value=model_name, variable=model_var).grid(
+        label_text = MODEL_DISPLAY_LABELS.get(model_name, model_name)
+        ttk.Radiobutton(frame, text=label_text, value=model_name, variable=model_var).grid(
             row=idx, column=0, columnspan=2, sticky="w", padx=6, pady=2
         )
 
@@ -490,7 +504,13 @@ def apply_nms_and_remap(
                 remapped_ids.append(extra_name_to_id[key])
 
         mapped_cls = torch.tensor(remapped_ids, dtype=torch.float32)
-        offsets = mapped_cls.unsqueeze(1) * MAX_BOX_OFFSET
+        # Share one NMS group across 4-wheelers {car(0), bus(2), truck(3)} (including remapped 3-wheelers)
+        # so they never stack on the same vehicle, while keeping motorcycles (1) independent.
+        nms_groups = torch.tensor(
+            [0 if cid in (0, 2, 3) else (1 if cid == 1 else cid) for cid in remapped_ids],
+            dtype=torch.float32,
+        )
+        offsets = nms_groups.unsqueeze(1) * MAX_BOX_OFFSET
         keep = torchvision.ops.nms(boxes + offsets, scores, iou)
         final_boxes = torch.cat([boxes[keep], scores[keep].unsqueeze(1), mapped_cls[keep].unsqueeze(1)], dim=1)
         return final_boxes, final_names
@@ -513,7 +533,7 @@ def main() -> None:
         default=None,
         help=(
             "Model preset, Hugging Face repo ID, or .pt path "
-            "(yolo26x.pt, dronefreak/visdrone-yolo11x, dronefreak/visdrone-yolo26l, "
+            "(ensemble, yolo26x.pt, dronefreak/visdrone-yolo11x, dronefreak/visdrone-yolo26l, "
             "iisc-aim/UVH-26, iisc-aim/UVH-26-s)"
         ),
     )
@@ -586,8 +606,46 @@ def main() -> None:
     if not image_path.is_file():
         raise FileNotFoundError(f"Image not found: {image_path}")
 
-    from ultralytics import YOLO
     from ultralytics.utils.files import increment_path
+
+    normalized_model = MODEL_ALIASES.get(model_arg.strip().lower(), model_arg.strip())
+    if normalized_model == "ensemble":
+        src_dir = str(Path(__file__).resolve().parent)
+        if src_dir not in sys.path:
+            sys.path.insert(0, src_dir)
+        from robust_detector import RobustTrafficDetector, draw_detections
+
+        detector = RobustTrafficDetector(imgsz=imgsz)
+        ens_res = detector.predict(image_path, conf=conf)
+        img_bgr = cv2.imread(str(image_path))
+        vis = draw_detections(img_bgr, ens_res, title=f"Ensemble | {image_path.name}")
+
+        save_dir = increment_path(PROJECT_ROOT / "runs" / "detect" / "predict", mkdir=True)
+        saved_path = (save_dir / image_path.name).with_suffix(".jpg")
+        cv2.imwrite(str(saved_path), vis)
+
+        print(f"\nModel: ensemble (5-expert UVH-26 + VisDrone-11x/26l + YOLO26x + YOLO11x + BG/OSD Gates)")
+        print(f"Settings: imgsz={imgsz}, conf={conf}")
+        print(f"Optical profile: {ens_res.optical_profile}")
+        print(f"Image: {image_path}")
+        print(f"Suppressed static/parked boxes: {ens_res.suppressed_static_count}")
+        print(f"Suppressed off-ROI boxes: {ens_res.suppressed_roi_count} | Road occupancy: {ens_res.road_occupancy_ratio:.4f}")
+        print(f"Detections ({len(ens_res.scores)}): {ens_res.counts}")
+        for box, score, cid, sup in zip(
+            ens_res.boxes_xyxy, ens_res.scores, ens_res.class_ids, ens_res.support_counts
+        ):
+            cls_name = ens_res.class_names[int(cid)]
+            x1, y1, x2, y2 = (round(float(v), 1) for v in box)
+            print(f"  - {cls_name}: {float(score):.2f} (models={int(sup)}) [{x1}, {y1}, {x2}, {y2}]")
+        print(f"Saved result: {saved_path}")
+
+        if not args.no_show:
+            cv2.imshow(f"Ensemble Detection - {image_path.name}", vis)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+        return
+
+    from ultralytics import YOLO
 
     weights_source = resolve_model_source(model_arg)
     model = YOLO(weights_source)

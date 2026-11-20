@@ -28,6 +28,7 @@ Thumbs.db
 # Heavy regenerable raw data (archived separately)
 data/raw_traffy_cache/
 data/traffy_complaints_near_cctv.parquet
+data/annotated_frames/
 
 # Temporary workspace directories (local scratch/audit files that do not need to be committed)
 **/workspace/
