@@ -3,8 +3,8 @@
     "start": "2026-05-01",
     "end": "2026-10-31"
   },
-  "generated_at": "2026-11-18T04:01:22+00:00",
-  "git_commit": "733ac5d79463f9a14b0d5ad36b5ca5cdf1a849b9",
+  "generated_at": "2026-11-20T03:21:24+00:00",
+  "git_commit": "057037c69248e4e10f09efd4fc3ac73c3cc16331",
   "complete": true,
   "termination": "cache",
   "pages": 190,
@@ -54,7 +54,7 @@
     "largest_gap_hours": 3.05,
     "complete": true
   },
-  "rows": 70822,
+  "rows": 70886,
   "dropped": {
     "no_id": 0,
     "no_coords": 0,
@@ -64,12 +64,12 @@
   "allow_partial_reason": null,
   "outputs": {
     "traffy_complaints_near_cctv.parquet": {
-      "rows": 70822,
-      "sha256": "198a11e001c28bbd59875dc76bd2c2ead79c498935ab65da104295eb8a1f4736"
+      "rows": 70886,
+      "sha256": "9e951f1a90042dab1fe2dec8a7d9861376034495691e1ca5d7cee95546cf5d05"
     },
     "traffy_camera_counts.parquet": {
       "rows": 100,
-      "sha256": "65d6bce6c97055ab201f088927940edbf350d71ba6a85753f479e3837142447f"
+      "sha256": "d3d1273d58c01bfe795eb3a91057de96663360f135659e0497d5747da5f8dedb"
     }
   }
 }

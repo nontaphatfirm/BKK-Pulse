@@ -4,21 +4,21 @@
   "actual_first_timestamp": "2026-05-01 00:00:16",
   "actual_last_timestamp": "2026-10-31 23:56:30",
   "complaints_fetched": 356513,
-  "complaints_within_1000m": 70822,
+  "complaints_within_1000m": 70886,
   "category_counts_all": {
     "other": 259107,
     "traffic": 68349,
     "flood": 29057
   },
   "category_counts_matched": {
-    "other": 49219,
-    "traffic": 19267,
-    "flood": 2336
+    "other": 49271,
+    "traffic": 19280,
+    "flood": 2335
   },
   "unmatched_type_tags": {},
-  "cameras_with_any_complaint": 100,
-  "cameras_with_flood_complaint": 94,
-  "week_complaints_within_1000m": 2513,
+  "cameras_with_any_complaint": 99,
+  "cameras_with_flood_complaint": 93,
+  "week_complaints_within_1000m": 2514,
   "match_radius_m": 1000.0,
   "complete": true,
   "fetch": {
@@ -287,7 +287,7 @@
         0,
         836
       ],
-      "direction": "asc",
+      "direction": "desc",
       "complete": true,
       "first_ts": "2026-08-30T00:00:24",
       "last_ts": "2026-08-30T23:45:35",

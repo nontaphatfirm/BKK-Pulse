@@ -16,7 +16,7 @@ actually produces.
 
 ## Outputs
 
-### `data/traffy_complaints_near_cctv.parquet` — 70,822 rows x 10 columns
+### `data/traffy_complaints_near_cctv.parquet` — 70,886 rows x 10 columns
 
 One row per complaint that is within 1,000 m of at least one camera.
 
@@ -79,7 +79,7 @@ parquet.
 | `fetch` | `termination` (`empty_page` / `max_pages` / `error_prefix` / `cache`), `pages`, `terminal_offset` |
 | `coverage` | `days_in_window`, `days_with_records`, `days_missing`, `hours_in_window`, `empty_hours`, `largest_gap_hours`, `complete`. Advisory only; it no longer gates the build |
 | `unmatched_type_tags` | Raw tags missing from `category_map.json`, with counts. `{}` means the map covers the cache |
-| `dropped` | Features discarded this run: `no_id`, `no_coords`, `null_timestamp`, `null_coords` |
+| `dropped` | Features discarded this run: `no_id`, `no_coords`, `null_timestamp`, `null_coords` (on `--combine-cache`, `no_id`/`no_coords` are `0` because cached pages are stored post-compaction) |
 | `cache_segments` | One per crawl window: `window_start`, `window_end`, `pages`, `offsets`, `direction`, `complete`, `first_ts`, `last_ts`, `covered` |
 | `coverage_gaps` | ISO pairs of the parts of the window no segment covers. Empty means complete |
 
@@ -94,7 +94,8 @@ The same block, minus the output hashes, is written into the Arrow schema
 metadata of `traffy_complaints_near_cctv.parquet` and Table 4 under the key
 `bkk_pulse_provenance`, so a reader holding one file can tell a complete build
 from a truncated one. `run_pipeline.py --check-contract` fails when the file says
-`complete: false` and warns when it is missing.
+`complete: false`, and also fails if the file is missing whenever Table 4 exists
+(or `--strict` is passed).
 
 ### `data/traffy_fetch_progress.json`
 
@@ -114,11 +115,11 @@ slots) x 17 columns. The Traffy contract columns are
 
 Each value is computed per `(cam_id, timestamp)`, never broadcast, and never
 counts a complaint after the row's own hour, so the column is safe as a feature
-for that hour. `sum(traffy_complaint_count)` over the table is 464,229.
+for that hour. `sum(traffy_complaint_count)` over the table is 464,409.
 
 The first row of the week counts complaints from 2026-08-18 onward, which is
 inside the crawl window, so no row is zero padded. The largest value in the
-table is 193, and 373 of the 16,800 rows are zero.
+table is 193, and 541 of the 16,800 rows are zero.
 
 `data/traffy_camera_counts.parquet` keeps the six-month lifetime totals and the
 `_7d` slice. A consumer that wants a structural flood indicator without a time
@@ -138,7 +139,9 @@ limit must read that file; Table 4 no longer carries a lifetime figure.
 Assignment is **nearest camera only**. A complaint belongs to exactly one
 camera, so counts add up to the row count. The cost is that two cameras under
 100 m apart (21 such pairs) split shared traffic arbitrarily. Counts per camera
-in a pair are not comparable to each other; their sum is.
+in a pair are not comparable to each other; their sum is. In Data `V2.1`,
+cameras `411` and `412` share identical coordinates, so tie-breaking assigns all
+shared complaints to `411` (`412` receives `0`).
 
 ## Classification
 
@@ -154,16 +157,18 @@ in a pair are not comparable to each other; their sum is.
 The map holds all 98 tags observed in the cache. A tag missing from it falls to
 the default and is listed with its count under `unmatched_type_tags`, so a new
 label surfaces instead of silently changing a bucket. The current split over the
-matched 70,822 rows is `other` 49,219, `traffic` 19,267, `flood` 2,336, identical
-to the old substring rule on this data. `ผิดกฎจราจร` (illegal parking, 59% of
-traffic) drives the traffic bucket. Whether it belongs there is an open decision.
+matched 70,886 rows on Data `V2.1` is `other` 49,271, `traffic` 19,280, `flood`
+2,335, identical to the old substring rule on this data. `ผิดกฎจราจร` (illegal
+parking, 59% of traffic) drives the traffic bucket. Whether it belongs there is
+an open decision.
 
 `type_raw` can hold several comma-joined tags. Flood wins, so `อื่นๆ,น้ำท่วม`
 lands in `flood`.
 
-`src/audit_categories.py` regenerates `artifacts/type_raw_counts.csv` and
-`artifacts/type_tag_counts.csv` from the cache. That is how the map was built
-and how it gets rechecked after a new crawl.
+`src/audit_categories.py` regenerates
+`02_scraping_traffy_playwright/artifacts/type_raw_counts.csv` and
+`02_scraping_traffy_playwright/artifacts/type_tag_counts.csv` from the cache.
+That is how the map was built and how it gets rechecked after a new crawl.
 
 ## Page cache
 
@@ -208,12 +213,16 @@ BKK-Pulse/
 └── data/
     ├── raw_traffy_cache/pages/*.json.gz              190 pages
     ├── raw_traffy_cache/windows.json                 segment manifest
-    └── traffy_complaints_near_cctv.parquet           70,822 rows
+    └── traffy_complaints_near_cctv.parquet           70,822 rows (V2.0; rebuilt to 70,886 on V2.1)
 ```
 
 ```bash
 unzip -q ~/Downloads/BKK-Pulse_Traffy_heavy_data_2026-11-18-r2.zip -d ~/coding
 ```
+
+Running `fetch_traffy_geojson.py --combine-cache` against Data `V2.1`
+regenerates `traffy_complaints_near_cctv.parquet` (`70,886` rows) and
+`windows.json` from the exact same 190 raw pages.
 
 The earlier `BKK-Pulse_Traffy_heavy_data_2026-11-13.zip` in the same folder is
 superseded. It has 188 pages, the 13.6 h gap on 2026-09-25, V1.0 camera pins and
@@ -292,27 +301,27 @@ Three matter most: `p_limit` caps at 2000, `p_offset` paginates, and the
 response `total` undercounts, so the loop runs until an empty page rather than
 trusting `total`.
 
-## Current snapshot (2026-11-18)
+## Current snapshot (2026-11-20, Data V2.1)
 
-Built from the V2.0 locked camera table plus the 2026-09-25 backfill.
+Built from the V2.1 locked camera table plus the 2026-09-25 backfill.
 
 | Metric | Value |
 |---|---:|
 | Window | 2026-05-01 .. 2026-10-31 |
 | Cache pages | 190 |
 | Complaints citywide in window | 356,513 |
-| Matched within 1,000 m | 70,822 |
-| Cameras with any complaint | 100 |
-| Cameras with a flood complaint | 94 |
-| `_7d` slice (2026-08-25 .. 08-31) | 2,513 |
+| Matched within 1,000 m | 70,886 |
+| Cameras with any complaint | 99 |
+| Cameras with a flood complaint | 93 |
+| `_7d` slice (2026-08-25 .. 08-31) | 2,514 |
 | Days covered | 184 / 184 |
 | Cache segments | 8, all chains intact |
 | Empty hours | 9 of 4,416 |
 | Largest timestamp gap | 3.05 h |
 | Table 4 rows | 16,800 x 17 |
-| Table 4 complaint sum | 464,229 |
+| Table 4 complaint sum | 464,409 |
 | Largest trailing 7-day count | 193 |
-| Cameras with a nonzero trailing count | 99 |
+| Cameras with a nonzero trailing count | 98 |
 
 ## Known limitations
 
