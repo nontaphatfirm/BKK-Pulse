@@ -238,10 +238,14 @@ PIPELINE_STAGES: tuple[PipelineStage, ...] = (
 )
 
 
-def check_traffy_provenance() -> bool:
+def check_traffy_provenance(strict_all: bool = False) -> bool:
     path = PROJECT_ROOT / "data" / "traffy_provenance.json"
+    table4_exists = (PROJECT_ROOT / "data" / "external_weather_poi.parquet").exists()
     if not path.exists():
-        print("[WARN] Traffy provenance -> data/traffy_provenance.json not found")
+        if table4_exists or strict_all:
+            print("[FAIL] Traffy provenance -> Missing required file: data/traffy_provenance.json")
+            return False
+        print("[PEND] Traffy provenance -> Not yet generated (data/traffy_provenance.json)")
         return True
     provenance = json.loads(path.read_text(encoding="utf-8"))
     if not provenance.get("complete"):
@@ -321,7 +325,7 @@ def validate_contract(strict_all: bool = False) -> bool:
             f"[PASS] {spec.name} ({spec.rel_path}) -> {len(df):,} rows, {len(df.columns)} cols, PK {spec.primary_keys} valid"
         )
 
-    if not check_traffy_provenance():
+    if not check_traffy_provenance(strict_all=strict_all):
         all_passed = False
 
     print("=" * 76)

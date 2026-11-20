@@ -10,7 +10,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CACHE_DIR = PROJECT_ROOT / "data" / "raw_traffy_cache" / "pages"
-ARTIFACTS_DIR = PROJECT_ROOT / "artifacts"
+ARTIFACTS_DIR = PROJECT_ROOT / "02_scraping_traffy_playwright" / "artifacts"
 MAP_PATH = Path(__file__).with_name("category_map.json")
 
 

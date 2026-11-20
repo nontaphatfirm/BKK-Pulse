@@ -198,7 +198,7 @@ def fetch_complaints(
     refresh: bool = False,
     max_pages: int = MAX_PAGES,
     fail_on_throttle: bool = False,
-) -> tuple[pd.DataFrame, dict]:
+) -> tuple[pd.DataFrame, dict, dict[str, int]]:
     """Page through the feed until an empty page, then dedupe by ticket id."""
     records: dict[str, dict] = {}
     dropped = {"no_id": 0, "no_coords": 0}
@@ -382,9 +382,18 @@ def scan_cache(start: str, end: str) -> tuple[list[CacheSegment], list[str]]:
             continue
 
         first_records = [stamp for stamp in map(_first_timestamp, pages) if stamp is not None]
-        direction = (
-            "desc" if len(first_records) >= 2 and first_records[0] > first_records[-1] else "asc"
-        )
+        if len(first_records) >= 2:
+            direction = "desc" if first_records[0] > first_records[-1] else "asc"
+        else:
+            non_empty_stamps = next(
+                (stamps for page in pages if len(stamps := _page_timestamps(page)) >= 2),
+                [],
+            )
+            direction = (
+                "desc"
+                if len(non_empty_stamps) >= 2 and non_empty_stamps[0] > non_empty_stamps[-1]
+                else "asc"
+            )
         timestamps = [stamp for page in pages for stamp in _page_timestamps(page)]
         segments.append(
             CacheSegment(
@@ -459,6 +468,8 @@ def load_cached_frame(start: str, end: str) -> tuple[pd.DataFrame, dict[str, int
     if frame.empty:
         raise RuntimeError("No cached Traffy pages found")
     frame["timestamp"] = pd.to_datetime(frame["timestamp"], errors="coerce")
+    # Cached pages are stored post-compaction (_compact already dropped missing id/coords on fetch),
+    # so no_id and no_coords are 0 when rebuilding offline via --combine-cache.
     dropped = {
         "no_id": 0,
         "no_coords": 0,
@@ -538,6 +549,7 @@ def build_outputs(
             f"{start}..{end} is incomplete: {detail}; gaps=[{gap_text}]. "
             'Rerun with --allow-partial --reason "<text>" to build anyway.'
         )
+    WINDOWS_PATH.parent.mkdir(parents=True, exist_ok=True)
     WINDOWS_PATH.write_text(
         json.dumps(
             {
@@ -569,7 +581,7 @@ def build_outputs(
             "lon",
             "type_raw",
         ]
-    ].rename(columns={"nearest_cam_id": "nearest_cam_id"})
+    ]
     incidents = incidents.sort_values(["nearest_cam_id", "timestamp"]).reset_index(drop=True)
 
     def counts_for(subset: pd.DataFrame) -> pd.DataFrame:

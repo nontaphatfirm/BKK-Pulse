@@ -120,7 +120,7 @@ def load_poi_payload(refresh: bool = False) -> dict:
     raise RuntimeError(f"Overpass download failed after 3 attempts: {last_error}")
 
 
-def haversine_m(lat1: float, lon1: np.ndarray, lat2: np.ndarray, lon2: np.ndarray) -> np.ndarray:
+def haversine_m(lat1: float, lon1: float, lat2: np.ndarray, lon2: np.ndarray) -> np.ndarray:
     radius = 6_371_000.0
     p1, p2 = math.radians(lat1), np.radians(lat2)
     dphi = p2 - p1
@@ -149,7 +149,7 @@ def _drop_cross_type_duplicates(
             peers = [k for k in kept if k[2] == category and k[4] == name and k[3] != osm_type]
             if peers:
                 distances = haversine_m(
-                    lat, np.array([p[1] for p in peers]), np.array([p[0] for p in peers]), lon
+                    lat, lon, np.array([p[0] for p in peers]), np.array([p[1] for p in peers])
                 )
                 if (distances <= DUPLICATE_RADIUS_M).any():
                     continue

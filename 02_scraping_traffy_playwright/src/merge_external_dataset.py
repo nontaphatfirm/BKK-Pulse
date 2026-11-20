@@ -131,7 +131,7 @@ def main() -> None:
     _write_parquet(frame, _read_provenance())
 
     summary = {
-        "output": str(OUTPUT_PATH.relative_to(PROJECT_ROOT)),
+        "output": OUTPUT_PATH.relative_to(PROJECT_ROOT).as_posix(),
         "rows": int(len(frame)),
         "columns": len(frame.columns),
         "cameras": int(frame["cam_id"].nunique()),
